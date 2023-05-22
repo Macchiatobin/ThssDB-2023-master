@@ -114,18 +114,6 @@ public class SQLBaseListener implements SQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterShowMetaStmt(SQLParser.ShowMetaStmtContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitShowMetaStmt(SQLParser.ShowMetaStmtContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterGrantStmt(SQLParser.GrantStmtContext ctx) { }
 	/**
 	 * {@inheritDoc}

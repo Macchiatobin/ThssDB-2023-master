@@ -135,7 +135,6 @@ cn\edu\thssdb\rpc\thrift\DisconnectReq$DisconnectReqTupleSchemeFactory.class
 cn\edu\thssdb\type\ColumnType.class
 cn\edu\thssdb\schema\Table.class
 cn\edu\thssdb\rpc\thrift\IService$getTime_result$getTime_resultTupleScheme.class
-cn\edu\thssdb\sql\SQLParser$ShowMetaStmtContext.class
 cn\edu\thssdb\rpc\thrift\ExecuteStatementReq$ExecuteStatementReqTupleSchemeFactory.class
 cn\edu\thssdb\rpc\thrift\DisconnectReq.class
 cn\edu\thssdb\parser\ThssDBSQLVisitor.class

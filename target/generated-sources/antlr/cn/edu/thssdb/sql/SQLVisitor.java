@@ -61,12 +61,6 @@ public interface SQLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCreateTableStmt(SQLParser.CreateTableStmtContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SQLParser#showMetaStmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitShowMetaStmt(SQLParser.ShowMetaStmtContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link SQLParser#grantStmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
