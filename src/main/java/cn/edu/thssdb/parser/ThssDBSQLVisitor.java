@@ -35,43 +35,43 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
   @Override
   public LogicalPlan visitDropDbStmt(SQLParser.DropDbStmtContext ctx) {
     //TODO
-    return visitChildren(ctx);
+    return null;
   }
 
   @Override
   public LogicalPlan visitCreateTableStmt(SQLParser.CreateTableStmtContext ctx) {
     //TODO
-    return visitChildren(ctx);
+    return null;
   }
 
   @Override
   public LogicalPlan visitDropTableStmt(SQLParser.DropTableStmtContext ctx) {
     //TODO
-    return visitChildren(ctx);
+    return null;
   }
 
   @Override
   public LogicalPlan visitShowTableStmt(SQLParser.ShowTableStmtContext ctx) {
     //TODO
-    return visitChildren(ctx);
+    return null;
   }
 
   @Override
   public LogicalPlan visitInsertStmt(SQLParser.InsertStmtContext ctx) {
     //TODO
-    return visitChildren(ctx);
+    return null;
   }
 
   @Override
   public LogicalPlan visitDeleteStmt(SQLParser.DeleteStmtContext ctx) {
     //TODO
-    return visitChildren(ctx);
+    return null;
   }
 
   @Override
   public LogicalPlan visitUpdateStmt(SQLParser.UpdateStmtContext ctx) {
     //TODO
-    return visitChildren(ctx);
+    return null;
   }
   // TODO: parser to more logical plan
 }
