@@ -47,12 +47,26 @@ public class IServiceHandler implements IService.Iface {
       return new ExecuteStatementResp(
           StatusUtil.fail("You are not connected. Please connect first."), false);
     }
-    // TODO: implement execution logic
+    // TODO: implement execution logic，需要实现日志记录等
     LogicalPlan plan = LogicalGenerator.generate(req.statement);
     switch (plan.getType()) {
       case CREATE_DB:
-        System.out.println("[DEBUG] " + plan);
+        System.out.println("[DEBUG] " + plan); //TODO: 需要转换成日志形式
         return new ExecuteStatementResp(StatusUtil.success(), false);
+      case DROP_DB:
+        //TODO
+      case CREATE_TABLE:
+        //TODO
+      case DROP_TABLE:
+        //TODO
+      case SHOW_TABLE:
+        //TODO
+      case INSERT:
+        //TODO
+      case DELETE:
+        //TODO
+      case UPDATE:
+        //TODO
       default:
     }
     return null;
