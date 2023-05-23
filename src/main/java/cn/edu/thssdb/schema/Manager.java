@@ -21,7 +21,7 @@ public class Manager {
     {
       System.out.println("Database exists already!");
       return;
-      //TODO: 修改报错形式以及返回状态
+      // TODO: 修改报错形式以及返回状态
     }
 
     Database newDB = new Database(databaseName);
@@ -33,17 +33,17 @@ public class Manager {
 
   private void deleteDatabase(String databaseName) {
     /* macchiato code start */
-    if (databases.get(databaseName) == null)
-    {
+    Database obj = databases.get(databaseName);
+    if (obj == null) {
       System.out.println("Database not existing");
       return;
-      //TODO: 修改报错形式以及返回状态
+      // TODO: 修改报错形式以及返回状态
     }
-
     databases.remove(databaseName);
+    obj = null;
     /* macchiato code end */
 
-    //TODO
+    // TODO
   }
 
   public void switchDatabase() {
