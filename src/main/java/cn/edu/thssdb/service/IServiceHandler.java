@@ -51,22 +51,37 @@ public class IServiceHandler implements IService.Iface {
     LogicalPlan plan = LogicalGenerator.generate(req.statement);
     switch (plan.getType()) {
       case CREATE_DB:
+        System.out.println("CREATE_DB");
         System.out.println("[DEBUG] " + plan); // TODO: 需要转换成日志形式
         return new ExecuteStatementResp(StatusUtil.success(), false);
       case DROP_DB:
-        // TODO
+        System.out.println("DROP_DB");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       case CREATE_TABLE:
-        // TODO
+        System.out.println("CREATE_TABLE");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       case DROP_TABLE:
-        // TODO
+        System.out.println("DROP_TABLE");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       case SHOW_TABLE:
-        // TODO
+        System.out.println("SHOW_TABLE");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       case INSERT:
-        // TODO
+        System.out.println("INSERT");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       case DELETE:
-        // TODO
+        System.out.println("DELETE");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       case UPDATE:
-        // TODO
+        System.out.println("UPDATE");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       default:
     }
     return null;
