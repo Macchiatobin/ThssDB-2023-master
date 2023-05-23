@@ -20,7 +20,7 @@ public class Database {
   }
 
   private void persist() {
-    // TODO
+    // TODO: save as file, when changes made
   }
 
   public void create(String name, Column[] columns) {
@@ -38,7 +38,7 @@ public class Database {
   }
 
   private void recover() {
-    // TODO
+    // TODO: read from data-file, when 'create'
   }
 
   public void quit() {

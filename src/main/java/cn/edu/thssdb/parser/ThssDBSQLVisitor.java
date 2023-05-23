@@ -74,5 +74,12 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     //TODO
     return null;
   }
+
+  @Override
+  public LogicalPlan visitQuitStmt(SQLParser.QuitStmtContext ctx){
+    return new QuitDatabasePlan();
+  }
+
+
   // TODO: parser to more logical plan
 }
