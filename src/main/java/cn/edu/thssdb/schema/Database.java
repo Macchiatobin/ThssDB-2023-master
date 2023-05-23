@@ -36,13 +36,15 @@ public class Database {
   }
 
   public void drop(String tableName) {
-    if (tables.get(tableName) == null) //table exists already
+    Table obj = tables.get(tableName);
+    if (obj == null) //table exists already
     {
       System.out.println("Table doesn't exist!");
       //TODO: do sth else
       return;
     }
     tables.remove(tableName);
+    obj = null;
     persist();
   }
 
