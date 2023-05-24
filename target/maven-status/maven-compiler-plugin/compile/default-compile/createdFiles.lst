@@ -221,6 +221,7 @@ cn\edu\thssdb\rpc\thrift\IService$connect_args$connect_argsTupleScheme.class
 cn\edu\thssdb\rpc\thrift\IService$disconnect_result$_Fields.class
 cn\edu\thssdb\plan\LogicalGenerator.class
 cn\edu\thssdb\rpc\thrift\DisconnectResp$DisconnectRespTupleSchemeFactory.class
+cn\edu\thssdb\plan\impl\UseDatabasePlan.class
 cn\edu\thssdb\rpc\thrift\DisconnectReq$DisconnectReqStandardSchemeFactory.class
 cn\edu\thssdb\rpc\thrift\IService$executeStatement_args$executeStatement_argsStandardSchemeFactory.class
 cn\edu\thssdb\sql\SQLParser$ColumnConstraintContext.class

@@ -11,7 +11,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class Manager {
   private HashMap<String, Database> databases;
   private Database curDB;
-  public Database currentDatabase;
   private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
   public static Manager getInstance() {
@@ -24,7 +23,11 @@ public class Manager {
     databases = new HashMap<>();
     loadData();
     // TODO
-    currentDatabase = null;
+    curDB = null;
+  }
+
+  public Database getCurDB() {
+    return curDB;
   }
 
   public void createDatabaseIfNotExists(String databaseName) {

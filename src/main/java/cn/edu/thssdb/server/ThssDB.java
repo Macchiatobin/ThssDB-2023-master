@@ -33,10 +33,8 @@ public class ThssDB {
 
   private void start() {
     manager = Manager.getInstance();
-    // TODO: Maybe need some more parameters
 
     handler = new IServiceHandler(manager);
-    // handler = new IServiceHandler();
     processor = new IService.Processor(handler);
     Runnable setup = () -> setUp(processor);
     new Thread(setup).start();

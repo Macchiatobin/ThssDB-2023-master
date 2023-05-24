@@ -1,33 +1,27 @@
 package cn.edu.thssdb.plan.impl;
 
 import cn.edu.thssdb.plan.LogicalPlan;
-import cn.edu.thssdb.sql.SQLParser;
+import cn.edu.thssdb.schema.Column;
 
 import java.util.List;
 
 public class CreateTablePlan extends LogicalPlan {
 
   private String tableName;
-  private String columnDefContext;
-  private List<SQLParser.ColumnDefContext> columnDefContextList;
-  private String tableConstraintContext;
-  // TODO: check if types are compatible
+  private List<Column> columns;
 
-  public CreateTablePlan(
-      String tableName,
-      String columnDefContext,
-      List<SQLParser.ColumnDefContext> columnDefContextList,
-      String tableConstraintContext) {
+  public CreateTablePlan(String tableName, List<Column> columnList) {
     super(LogicalPlanType.CREATE_TABLE);
-
     this.tableName = tableName;
-    this.columnDefContext = columnDefContext;
-    this.columnDefContextList = columnDefContextList;
-    this.tableConstraintContext = tableConstraintContext;
+    this.columns = columnList;
   }
 
   public String getTableName() {
     return tableName;
+  }
+
+  public List<Column> getColumns() {
+    return columns;
   }
 
   // TODO: define more functions

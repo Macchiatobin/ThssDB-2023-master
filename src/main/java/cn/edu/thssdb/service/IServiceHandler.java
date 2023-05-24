@@ -2,6 +2,10 @@ package cn.edu.thssdb.service;
 
 import cn.edu.thssdb.plan.LogicalGenerator;
 import cn.edu.thssdb.plan.LogicalPlan;
+import cn.edu.thssdb.plan.impl.CreateDatabasePlan;
+import cn.edu.thssdb.plan.impl.CreateTablePlan;
+import cn.edu.thssdb.plan.impl.DropDatabasePlan;
+import cn.edu.thssdb.plan.impl.UseDatabasePlan;
 import cn.edu.thssdb.rpc.thrift.ConnectReq;
 import cn.edu.thssdb.rpc.thrift.ConnectResp;
 import cn.edu.thssdb.rpc.thrift.DisconnectReq;
@@ -12,6 +16,8 @@ import cn.edu.thssdb.rpc.thrift.GetTimeReq;
 import cn.edu.thssdb.rpc.thrift.GetTimeResp;
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.rpc.thrift.Status;
+import cn.edu.thssdb.schema.Column;
+import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.StatusUtil;
@@ -20,6 +26,7 @@ import org.apache.thrift.TException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static cn.edu.thssdb.utils.Global.DATA_DIR;
@@ -77,20 +84,35 @@ public class IServiceHandler implements IService.Iface {
         System.out.println("CREATE_DB");
         System.out.println("[DEBUG] " + plan); // TODO: 需要转换成日志形式
 
-        if (manager.currentDatabase != null) // Using some db
-        {
-          return new ExecuteStatementResp(
-              StatusUtil.fail("Please quit using database first before creation."), false);
-        }
+        CreateDatabasePlan createDatabasePlan = (CreateDatabasePlan) plan;
+        manager.createDatabaseIfNotExists(createDatabasePlan.getDatabaseName());
 
         return new ExecuteStatementResp(StatusUtil.success(), false);
       case DROP_DB:
         System.out.println("DROP_DB");
         System.out.println("[DEBUG] " + plan);
+
+        DropDatabasePlan dropDatabasePlan = (DropDatabasePlan) plan;
+        manager.deleteDatabase(dropDatabasePlan.getDatabaseName());
+
+        return new ExecuteStatementResp(StatusUtil.success(), false);
+      case USE_DB:
+        System.out.println("USE_DB");
+        System.out.println("[DEBUG] " + plan);
+
+        UseDatabasePlan useDatabasePlan = (UseDatabasePlan) plan;
+        manager.switchDatabase(useDatabasePlan.getDatabaseName());
+
         return new ExecuteStatementResp(StatusUtil.success(), false);
       case CREATE_TABLE:
         System.out.println("CREATE_TABLE");
         System.out.println("[DEBUG] " + plan);
+
+        CreateTablePlan cPlan = (CreateTablePlan) plan; // downgrading
+        Database db = manager.getCurDB();
+        List<Column> cList = cPlan.getColumns();
+        db.create(cPlan.getTableName(), cList.toArray(new Column[cList.size()]));
+
         return new ExecuteStatementResp(StatusUtil.success(), false);
       case DROP_TABLE:
         System.out.println("DROP_TABLE");
