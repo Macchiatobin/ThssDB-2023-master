@@ -20,8 +20,12 @@ package cn.edu.thssdb.parser;
 
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
+import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.sql.SQLBaseVisitor;
 import cn.edu.thssdb.sql.SQLParser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
@@ -40,7 +44,19 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
   @Override
   public LogicalPlan visitCreateTableStmt(SQLParser.CreateTableStmtContext ctx) {
-    // TODO: check ctx structure
+    List<Column> columnName = new ArrayList<>();
+    for (SQLParser.ColumnDefContext element : ctx.columnDef()) {
+      //Column column = new Column(element.columnName().getText(),
+           //                      element.typeName().getText().toUpperCase(), )
+      element.columnName().getText();
+      System.out.println(element.typeName().getText()); //if String, with length in ()
+      for (SQLParser.ColumnConstraintContext cc : element.columnConstraint()) {
+        System.out.println(cc.getText()); //notnull or primarykey
+      }
+    }
+    for (SQLParser.ColumnNameContext cn : ctx.tableConstraint().columnName()) {
+      System.out.println(cn.getText()); //primary keys!
+    }
     return new CreateTablePlan(
         ctx.tableName().getText(),
         ctx.columnDef(1).getText(),

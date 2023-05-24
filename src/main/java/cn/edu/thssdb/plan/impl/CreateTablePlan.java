@@ -19,6 +19,7 @@ public class CreateTablePlan extends LogicalPlan {
       List<SQLParser.ColumnDefContext> columnDefContextList,
       String tableConstraintContext) {
     super(LogicalPlanType.CREATE_TABLE);
+
     this.tableName = tableName;
     this.columnDefContext = columnDefContext;
     this.columnDefContextList = columnDefContextList;

@@ -5,7 +5,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Manager {
   private HashMap<String, Database> databases;
-  private Database currentDatabase;
+  public Database currentDatabase;
   private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
   public static Manager getInstance() {

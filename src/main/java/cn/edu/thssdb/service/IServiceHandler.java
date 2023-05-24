@@ -29,20 +29,18 @@ public class IServiceHandler implements IService.Iface {
   private Manager manager;
   private static final AtomicInteger sessionCnt = new AtomicInteger(0);
 
-  public IServiceHandler(Manager manager)
-  {
-    this.manager = manager;
+  public IServiceHandler(Manager manager) {
+    this.manager = Manager.getInstance();
+
+    // Create Data File Directory
     String dataPath = DATA_DIR;
     File dataFile = new File(dataPath);
-    if (!dataFile.exists())
-    {
+    if (!dataFile.exists()) {
       try {
         boolean created = dataFile.mkdir();
         if (!created) throw new IOException();
-      }
-      catch (IOException e)
-      {
-        //TODO: error handling
+      } catch (IOException e) {
+        // TODO: error handling
         System.out.println("Data File Creation Failed!");
       }
     }
@@ -78,6 +76,13 @@ public class IServiceHandler implements IService.Iface {
       case CREATE_DB:
         System.out.println("CREATE_DB");
         System.out.println("[DEBUG] " + plan); // TODO: 需要转换成日志形式
+
+        if (manager.currentDatabase != null) // Using some db
+        {
+          return new ExecuteStatementResp(
+              StatusUtil.fail("Please quit using database first before creation."), false);
+        }
+
         return new ExecuteStatementResp(StatusUtil.success(), false);
       case DROP_DB:
         System.out.println("DROP_DB");
