@@ -17,8 +17,12 @@ import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.StatusUtil;
 import org.apache.thrift.TException;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class IServiceHandler implements IService.Iface {
 
@@ -28,6 +32,20 @@ public class IServiceHandler implements IService.Iface {
   public IServiceHandler(Manager manager)
   {
     this.manager = manager;
+    String dataPath = DATA_DIR;
+    File dataFile = new File(dataPath);
+    if (!dataFile.exists())
+    {
+      try {
+        boolean created = dataFile.mkdir();
+        if (!created) throw new IOException();
+      }
+      catch (IOException e)
+      {
+        //TODO: error handling
+        System.out.println("Data File Creation Failed!");
+      }
+    }
   }
 
   @Override
