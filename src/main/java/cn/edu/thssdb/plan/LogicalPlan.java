@@ -16,6 +16,7 @@ public abstract class LogicalPlan {
     // TODO: add more LogicalPlanType
     CREATE_DB,
     DROP_DB,
+    QUIT_DB,
     CREATE_TABLE,
     DROP_TABLE,
     SHOW_TABLE,

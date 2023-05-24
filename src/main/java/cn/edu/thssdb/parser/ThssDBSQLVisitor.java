@@ -19,9 +19,13 @@
 package cn.edu.thssdb.parser;
 
 import cn.edu.thssdb.plan.LogicalPlan;
-import cn.edu.thssdb.plan.impl.CreateDatabasePlan;
+import cn.edu.thssdb.plan.impl.*;
+import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.sql.SQLBaseVisitor;
 import cn.edu.thssdb.sql.SQLParser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
@@ -35,25 +39,41 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
   @Override
   public LogicalPlan visitDropDbStmt(SQLParser.DropDbStmtContext ctx) {
     // TODO
-    return null;
+    return new DropDatabasePlan(ctx.databaseName().getText());
   }
 
   @Override
   public LogicalPlan visitCreateTableStmt(SQLParser.CreateTableStmtContext ctx) {
-    // TODO
-    return null;
+    List<Column> columnName = new ArrayList<>();
+    for (SQLParser.ColumnDefContext element : ctx.columnDef()) {
+      //Column column = new Column(element.columnName().getText(),
+           //                      element.typeName().getText().toUpperCase(), )
+      element.columnName().getText();
+      System.out.println(element.typeName().getText()); //if String, with length in ()
+      for (SQLParser.ColumnConstraintContext cc : element.columnConstraint()) {
+        System.out.println(cc.getText()); //notnull or primarykey
+      }
+    }
+    for (SQLParser.ColumnNameContext cn : ctx.tableConstraint().columnName()) {
+      System.out.println(cn.getText()); //primary keys!
+    }
+    return new CreateTablePlan(
+        ctx.tableName().getText(),
+        ctx.columnDef(1).getText(),
+        ctx.columnDef().stream().toList(),
+        ctx.tableConstraint().getText());
   }
 
   @Override
   public LogicalPlan visitDropTableStmt(SQLParser.DropTableStmtContext ctx) {
-    // TODO
-    return null;
+    // TODO: check ctx structure
+    return new DropTablePlan(ctx.tableName().getText());
   }
 
   @Override
   public LogicalPlan visitShowTableStmt(SQLParser.ShowTableStmtContext ctx) {
     // TODO
-    return null;
+    return new ShowTablePlan(ctx.tableName().getText());
   }
 
   @Override
@@ -73,5 +93,11 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     // TODO
     return null;
   }
+
+  @Override
+  public LogicalPlan visitQuitStmt(SQLParser.QuitStmtContext ctx) {
+    return new QuitDatabasePlan();
+  }
+
   // TODO: parser to more logical plan
 }
