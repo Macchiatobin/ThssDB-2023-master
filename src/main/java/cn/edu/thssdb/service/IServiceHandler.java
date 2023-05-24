@@ -12,6 +12,7 @@ import cn.edu.thssdb.rpc.thrift.GetTimeReq;
 import cn.edu.thssdb.rpc.thrift.GetTimeResp;
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.rpc.thrift.Status;
+import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.StatusUtil;
 import org.apache.thrift.TException;
@@ -21,7 +22,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class IServiceHandler implements IService.Iface {
 
+  private Manager manager;
   private static final AtomicInteger sessionCnt = new AtomicInteger(0);
+
+  public IServiceHandler(Manager manager)
+  {
+    this.manager = manager;
+  }
 
   @Override
   public GetTimeResp getTime(GetTimeReq req) throws TException {
