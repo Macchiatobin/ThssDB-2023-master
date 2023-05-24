@@ -19,6 +19,14 @@ public class Column implements Comparable<Column>, Serializable {
     this.maxLength = maxLength;
   }
 
+  public String getName() {
+    return name;
+  }
+
+  public void setPrimary(int primary) {
+    this.primary = primary;
+  }
+
   @Override
   public int compareTo(Column e) {
     return name.compareTo(e.name);
