@@ -19,7 +19,8 @@ public class Manager {
   }
 
   public Manager() {
-    /* TODO */ // v1 done
+    /* TODO */
+    // v1 done
     databases = new HashMap<>();
     loadData();
     // TODO
@@ -27,7 +28,8 @@ public class Manager {
   }
 
   public void createDatabaseIfNotExists(String databaseName) {
-    /* TODO */ // v1 done
+    /* TODO */
+    // v1 done
     if (databases.get(databaseName) != null) // exists already
     {
       throw new AlreadyExistsException(AlreadyExistsException.Database, databaseName);
@@ -40,7 +42,8 @@ public class Manager {
   }
 
   public void deleteDatabase(String databaseName) {
-    /* TODO */ // v1 done
+    /* TODO */
+    // v1 done
     if (databases.get(databaseName) == null)
       throw new NotExistsException(NotExistsException.Database, databaseName);
 
@@ -50,8 +53,9 @@ public class Manager {
   }
 
   public void switchDatabase(String databaseName) {
-    /* TODO */ // v1 done
-    if(!databases.containsKey(databaseName))
+    /* TODO */
+    // v1 done
+    if (!databases.containsKey(databaseName))
       throw new NotExistsException(NotExistsException.Database, databaseName);
 
     curDB = getDB(databaseName);
@@ -69,52 +73,48 @@ public class Manager {
 
   private void loadData() {
     File data_dir = new File("/data");
-    if (!data_dir.exists())  // create directory if not exists
-      data_dir.mkdir();
+    if (!data_dir.exists()) // create directory if not exists
+    data_dir.mkdir();
     File data_file = new File("/data" + "manager.data");
-    if (!data_file.exists()) {  // create file if not exists
+    if (!data_file.exists()) { // create file if not exists
       try {
         data_file.createNewFile();
-      } catch(Exception e) {
+      } catch (Exception e) {
         throw new FileException(FileException.Create, data_file.getName());
       }
-    } else {  // read from existing file
+    } else { // read from existing file
       try {
         BufferedReader reader = new BufferedReader(new FileReader(data_file));
         String cur_line = null;
-        while ((cur_line = reader.readLine()) != null)
-        {
+        while ((cur_line = reader.readLine()) != null) {
           createDatabaseIfNotExists(cur_line);
           // 目前没加readlog
         }
         reader.close();
-      } catch(Exception e) {
+      } catch (Exception e) {
         throw new FileException(FileException.ReadWrite, data_file.getName());
       }
     }
   }
 
-  private void persist()
-  {
+  private void persist() {
     File data_file = new File("/data" + "manager.data");
-    if (!data_file.exists()) {  // create file if not exists
+    if (!data_file.exists()) { // create file if not exists
       try {
         data_file.createNewFile();
-      } catch(Exception e) {
+      } catch (Exception e) {
         throw new FileException(FileException.Create, data_file.getName());
       }
     }
     // write to file (from beginning)
     try {
       FileWriter writer = new FileWriter("data/" + "manager.data");
-      for (String databaseName : databases.keySet())
-      {
+      for (String databaseName : databases.keySet()) {
         writer.write(databaseName);
         writer.write("\n");
       }
       writer.close();
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new FileException(FileException.ReadWrite, "manager.data");
     }
   }

@@ -28,5 +28,7 @@ public class Column implements Comparable<Column>, Serializable {
     return name + ',' + type + ',' + primary + ',' + notNull + ',' + maxLength;
   }
 
-  public int get_Primary() { return primary;}
+  public int get_Primary() {
+    return primary;
+  }
 }
