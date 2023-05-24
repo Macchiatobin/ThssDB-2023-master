@@ -30,47 +30,47 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     return new CreateDatabasePlan(ctx.databaseName().getText());
   }
 
-  //TODO 以下方法都需要返回相应的、新定义的类实例
+  // TODO 以下方法都需要返回相应的、新定义的类实例
 
   @Override
   public LogicalPlan visitDropDbStmt(SQLParser.DropDbStmtContext ctx) {
-    //TODO
+    // TODO
     return null;
   }
 
   @Override
   public LogicalPlan visitCreateTableStmt(SQLParser.CreateTableStmtContext ctx) {
-    //TODO
+    // TODO
     return null;
   }
 
   @Override
   public LogicalPlan visitDropTableStmt(SQLParser.DropTableStmtContext ctx) {
-    //TODO
+    // TODO
     return null;
   }
 
   @Override
   public LogicalPlan visitShowTableStmt(SQLParser.ShowTableStmtContext ctx) {
-    //TODO
+    // TODO
     return null;
   }
 
   @Override
   public LogicalPlan visitInsertStmt(SQLParser.InsertStmtContext ctx) {
-    //TODO
+    // TODO
     return null;
   }
 
   @Override
   public LogicalPlan visitDeleteStmt(SQLParser.DeleteStmtContext ctx) {
-    //TODO
+    // TODO
     return null;
   }
 
   @Override
   public LogicalPlan visitUpdateStmt(SQLParser.UpdateStmtContext ctx) {
-    //TODO
+    // TODO
     return null;
   }
   // TODO: parser to more logical plan

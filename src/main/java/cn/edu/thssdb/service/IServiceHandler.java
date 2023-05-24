@@ -51,22 +51,22 @@ public class IServiceHandler implements IService.Iface {
     LogicalPlan plan = LogicalGenerator.generate(req.statement);
     switch (plan.getType()) {
       case CREATE_DB:
-        System.out.println("[DEBUG] " + plan); //TODO: 需要转换成日志形式
+        System.out.println("[DEBUG] " + plan); // TODO: 需要转换成日志形式
         return new ExecuteStatementResp(StatusUtil.success(), false);
       case DROP_DB:
-        //TODO
+        // TODO
       case CREATE_TABLE:
-        //TODO
+        // TODO
       case DROP_TABLE:
-        //TODO
+        // TODO
       case SHOW_TABLE:
-        //TODO
+        // TODO
       case INSERT:
-        //TODO
+        // TODO
       case DELETE:
-        //TODO
+        // TODO
       case UPDATE:
-        //TODO
+        // TODO
       default:
     }
     return null;
