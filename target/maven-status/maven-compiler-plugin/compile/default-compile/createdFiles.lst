@@ -6,6 +6,7 @@ cn\edu\thssdb\rpc\thrift\Status.class
 cn\edu\thssdb\rpc\thrift\ExecuteStatementReq$ExecuteStatementReqStandardSchemeFactory.class
 cn\edu\thssdb\rpc\thrift\GetTimeResp$1.class
 cn\edu\thssdb\rpc\thrift\IService$Processor$disconnect.class
+cn\edu\thssdb\plan\impl\QuitDatabasePlan.class
 cn\edu\thssdb\rpc\thrift\IService$disconnect_args.class
 cn\edu\thssdb\sql\SQLParser$DeleteStmtContext.class
 cn\edu\thssdb\sql\SQLParser$TableNameContext.class
@@ -18,6 +19,7 @@ cn\edu\thssdb\rpc\thrift\IService$disconnect_result$disconnect_resultStandardSch
 cn\edu\thssdb\rpc\thrift\IService$AsyncClient$executeStatement_call.class
 cn\edu\thssdb\schema\Database.class
 cn\edu\thssdb\sql\SQLParser$UserNameContext.class
+cn\edu\thssdb\plan\impl\DropDatabasePlan.class
 cn\edu\thssdb\rpc\thrift\IService$disconnect_result$disconnect_resultTupleScheme.class
 cn\edu\thssdb\rpc\thrift\IService$executeStatement_result$executeStatement_resultTupleSchemeFactory.class
 cn\edu\thssdb\rpc\thrift\IService$AsyncProcessor$connect$1.class
@@ -28,6 +30,7 @@ cn\edu\thssdb\sql\SQLParser$TableQueryContext.class
 cn\edu\thssdb\rpc\thrift\ExecuteStatementResp$ExecuteStatementRespStandardScheme.class
 cn\edu\thssdb\rpc\thrift\IService$Processor$executeStatement.class
 cn\edu\thssdb\rpc\thrift\IService$getTime_args.class
+cn\edu\thssdb\plan\impl\DropTablePlan.class
 cn\edu\thssdb\rpc\thrift\ExecuteStatementResp$_Fields.class
 cn\edu\thssdb\rpc\thrift\IService$AsyncClient$getTime_call.class
 cn\edu\thssdb\rpc\thrift\ExecuteStatementResp$ExecuteStatementRespTupleSchemeFactory.class
@@ -107,6 +110,7 @@ cn\edu\thssdb\rpc\thrift\IService$executeStatement_args.class
 cn\edu\thssdb\index\BPlusTreeNode.class
 cn\edu\thssdb\sql\SQLListener.class
 cn\edu\thssdb\query\QueryTable.class
+cn\edu\thssdb\plan\impl\ShowTablePlan.class
 cn\edu\thssdb\rpc\thrift\ConnectResp.class
 cn\edu\thssdb\sql\SQLParser$LiteralValueContext.class
 cn\edu\thssdb\rpc\thrift\IService$connect_args$connect_argsTupleSchemeFactory.class
@@ -124,6 +128,7 @@ cn\edu\thssdb\rpc\thrift\IService$executeStatement_args$executeStatement_argsTup
 cn\edu\thssdb\rpc\thrift\ExecuteStatementResp.class
 cn\edu\thssdb\rpc\thrift\IService$AsyncProcessor$getTime$1.class
 cn\edu\thssdb\rpc\thrift\ConnectResp$ConnectRespStandardSchemeFactory.class
+cn\edu\thssdb\plan\impl\CreateTablePlan.class
 cn\edu\thssdb\sql\SQLParser$UpdateStmtContext.class
 cn\edu\thssdb\rpc\thrift\IService$getTime_args$_Fields.class
 cn\edu\thssdb\rpc\thrift\IService$disconnect_args$_Fields.class

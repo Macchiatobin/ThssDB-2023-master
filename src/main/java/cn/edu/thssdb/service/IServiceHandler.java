@@ -12,6 +12,7 @@ import cn.edu.thssdb.rpc.thrift.GetTimeReq;
 import cn.edu.thssdb.rpc.thrift.GetTimeResp;
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.rpc.thrift.Status;
+import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.StatusUtil;
 import org.apache.thrift.TException;
@@ -21,7 +22,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class IServiceHandler implements IService.Iface {
 
+  private Manager manager;
   private static final AtomicInteger sessionCnt = new AtomicInteger(0);
+
+  public IServiceHandler(Manager manager)
+  {
+    this.manager = manager;
+  }
 
   @Override
   public GetTimeResp getTime(GetTimeReq req) throws TException {
@@ -51,22 +58,37 @@ public class IServiceHandler implements IService.Iface {
     LogicalPlan plan = LogicalGenerator.generate(req.statement);
     switch (plan.getType()) {
       case CREATE_DB:
-        System.out.println("[DEBUG] " + plan); //TODO: 需要转换成日志形式
+        System.out.println("CREATE_DB");
+        System.out.println("[DEBUG] " + plan); // TODO: 需要转换成日志形式
         return new ExecuteStatementResp(StatusUtil.success(), false);
       case DROP_DB:
-        //TODO
+        System.out.println("DROP_DB");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       case CREATE_TABLE:
-        //TODO
+        System.out.println("CREATE_TABLE");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       case DROP_TABLE:
-        //TODO
+        System.out.println("DROP_TABLE");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       case SHOW_TABLE:
-        //TODO
+        System.out.println("SHOW_TABLE");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       case INSERT:
-        //TODO
+        System.out.println("INSERT");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       case DELETE:
-        //TODO
+        System.out.println("DELETE");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       case UPDATE:
-        //TODO
+        System.out.println("UPDATE");
+        System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
       default:
     }
     return null;

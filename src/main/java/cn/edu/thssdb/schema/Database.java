@@ -23,12 +23,29 @@ public class Database {
     // TODO: save as file, when changes made
   }
 
-  public void create(String name, Column[] columns) {
-    // TODO
+  public void create(String tableName, Column[] columns) {
+    if (tables.get(tableName) != null) // table exists already
+    {
+      System.out.println("Table exists already!");
+      // TODO: do sth else
+      return;
+    }
+    tables.put(tableName, new Table(this.name, tableName, columns));
+    persist();
+    // TODO: do sth else
   }
 
-  public void drop() {
-    // TODO
+  public void drop(String tableName) {
+    Table obj = tables.get(tableName);
+    if (obj == null) // table exists already
+    {
+      System.out.println("Table doesn't exist!");
+      // TODO: do sth else
+      return;
+    }
+    tables.remove(tableName);
+    obj = null;
+    persist();
   }
 
   public String select(QueryTable[] queryTables) {
