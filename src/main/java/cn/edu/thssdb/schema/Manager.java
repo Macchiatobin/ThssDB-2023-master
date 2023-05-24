@@ -11,6 +11,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class Manager {
   private HashMap<String, Database> databases;
   private Database curDB;
+  public Database currentDatabase;
   private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
   public static Manager getInstance() {
@@ -21,6 +22,8 @@ public class Manager {
     /* TODO */ // v1 done
     databases = new HashMap<>();
     loadData();
+    // TODO
+    currentDatabase = null;
   }
 
   public void createDatabaseIfNotExists(String databaseName) {
@@ -39,9 +42,7 @@ public class Manager {
   public void deleteDatabase(String databaseName) {
     /* TODO */ // v1 done
     if (databases.get(databaseName) == null)
-    {
       throw new NotExistsException(NotExistsException.Database, databaseName);
-    }
 
     databases.remove(databaseName);
     // 是否要persist?

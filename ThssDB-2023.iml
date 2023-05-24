@@ -2,8 +2,10 @@
 <module version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/antlr" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/antlr" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/thrift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/thrift" type="java-resource" />
     </content>
   </component>
 </module>

@@ -4,22 +4,21 @@ import cn.edu.thssdb.plan.LogicalPlan;
 
 public class QuitDatabasePlan extends LogicalPlan {
 
-    //private String databaseName;
+  // private String databaseName;
 
+  public QuitDatabasePlan() {
+    super(LogicalPlanType.QUIT_DB);
+    // this.databaseName = databaseName;
+  }
 
-    public QuitDatabasePlan() {
-        super(LogicalPlanType.QUIT_DB);
-        //this.databaseName = databaseName;
-    }
+  /*
+  public String getDatabaseName() {
+      return databaseName;
+  }
+   */
 
-    /*
-    public String getDatabaseName() {
-        return databaseName;
-    }
-     */
-
-    @Override
-    public String toString() {
-        return "QuitDatabasePlan";
-    }
+  @Override
+  public String toString() {
+    return "QuitDatabasePlan";
+  }
 }
