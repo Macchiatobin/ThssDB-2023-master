@@ -3,9 +3,7 @@ package cn.edu.thssdb.schema;
 import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.query.QueryTable;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -26,27 +24,35 @@ public class Database implements Serializable {
   }
 
   private void persist() {
-    //save as file, when changes made
-    //TODO: LOCK HANDLING
+    // save as file, when changes made
+
+    // TODO: LOCK HANDLING
     String dbPath = DATA_DIR + this.name;
     File dbFolder = new File(dbPath);
-    if (!dbFolder.exists()) //No database file
+    if (!dbFolder.exists()) // No database file
     {
       try {
         boolean created = dbFolder.mkdir();
         if (!created) throw new IOException();
-      }
-      catch (IOException e)
-      {
-        //TODO: error handling
+      } catch (IOException e) {
+        // TODO: error handling
         System.out.println("Database File Creation Failed!");
       }
     }
 
+    String dbMetaPath = dbPath + "/meta";
+    try (FileOutputStream fileOut = new FileOutputStream(dbMetaPath);
+        ObjectOutputStream objectOut = new ObjectOutputStream(fileOut)) {
+      objectOut.writeObject(this); // Serialize this object
+    } catch (IOException e) {
+      // TODO: error handling
+      System.out.println("Database Metafile Serialization Failed!");
+    }
 
-
+    // TODO: should I do objectOut for tables too? and columns..
   }
 
+  // Create New Table
   public void create(String tableName, Column[] columns) {
     if (tables.get(tableName) != null) // table exists already
     {
@@ -59,6 +65,7 @@ public class Database implements Serializable {
     // TODO: do sth else
   }
 
+  // Drop Table
   public void drop(String tableName) {
     Table obj = tables.get(tableName);
     if (obj == null) // table exists already
@@ -80,15 +87,28 @@ public class Database implements Serializable {
 
   private void recover() {
     // TODO: read from data-file, when 'create'
-    // Gotta recover tables of current database first?
-    for (String key : tables.keySet())
-    {
-      Table curTable = tables.get(key);
-      //curTable.recover();
+    String filePath = DATA_DIR + this.name + "/meta";
+    File metaFile = new File(filePath);
+    if (metaFile.exists()) {
+      try (FileInputStream fileInputStream = new FileInputStream(filePath);
+          ObjectInputStream inputStream = new ObjectInputStream(fileInputStream); ) {
+        Database restored = (Database) inputStream.readObject(); // read from file
+
+        // recover
+        this.name = restored.name;
+        this.tables = restored.tables;
+        this.lock = restored.lock;
+      } catch (IOException e) {
+        // TODO: error handling
+        System.out.println("InputStream Error Occurred During Recovering Database object!");
+      } catch (ClassNotFoundException e) {
+        // TODO: error handling
+        System.out.println("ClassNotFoundError During Recovering Database object!");
+      }
     }
   }
 
   public void quit() {
-    // TODO
+    persist();
   }
 }

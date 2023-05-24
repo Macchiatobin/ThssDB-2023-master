@@ -3,7 +3,6 @@ package cn.edu.thssdb.schema;
 import cn.edu.thssdb.index.BPlusTree;
 import cn.edu.thssdb.utils.Pair;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
