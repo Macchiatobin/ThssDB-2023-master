@@ -29,23 +29,22 @@ public class IServiceHandler implements IService.Iface {
   private Manager manager;
   private static final AtomicInteger sessionCnt = new AtomicInteger(0);
 
-  // !!!加回来
-//  public IServiceHandler(Manager manager) {
-//    this.manager = Manager.getInstance();
-//
-//    // Create Data File Directory
-//    String dataPath = DATA_DIR;
-//    File dataFile = new File(dataPath);
-//    if (!dataFile.exists()) {
-//      try {
-//        boolean created = dataFile.mkdir();
-//        if (!created) throw new IOException();
-//      } catch (IOException e) {
-//        // TODO: error handling
-//        System.out.println("Data File Creation Failed!");
-//      }
-//    }
-//  }
+  public IServiceHandler(Manager manager) {
+    this.manager = Manager.getInstance();
+
+    // Create Data File Directory
+    String dataPath = DATA_DIR;
+    File dataFile = new File(dataPath);
+    if (!dataFile.exists()) {
+      try {
+        boolean created = dataFile.mkdir();
+        if (!created) throw new IOException();
+      } catch (IOException e) {
+        // TODO: error handling
+        System.out.println("Data File Creation Failed!");
+      }
+    }
+  }
 
   @Override
   public GetTimeResp getTime(GetTimeReq req) throws TException {
