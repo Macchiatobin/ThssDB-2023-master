@@ -2,6 +2,7 @@ package cn.edu.thssdb.schema;
 
 import cn.edu.thssdb.index.BPlusTree;
 import cn.edu.thssdb.utils.Pair;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -45,7 +46,7 @@ public class Table implements Iterable<Row> {
       lock.writeLock().lock();
       Entry key = row.getEntries().get(primaryIndex);
       index.put(key, row);
-      serialize();
+      //      serialize();
     } finally {
       lock.writeLock().unlock();
     }
@@ -56,7 +57,7 @@ public class Table implements Iterable<Row> {
     try {
       lock.writeLock().lock();
       index.remove(key);
-      serialize();
+      //      serialize();
     } finally {
       lock.writeLock().unlock();
     }
@@ -68,7 +69,7 @@ public class Table implements Iterable<Row> {
       lock.writeLock().lock();
       index.remove(key);
       index.put(newRow.getEntries().get(primaryIndex), newRow);
-      serialize();
+      //      serialize();
     } finally {
       lock.writeLock().unlock();
     }
