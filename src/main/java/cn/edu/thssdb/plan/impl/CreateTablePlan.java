@@ -1,6 +1,7 @@
 package cn.edu.thssdb.plan.impl;
 
 import cn.edu.thssdb.plan.LogicalPlan;
+import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.sql.SQLParser;
 
 import java.util.List;
@@ -8,22 +9,14 @@ import java.util.List;
 public class CreateTablePlan extends LogicalPlan {
 
   private String tableName;
-  private String columnDefContext;
-  private List<SQLParser.ColumnDefContext> columnDefContextList;
-  private String tableConstraintContext;
-  // TODO: check if types are compatible
+  private List<Column> columns;
+  private List<String> keyNames;
 
-  public CreateTablePlan(
-      String tableName,
-      String columnDefContext,
-      List<SQLParser.ColumnDefContext> columnDefContextList,
-      String tableConstraintContext) {
+  public CreateTablePlan(String tableName, List<Column> columnList, List<String> keyList) {
     super(LogicalPlanType.CREATE_TABLE);
-
     this.tableName = tableName;
-    this.columnDefContext = columnDefContext;
-    this.columnDefContextList = columnDefContextList;
-    this.tableConstraintContext = tableConstraintContext;
+    this.columns = columnList;
+    this.keyNames = keyList;
   }
 
   public String getTableName() {

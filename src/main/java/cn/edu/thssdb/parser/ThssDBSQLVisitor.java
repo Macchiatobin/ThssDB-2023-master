@@ -23,9 +23,12 @@ import cn.edu.thssdb.plan.impl.*;
 import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.sql.SQLBaseVisitor;
 import cn.edu.thssdb.sql.SQLParser;
+import cn.edu.thssdb.type.ColumnType;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static cn.edu.thssdb.type.ColumnType.*;
 
 public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
@@ -42,22 +45,44 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     return new DropDatabasePlan(ctx.databaseName().getText());
   }
 
-  @Override // !!!加回来
+  @Override
   public LogicalPlan visitCreateTableStmt(SQLParser.CreateTableStmtContext ctx) {
+    String tableName = ctx.tableName().getText();
     List<Column> columnName = new ArrayList<>();
+    List<String> pkName = new ArrayList<>();
     for (SQLParser.ColumnDefContext element : ctx.columnDef()) {
-      // Column column = new Column(element.columnName().getText(),
-      //                      element.typeName().getText().toUpperCase(), )
-      element.columnName().getText();
-      System.out.println(element.typeName().getText()); // if String, with length in ()
-      for (SQLParser.ColumnConstraintContext cc : element.columnConstraint()) {
-        System.out.println(cc.getText()); // notnull or primarykey
+      String cName = element.columnName().getText(); //column name
+      String cType = element.typeName().getText().toUpperCase(); //column type
+      ColumnType type = INT;
+      int maxLength = 0;
+      if (cType.length() >= 6 && cType.charAt(0) == 'S') //String
+      {
+        String numString = cType.substring(7, cType.length() - 1);
+        maxLength = Integer.parseInt(numString);
+        type = STRING;
       }
+      else
+      {
+        if (cType.length() == 3) type = INT;
+        else if (cType.length() == 4) type = LONG;
+        else if (cType.length() == 5) type = FLOAT;
+        else type = DOUBLE;
+      }
+      int pk = 0;
+      boolean nn = false;
+      for (SQLParser.ColumnConstraintContext cc : element.columnConstraint()) {
+        // notnull or primarykey
+        char t = cc.getText().charAt(0);
+        if (t == 'n') nn = true; //notnull
+        else pk = 1; //primarykey
+      }
+      Column curColumn = new Column(cName, type, pk, nn, maxLength);
+      columnName.add(curColumn);
     }
     for (SQLParser.ColumnNameContext cn : ctx.tableConstraint().columnName()) {
-      System.out.println(cn.getText()); // primary keys!
+      pkName.add(cn.getText()); //primary key column names
     }
-    return null;
+    return new CreateTablePlan(tableName, columnName, pkName);
   }
 
   @Override
