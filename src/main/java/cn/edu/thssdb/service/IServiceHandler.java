@@ -36,7 +36,7 @@ public class IServiceHandler implements IService.Iface {
   private Manager manager;
   private static final AtomicInteger sessionCnt = new AtomicInteger(0);
 
-  public IServiceHandler(Manager manager) {
+  public IServiceHandler() {
     this.manager = Manager.getInstance();
 
     // Create Data File Directory
