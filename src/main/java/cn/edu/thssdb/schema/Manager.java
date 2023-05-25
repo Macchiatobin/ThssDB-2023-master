@@ -75,10 +75,10 @@ public class Manager {
   /* 自己添加的辅助方法 */
 
   private void loadData() {
-    File data_dir = new File("/data");
+    File data_dir = new File("data");
     if (!data_dir.exists()) // create directory if not exists
     data_dir.mkdir();
-    File data_file = new File("/data" + "manager.data");
+    File data_file = new File("data/" + "manager.data");
     if (!data_file.exists()) { // create file if not exists
       try {
         data_file.createNewFile();
@@ -101,7 +101,7 @@ public class Manager {
   }
 
   private void persist() {
-    File data_file = new File("/data" + "manager.data");
+    File data_file = new File("data/" + "manager.data");
     if (!data_file.exists()) { // create file if not exists
       try {
         data_file.createNewFile();
