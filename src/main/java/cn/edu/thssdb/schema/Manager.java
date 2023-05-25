@@ -8,6 +8,8 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
+
 public class Manager {
   private HashMap<String, Database> databases;
   private Database curDB;
@@ -75,10 +77,10 @@ public class Manager {
   /* 自己添加的辅助方法 */
 
   private void loadData() {
-    File data_dir = new File("data");
+    File data_dir = new File(DATA_DIR);
     if (!data_dir.exists()) // create directory if not exists
     data_dir.mkdir();
-    File data_file = new File("data/" + "manager.data");
+    File data_file = new File(DATA_DIR + "manager.data");
     if (!data_file.exists()) { // create file if not exists
       try {
         data_file.createNewFile();
