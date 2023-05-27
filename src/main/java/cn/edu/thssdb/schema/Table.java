@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class Table implements Iterable<Row> {
+public class Table implements Iterable<Row>, Serializable{
   ReentrantReadWriteLock lock;
   private String databaseName;
   public String tableName;

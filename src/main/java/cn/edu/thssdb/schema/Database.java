@@ -1,5 +1,6 @@
 package cn.edu.thssdb.schema;
 
+import cn.edu.thssdb.exception.AlreadyExistsException;
 import cn.edu.thssdb.exception.NotExistsException;
 import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.query.QueryTable;
@@ -8,6 +9,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static cn.edu.thssdb.utils.FolderOperations.deleteFolder;
 import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Database implements Serializable {
@@ -17,10 +19,13 @@ public class Database implements Serializable {
   private HashMap<String, Table> tables;
   ReentrantReadWriteLock lock;
 
+  private String path;
+
   public Database(String name) {
     this.name = name;
     this.tables = new HashMap<>();
     this.lock = new ReentrantReadWriteLock();
+    this.path = DATA_DIR + name + "/";
     recover();
   }
 
@@ -50,17 +55,13 @@ public class Database implements Serializable {
       System.out.println("Database Metafile Serialization Failed!");
       System.out.println(e);
     }
-
-    // TODO: should I do objectOut for tables too? and columns..
   }
 
   // Create New Table
   public void create(String tableName, Column[] columns) {
     if (tables.get(tableName) != null) // table exists already
     {
-      System.out.println("Table exists already!");
-      // TODO: do sth else
-      return;
+      throw new AlreadyExistsException(AlreadyExistsException.Table, tableName);
     }
     tables.put(tableName, new Table(this.name, tableName, columns));
     persist();
@@ -76,7 +77,7 @@ public class Database implements Serializable {
     }
     tables.remove(tableName);
     obj = null;
-    // TODO: delete table folder
+    deleteFolder(new File(path + tableName));
     persist();
   }
 
