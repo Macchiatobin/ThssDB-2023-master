@@ -6,12 +6,13 @@ import cn.edu.thssdb.utils.Pair;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class Table implements Iterable<Row> {
+public class Table implements Iterable<Row>, Serializable {
   ReentrantReadWriteLock lock;
   private String databaseName;
   public String tableName;

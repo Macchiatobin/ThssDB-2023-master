@@ -1,5 +1,6 @@
 package cn.edu.thssdb.schema;
 
+import cn.edu.thssdb.exception.NotExistsException;
 import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.query.QueryTable;
 
@@ -11,7 +12,7 @@ import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Database implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+  //private static final long serialVersionUID = 1L;
   private String name;
   private HashMap<String, Table> tables;
   ReentrantReadWriteLock lock;
@@ -47,6 +48,7 @@ public class Database implements Serializable {
     } catch (IOException e) {
       // TODO: error handling
       System.out.println("Database Metafile Serialization Failed!");
+      System.out.println(e);
     }
 
     // TODO: should I do objectOut for tables too? and columns..
@@ -68,14 +70,13 @@ public class Database implements Serializable {
   // Drop Table
   public void drop(String tableName) {
     Table obj = tables.get(tableName);
-    if (obj == null) // table exists already
+    if (obj == null) // table doesn't exist
     {
-      System.out.println("Table doesn't exist!");
-      // TODO: do sth else
-      return;
+      throw new NotExistsException(NotExistsException.Table, tableName);
     }
     tables.remove(tableName);
     obj = null;
+    // TODO: delete table folder
     persist();
   }
 
@@ -95,15 +96,19 @@ public class Database implements Serializable {
         Database restored = (Database) inputStream.readObject(); // read from file
 
         // recover
-        this.name = restored.name;
-        this.tables = restored.tables;
-        this.lock = restored.lock;
+        if (restored != null)
+        {
+          this.name = restored.name;
+          this.tables = restored.tables;
+          this.lock = restored.lock;
+        }
       } catch (IOException e) {
         // TODO: error handling
         System.out.println("InputStream Error Occurred During Recovering Database object!");
+        System.out.println(e);
       } catch (ClassNotFoundException e) {
-        // TODO: error handling
         System.out.println("ClassNotFoundError During Recovering Database object!");
+        System.out.println(e);
       }
     }
   }

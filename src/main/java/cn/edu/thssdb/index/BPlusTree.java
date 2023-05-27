@@ -2,7 +2,9 @@ package cn.edu.thssdb.index;
 
 import cn.edu.thssdb.utils.Pair;
 
-public final class BPlusTree<K extends Comparable<K>, V> implements Iterable<Pair<K, V>> {
+import java.io.Serializable;
+
+public final class BPlusTree<K extends Comparable<K>, V> implements Iterable<Pair<K, V>>, Serializable {
 
   BPlusTreeNode<K, V> root;
   private int size;

@@ -82,12 +82,13 @@ public class IServiceHandler implements IService.Iface {
     switch (plan.getType()) {
       case CREATE_DB:
         System.out.println("CREATE_DB");
-        System.out.println("[DEBUG] " + plan); // TODO: 需要转换成日志形式
+        System.out.println("[DEBUG] " + plan);
 
         CreateDatabasePlan createDatabasePlan = (CreateDatabasePlan) plan;
         manager.createDatabaseIfNotExists(createDatabasePlan.getDatabaseName());
 
         return new ExecuteStatementResp(StatusUtil.success(), false);
+
       case DROP_DB:
         System.out.println("DROP_DB");
         System.out.println("[DEBUG] " + plan);
@@ -96,6 +97,7 @@ public class IServiceHandler implements IService.Iface {
         manager.deleteDatabase(dropDatabasePlan.getDatabaseName());
 
         return new ExecuteStatementResp(StatusUtil.success(), false);
+
       case USE_DB:
         System.out.println("USE_DB");
         System.out.println("[DEBUG] " + plan);
@@ -104,16 +106,23 @@ public class IServiceHandler implements IService.Iface {
         manager.switchDatabase(useDatabasePlan.getDatabaseName());
 
         return new ExecuteStatementResp(StatusUtil.success(), false);
+
       case CREATE_TABLE:
         System.out.println("CREATE_TABLE");
         System.out.println("[DEBUG] " + plan);
 
         CreateTablePlan cPlan = (CreateTablePlan) plan; // downgrading
         Database db = manager.getCurDB();
+        if (db == null)
+        {
+          return new ExecuteStatementResp(
+                  StatusUtil.fail("Use database first."), false);
+        }
         List<Column> cList = cPlan.getColumns();
         db.create(cPlan.getTableName(), cList.toArray(new Column[cList.size()]));
 
         return new ExecuteStatementResp(StatusUtil.success(), false);
+
       case DROP_TABLE:
         System.out.println("DROP_TABLE");
         System.out.println("[DEBUG] " + plan);

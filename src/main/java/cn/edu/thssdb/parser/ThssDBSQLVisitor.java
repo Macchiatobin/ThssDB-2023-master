@@ -82,9 +82,8 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
       Column curColumn = new Column(cName, type, pk, nn, maxLength);
       columns.add(curColumn);
     }
-    if (ctx.tableConstraint().columnName() != null) // TODO: nullpointerException if no table constraint?!
+    if (ctx.tableConstraint() != null) // TODO: nullpointerException if no table constraint?!
     {
-      System.out.println(ctx.tableConstraint().columnName());
       for (SQLParser.ColumnNameContext cn : ctx.tableConstraint().columnName()) {
         String keyColumnName = cn.getText(); // primary key column names
         for (Column c : columns) {
