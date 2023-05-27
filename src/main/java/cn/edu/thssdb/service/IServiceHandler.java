@@ -2,10 +2,7 @@ package cn.edu.thssdb.service;
 
 import cn.edu.thssdb.plan.LogicalGenerator;
 import cn.edu.thssdb.plan.LogicalPlan;
-import cn.edu.thssdb.plan.impl.CreateDatabasePlan;
-import cn.edu.thssdb.plan.impl.CreateTablePlan;
-import cn.edu.thssdb.plan.impl.DropDatabasePlan;
-import cn.edu.thssdb.plan.impl.UseDatabasePlan;
+import cn.edu.thssdb.plan.impl.*;
 import cn.edu.thssdb.rpc.thrift.ConnectReq;
 import cn.edu.thssdb.rpc.thrift.ConnectResp;
 import cn.edu.thssdb.rpc.thrift.DisconnectReq;
@@ -111,38 +108,61 @@ public class IServiceHandler implements IService.Iface {
         System.out.println("CREATE_TABLE");
         System.out.println("[DEBUG] " + plan);
 
-        CreateTablePlan cPlan = (CreateTablePlan) plan; // downgrading
-        Database db = manager.getCurDB();
-        if (db == null)
+        CreateTablePlan createTablePlan = (CreateTablePlan) plan; // downgrading
+        Database dbForTableCreate = manager.getCurDB();
+        if (dbForTableCreate == null)
         {
           return new ExecuteStatementResp(
                   StatusUtil.fail("Use database first."), false);
         }
-        List<Column> cList = cPlan.getColumns();
-        db.create(cPlan.getTableName(), cList.toArray(new Column[cList.size()]));
+        List<Column> cList = createTablePlan.getColumns();
+        dbForTableCreate.create(createTablePlan.getTableName(), cList.toArray(new Column[cList.size()]));
 
         return new ExecuteStatementResp(StatusUtil.success(), false);
 
       case DROP_TABLE:
         System.out.println("DROP_TABLE");
         System.out.println("[DEBUG] " + plan);
+
+        DropTablePlan dropTablePlan = (DropTablePlan) plan;
+        Database dbForTableDrop = manager.getCurDB();
+        if (dbForTableDrop == null)
+        {
+          return new ExecuteStatementResp(
+                  StatusUtil.fail("Use database first."), false);
+        }
+        dbForTableDrop.drop(dropTablePlan.getTableName());
+
         return new ExecuteStatementResp(StatusUtil.success(), false);
+
+      case QUIT:
+        System.out.println("QUIT");
+        System.out.println("[DEBUG] " + plan);
+
+        // TODO: wtf does this quit mean
+
+        return new ExecuteStatementResp(StatusUtil.success(), false);
+
       case SHOW_TABLE:
         System.out.println("SHOW_TABLE");
         System.out.println("[DEBUG] " + plan);
         return new ExecuteStatementResp(StatusUtil.success(), false);
+
       case INSERT:
         System.out.println("INSERT");
         System.out.println("[DEBUG] " + plan);
         return new ExecuteStatementResp(StatusUtil.success(), false);
+
       case DELETE:
         System.out.println("DELETE");
         System.out.println("[DEBUG] " + plan);
         return new ExecuteStatementResp(StatusUtil.success(), false);
+
       case UPDATE:
         System.out.println("UPDATE");
         System.out.println("[DEBUG] " + plan);
         return new ExecuteStatementResp(StatusUtil.success(), false);
+
       default:
     }
     return null;

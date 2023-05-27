@@ -37,7 +37,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     return new CreateDatabasePlan(ctx.databaseName().getText());
   }
 
-  // TODO 以下方法都需要返回相应的、新定义的类实例
+  //以下方法都需要返回相应的、新定义的类实例
 
   @Override
   public LogicalPlan visitDropDbStmt(SQLParser.DropDbStmtContext ctx) {
@@ -98,13 +98,11 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
   @Override
   public LogicalPlan visitDropTableStmt(SQLParser.DropTableStmtContext ctx) {
-    // TODO: check ctx structure
     return new DropTablePlan(ctx.tableName().getText());
   }
 
   @Override
   public LogicalPlan visitShowTableStmt(SQLParser.ShowTableStmtContext ctx) {
-    // TODO
     return new ShowTablePlan(ctx.tableName().getText());
   }
 
@@ -128,7 +126,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
   @Override
   public LogicalPlan visitQuitStmt(SQLParser.QuitStmtContext ctx) {
-    return new QuitDatabasePlan();
+    return new QuitPlan();
   }
 
   // TODO: parser to more logical plan

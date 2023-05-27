@@ -4,6 +4,10 @@ import java.io.File;
 
 public class FolderOperations {
     public static void deleteFolder(File folder) { //Delete Folder and files recursively
+        if (!folder.exists()) {
+            return;
+        }
+
         if (folder.isDirectory()) {
             File[] files = folder.listFiles();
             if (files != null) {
