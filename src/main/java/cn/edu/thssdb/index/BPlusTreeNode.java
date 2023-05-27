@@ -1,12 +1,10 @@
 package cn.edu.thssdb.index;
 
 import cn.edu.thssdb.utils.Global;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
-abstract class BPlusTreeNode<K extends Comparable<K>, V> implements Serializable {
+abstract class BPlusTreeNode<K extends Comparable<K>, V> {
   ArrayList<K> keys;
   int nodeSize;
 
@@ -54,4 +52,6 @@ abstract class BPlusTreeNode<K extends Comparable<K>, V> implements Serializable
     }
     nodeSize--;
   }
+
+  public abstract void clear();
 }
