@@ -1,7 +1,6 @@
 package cn.edu.thssdb.index;
 
 import cn.edu.thssdb.utils.Global;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -53,4 +52,6 @@ abstract class BPlusTreeNode<K extends Comparable<K>, V> {
     }
     nodeSize--;
   }
+
+  public abstract void clear();
 }

@@ -1,7 +1,6 @@
 package cn.edu.thssdb.schema;
 
 import cn.edu.thssdb.type.ColumnType;
-
 import java.io.Serializable;
 
 public class Column implements Comparable<Column>, Serializable {
@@ -38,5 +37,9 @@ public class Column implements Comparable<Column>, Serializable {
 
   public int get_Primary() {
     return primary;
+  }
+
+  public ColumnType getType() {
+    return type;
   }
 }
