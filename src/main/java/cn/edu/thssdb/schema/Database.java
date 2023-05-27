@@ -14,7 +14,7 @@ import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Database implements Serializable {
 
-  //private static final long serialVersionUID = 1L;
+  // private static final long serialVersionUID = 1L;
   private String name;
   private HashMap<String, Table> tables;
   ReentrantReadWriteLock lock;
@@ -97,8 +97,7 @@ public class Database implements Serializable {
         Database restored = (Database) inputStream.readObject(); // read from file
 
         // recover
-        if (restored != null)
-        {
+        if (restored != null) {
           this.name = restored.name;
           this.tables = restored.tables;
           this.lock = restored.lock;

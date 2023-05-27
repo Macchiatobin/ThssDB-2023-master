@@ -6,7 +6,6 @@ cn\edu\thssdb\rpc\thrift\Status.class
 cn\edu\thssdb\rpc\thrift\ExecuteStatementReq$ExecuteStatementReqStandardSchemeFactory.class
 cn\edu\thssdb\rpc\thrift\GetTimeResp$1.class
 cn\edu\thssdb\rpc\thrift\IService$Processor$disconnect.class
-cn\edu\thssdb\plan\impl\QuitDatabasePlan.class
 cn\edu\thssdb\rpc\thrift\IService$disconnect_args.class
 cn\edu\thssdb\sql\SQLParser$DeleteStmtContext.class
 cn\edu\thssdb\sql\SQLParser$TableNameContext.class
@@ -18,6 +17,7 @@ cn\edu\thssdb\rpc\thrift\IService$connect_result$connect_resultTupleSchemeFactor
 cn\edu\thssdb\rpc\thrift\IService$disconnect_result$disconnect_resultStandardSchemeFactory.class
 cn\edu\thssdb\rpc\thrift\IService$AsyncClient$executeStatement_call.class
 cn\edu\thssdb\schema\Database.class
+cn\edu\thssdb\exception\IllegalTypeException.class
 cn\edu\thssdb\sql\SQLParser$UserNameContext.class
 cn\edu\thssdb\plan\impl\DropDatabasePlan.class
 cn\edu\thssdb\rpc\thrift\IService$disconnect_result$disconnect_resultTupleScheme.class
@@ -61,6 +61,7 @@ cn\edu\thssdb\rpc\thrift\IService$Client.class
 cn\edu\thssdb\rpc\thrift\DisconnectReq$1.class
 cn\edu\thssdb\utils\Cell.class
 cn\edu\thssdb\sql\SQLParser$ColumnFullNameContext.class
+cn\edu\thssdb\utils\FolderOperations.class
 cn\edu\thssdb\plan\impl\CreateDatabasePlan.class
 cn\edu\thssdb\rpc\thrift\Status$StatusTupleScheme.class
 cn\edu\thssdb\sql\SQLParser$ColumnNameContext.class
@@ -71,6 +72,7 @@ cn\edu\thssdb\sql\SQLParser$ResultColumnContext.class
 cn\edu\thssdb\exception\DuplicateKeyException.class
 cn\edu\thssdb\rpc\thrift\ConnectResp$_Fields.class
 cn\edu\thssdb\rpc\thrift\ExecuteStatementReq$ExecuteStatementReqStandardScheme.class
+cn\edu\thssdb\plan\impl\QuitPlan.class
 cn\edu\thssdb\rpc\thrift\IService$getTime_args$getTime_argsTupleSchemeFactory.class
 cn\edu\thssdb\type\AlignType.class
 cn\edu\thssdb\service\IServiceHandler.class
@@ -116,7 +118,9 @@ cn\edu\thssdb\query\QueryTable.class
 cn\edu\thssdb\plan\impl\ShowTablePlan.class
 cn\edu\thssdb\rpc\thrift\ConnectResp.class
 cn\edu\thssdb\sql\SQLParser$LiteralValueContext.class
+cn\edu\thssdb\sql\SQLParser$BeginTransactionStmtContext.class
 cn\edu\thssdb\rpc\thrift\IService$connect_args$connect_argsTupleSchemeFactory.class
+cn\edu\thssdb\schema\Manager$1.class
 cn\edu\thssdb\sql\SQLParser$ShowDbStmtContext.class
 cn\edu\thssdb\rpc\thrift\GetTimeReq$_Fields.class
 cn\edu\thssdb\rpc\thrift\IService$disconnect_result$disconnect_resultStandardScheme.class
@@ -159,6 +163,7 @@ cn\edu\thssdb\service\IServiceHandler$1.class
 cn\edu\thssdb\rpc\thrift\GetTimeResp$GetTimeRespTupleSchemeFactory.class
 cn\edu\thssdb\rpc\thrift\DisconnectResp.class
 cn\edu\thssdb\rpc\thrift\ExecuteStatementResp$ExecuteStatementRespStandardSchemeFactory.class
+cn\edu\thssdb\sql\SQLParser$CommitStmtContext.class
 cn\edu\thssdb\rpc\thrift\IService$executeStatement_result$executeStatement_resultStandardScheme.class
 cn\edu\thssdb\server\ThssDB$ThssDBHolder.class
 cn\edu\thssdb\utils\Pair.class
@@ -182,6 +187,7 @@ cn\edu\thssdb\rpc\thrift\ConnectReq$1.class
 cn\edu\thssdb\rpc\thrift\ExecuteStatementResp$1.class
 cn\edu\thssdb\rpc\thrift\IService$AsyncProcessor$getTime.class
 cn\edu\thssdb\rpc\thrift\IService$Iface.class
+cn\edu\thssdb\sql\SQLParser$AutoCommitStmtContext.class
 cn\edu\thssdb\rpc\thrift\IService$Processor$getTime.class
 cn\edu\thssdb\sql\SQLParser$ColumnDefContext.class
 cn\edu\thssdb\sql\SQLParser$PasswordContext.class
@@ -193,6 +199,7 @@ cn\edu\thssdb\sql\SQLParser$RevokeStmtContext.class
 cn\edu\thssdb\sql\SQLParser$TypeNameContext.class
 cn\edu\thssdb\rpc\thrift\IService$getTime_args$getTime_argsStandardScheme.class
 cn\edu\thssdb\rpc\thrift\DisconnectReq$DisconnectReqTupleScheme.class
+cn\edu\thssdb\plan\impl\AutoCommitPlan.class
 cn\edu\thssdb\rpc\thrift\ConnectResp$ConnectRespStandardScheme.class
 cn\edu\thssdb\rpc\thrift\DisconnectReq$_Fields.class
 cn\edu\thssdb\rpc\thrift\ConnectReq.class

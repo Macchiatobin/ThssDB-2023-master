@@ -230,6 +230,36 @@ public interface SQLListener extends ParseTreeListener {
 	 */
 	void exitUpdateStmt(SQLParser.UpdateStmtContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link SQLParser#beginTransactionStmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterBeginTransactionStmt(SQLParser.BeginTransactionStmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SQLParser#beginTransactionStmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitBeginTransactionStmt(SQLParser.BeginTransactionStmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SQLParser#commitStmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterCommitStmt(SQLParser.CommitStmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SQLParser#commitStmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitCommitStmt(SQLParser.CommitStmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SQLParser#autoCommitStmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterAutoCommitStmt(SQLParser.AutoCommitStmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SQLParser#autoCommitStmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitAutoCommitStmt(SQLParser.AutoCommitStmtContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link SQLParser#columnDef}.
 	 * @param ctx the parse tree
 	 */

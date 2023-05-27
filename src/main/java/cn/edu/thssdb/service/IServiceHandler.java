@@ -110,13 +110,12 @@ public class IServiceHandler implements IService.Iface {
 
         CreateTablePlan createTablePlan = (CreateTablePlan) plan; // downgrading
         Database dbForTableCreate = manager.getCurDB();
-        if (dbForTableCreate == null)
-        {
-          return new ExecuteStatementResp(
-                  StatusUtil.fail("Use database first."), false);
+        if (dbForTableCreate == null) {
+          return new ExecuteStatementResp(StatusUtil.fail("Use database first."), false);
         }
         List<Column> cList = createTablePlan.getColumns();
-        dbForTableCreate.create(createTablePlan.getTableName(), cList.toArray(new Column[cList.size()]));
+        dbForTableCreate.create(
+            createTablePlan.getTableName(), cList.toArray(new Column[cList.size()]));
 
         return new ExecuteStatementResp(StatusUtil.success(), false);
 
@@ -126,10 +125,8 @@ public class IServiceHandler implements IService.Iface {
 
         DropTablePlan dropTablePlan = (DropTablePlan) plan;
         Database dbForTableDrop = manager.getCurDB();
-        if (dbForTableDrop == null)
-        {
-          return new ExecuteStatementResp(
-                  StatusUtil.fail("Use database first."), false);
+        if (dbForTableDrop == null) {
+          return new ExecuteStatementResp(StatusUtil.fail("Use database first."), false);
         }
         dbForTableDrop.drop(dropTablePlan.getTableName());
 
@@ -143,9 +140,33 @@ public class IServiceHandler implements IService.Iface {
 
         return new ExecuteStatementResp(StatusUtil.success(), false);
 
-      case SHOW_TABLE:
+      case SHOW_TABLE: // SHOW DATABASE tableName
         System.out.println("SHOW_TABLE");
         System.out.println("[DEBUG] " + plan);
+        return new ExecuteStatementResp(StatusUtil.success(), false);
+
+      case AUTO_COMMIT:
+        System.out.println("AUTO_COMMIT");
+        System.out.println("[DEBUG] " + plan);
+
+        // TODO
+
+        return new ExecuteStatementResp(StatusUtil.success(), false);
+
+      case BEGIN_TRANSACTION:
+        System.out.println("BEGIN_TRANSACTION");
+        System.out.println("[DEBUG] " + plan);
+
+        // TODO
+
+        return new ExecuteStatementResp(StatusUtil.success(), false);
+
+      case COMMIT:
+        System.out.println("COMMIT");
+        System.out.println("[DEBUG] " + plan);
+
+        // TODO
+
         return new ExecuteStatementResp(StatusUtil.success(), false);
 
       case INSERT:

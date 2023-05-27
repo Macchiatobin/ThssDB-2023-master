@@ -145,6 +145,24 @@ public interface SQLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitUpdateStmt(SQLParser.UpdateStmtContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link SQLParser#beginTransactionStmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBeginTransactionStmt(SQLParser.BeginTransactionStmtContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SQLParser#commitStmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCommitStmt(SQLParser.CommitStmtContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SQLParser#autoCommitStmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAutoCommitStmt(SQLParser.AutoCommitStmtContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link SQLParser#columnDef}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

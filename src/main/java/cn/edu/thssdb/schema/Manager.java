@@ -65,11 +65,12 @@ public class Manager implements Serializable {
     if (!databases.containsKey(databaseName))
       throw new NotExistsException(NotExistsException.Database, databaseName);
 
-    databases.put(databaseName, new Database(databaseName)); //Load database(will read from file if exists)
+    databases.put(
+        databaseName, new Database(databaseName)); // Load database(will read from file if exists)
     curDB = getDB(databaseName);
   }
 
-  //单例模式
+  // 单例模式
   private static class ManagerHolder implements Serializable {
     private static final Manager INSTANCE = new Manager();
 
@@ -92,11 +93,11 @@ public class Manager implements Serializable {
         BufferedReader reader = new BufferedReader(new FileReader(data_file));
         String cur_line = null;
         while ((cur_line = reader.readLine()) != null) {
-          //modified from here
+          // modified from here
           databases.put(cur_line, null);
-          //modify ended
+          // modify ended
 
-          //createDatabaseIfNotExists(cur_line); //original
+          // createDatabaseIfNotExists(cur_line); //original
           // 目前没加readlog
         }
         reader.close();
@@ -127,7 +128,6 @@ public class Manager implements Serializable {
       throw new FileException(FileException.ReadWrite, filePath);
     }
   }
-
 
   private Database getDB(String databaseName) {
     if (!databases.containsKey(databaseName))
