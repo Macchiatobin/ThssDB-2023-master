@@ -22,7 +22,7 @@ public class Manager {
     // v1 done
     databases = new HashMap<>();
     loadData();
-    // TODO
+    // TODO: Lock处理
     curDB = null;
   }
 
@@ -37,9 +37,11 @@ public class Manager {
     {
       throw new AlreadyExistsException(AlreadyExistsException.Database, databaseName);
     }
-
     Database newDB = new Database(databaseName);
     databases.put(databaseName, newDB);
+    if (curDB == null) {
+      curDB = getDB(databaseName);
+    }
     // 是否要persist?
     // 是否要加成功提示语？
   }
@@ -47,9 +49,11 @@ public class Manager {
   public void deleteDatabase(String databaseName) {
     /* TODO */
     // v1 done
-    if (databases.get(databaseName) == null)
+    Database db = databases.get(databaseName);
+    if (db == null)
       throw new NotExistsException(NotExistsException.Database, databaseName);
-
+    if (db == curDB)
+      curDB = null;
     databases.remove(databaseName);
     // 是否要persist?
     // 是否要加成功提示语？
