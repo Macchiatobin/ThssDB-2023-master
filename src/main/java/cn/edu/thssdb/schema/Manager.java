@@ -36,37 +36,53 @@ public class Manager implements Serializable {
   public void createDatabaseIfNotExists(String databaseName) {
     /* TODO */
     // v1 done
-    if (databases.get(databaseName) != null) // exists already
-    {
-      throw new AlreadyExistsException(AlreadyExistsException.Database, databaseName);
+    try {
+      lock.writeLock().lock();
+      if (databases.get(databaseName) != null) // exists already
+      {
+        throw new AlreadyExistsException(AlreadyExistsException.Database, databaseName);
+      }
+      Database newDB = new Database(databaseName);
+      databases.put(databaseName, newDB);
+      persist();
+    } finally {
+      lock.writeLock().unlock();
     }
-    Database newDB = new Database(databaseName);
-    databases.put(databaseName, newDB);
-    persist();
+
   }
 
   public void deleteDatabase(String databaseName) {
     /* TODO */
     // v1 done
-    if (databases.get(databaseName) == null)
-      throw new NotExistsException(NotExistsException.Database, databaseName);
+    try {
+      lock.writeLock().lock();
+      if (databases.get(databaseName) == null)
+        throw new NotExistsException(NotExistsException.Database, databaseName);
 
-    databases.remove(databaseName);
-    String folderPath = DATA_DIR + databaseName;
-    File folder = new File(folderPath);
-    deleteFolder(folder);
-    persist();
+      databases.remove(databaseName);
+      String folderPath = DATA_DIR + databaseName;
+      File folder = new File(folderPath);
+      deleteFolder(folder);
+      persist();
+    } finally {
+      lock.writeLock().unlock();
+    }
+
   }
 
   public void switchDatabase(String databaseName) {
     /* TODO */
     // v1 done
-    if (!databases.containsKey(databaseName))
-      throw new NotExistsException(NotExistsException.Database, databaseName);
+    try {
+      lock.readLock().lock();
+      if (!databases.containsKey(databaseName))
+        throw new NotExistsException(NotExistsException.Database, databaseName);
+      databases.put(databaseName, new Database(databaseName)); // Load database(will read from file if exists)
+      curDB = getDB(databaseName);
+    } finally {
+      lock.readLock().unlock();
+    }
 
-    databases.put(
-        databaseName, new Database(databaseName)); // Load database(will read from file if exists)
-    curDB = getDB(databaseName);
   }
 
   // 单例模式
@@ -129,8 +145,14 @@ public class Manager implements Serializable {
   }
 
   private Database getDB(String databaseName) {
-    if (!databases.containsKey(databaseName))
-      throw new NotExistsException(NotExistsException.Database, databaseName);
-    return databases.get(databaseName);
+    try {
+      lock.readLock().lock();
+      if (!databases.containsKey(databaseName))
+        throw new NotExistsException(NotExistsException.Database, databaseName);
+      return databases.get(databaseName);
+    } finally {
+      lock.readLock().unlock();
+    }
+
   }
 }
