@@ -37,7 +37,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     return new CreateDatabasePlan(ctx.databaseName().getText());
   }
 
-  // TODO 以下方法都需要返回相应的、新定义的类实例
+  // 以下方法都需要返回相应的、新定义的类实例
 
   @Override
   public LogicalPlan visitDropDbStmt(SQLParser.DropDbStmtContext ctx) {
@@ -46,7 +46,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
   }
 
   @Override
-  public LogicalPlan visitUseDbStmt(SQLParser.UseDbStmtContext ctx){
+  public LogicalPlan visitUseDbStmt(SQLParser.UseDbStmtContext ctx) {
     return new UseDatabasePlan(ctx.databaseName().getText());
   }
 
@@ -82,9 +82,8 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
       Column curColumn = new Column(cName, type, pk, nn, maxLength);
       columns.add(curColumn);
     }
-    if (ctx.tableConstraint().columnName() != null) // TODO: nullpointerException if no table constraint?!
+    if (ctx.tableConstraint() != null) // TODO: nullpointerException if no table constraint?!
     {
-      System.out.println(ctx.tableConstraint().columnName());
       for (SQLParser.ColumnNameContext cn : ctx.tableConstraint().columnName()) {
         String keyColumnName = cn.getText(); // primary key column names
         for (Column c : columns) {
@@ -99,14 +98,17 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
   @Override
   public LogicalPlan visitDropTableStmt(SQLParser.DropTableStmtContext ctx) {
-    // TODO: check ctx structure
     return new DropTablePlan(ctx.tableName().getText());
   }
 
   @Override
   public LogicalPlan visitShowTableStmt(SQLParser.ShowTableStmtContext ctx) {
-    // TODO
     return new ShowTablePlan(ctx.tableName().getText());
+  }
+
+  @Override
+  public LogicalPlan visitAutoCommitStmt(SQLParser.AutoCommitStmtContext ctx) {
+    return new AutoCommitPlan();
   }
 
   @Override
@@ -129,7 +131,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
   @Override
   public LogicalPlan visitQuitStmt(SQLParser.QuitStmtContext ctx) {
-    return new QuitDatabasePlan();
+    return new QuitPlan();
   }
 
   // TODO: parser to more logical plan

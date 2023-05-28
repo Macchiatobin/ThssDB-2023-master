@@ -8,22 +8,25 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class Manager {
+import static cn.edu.thssdb.utils.FolderOperations.deleteFolder;
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
+
+public class Manager implements Serializable {
   private HashMap<String, Database> databases;
   private Database curDB;
   private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+  private String filePath = DATA_DIR + "manager/";
 
   public static Manager getInstance() {
     return Manager.ManagerHolder.INSTANCE;
   }
 
-  public Manager() {
+  private Manager() {
     /* TODO */
     // v1 done
     databases = new HashMap<>();
-    loadData();
-    // TODO: Lock处理
     curDB = null;
+    loadData();
   }
 
   public Database getCurDB() {
@@ -39,24 +42,20 @@ public class Manager {
     }
     Database newDB = new Database(databaseName);
     databases.put(databaseName, newDB);
-    if (curDB == null) {
-      curDB = getDB(databaseName);
-    }
-    // 是否要persist?
-    // 是否要加成功提示语？
+    persist();
   }
 
   public void deleteDatabase(String databaseName) {
     /* TODO */
     // v1 done
-    Database db = databases.get(databaseName);
-    if (db == null)
+    if (databases.get(databaseName) == null)
       throw new NotExistsException(NotExistsException.Database, databaseName);
-    if (db == curDB)
-      curDB = null;
+
     databases.remove(databaseName);
-    // 是否要persist?
-    // 是否要加成功提示语？
+    String folderPath = DATA_DIR + databaseName;
+    File folder = new File(folderPath);
+    deleteFolder(folder);
+    persist();
   }
 
   public void switchDatabase(String databaseName) {
@@ -65,24 +64,23 @@ public class Manager {
     if (!databases.containsKey(databaseName))
       throw new NotExistsException(NotExistsException.Database, databaseName);
 
+    databases.put(
+        databaseName, new Database(databaseName)); // Load database(will read from file if exists)
     curDB = getDB(databaseName);
-    // 是否要persist?
-    // 是否要加成功提示语？
   }
 
-  private static class ManagerHolder {
+  // 单例模式
+  private static class ManagerHolder implements Serializable {
     private static final Manager INSTANCE = new Manager();
 
     private ManagerHolder() {}
   }
 
-  /* 自己添加的辅助方法 */
-
   private void loadData() {
-    File data_dir = new File("data");
+    File data_dir = new File(DATA_DIR);
     if (!data_dir.exists()) // create directory if not exists
     data_dir.mkdir();
-    File data_file = new File("data/" + "manager.data");
+    File data_file = new File(filePath);
     if (!data_file.exists()) { // create file if not exists
       try {
         data_file.createNewFile();
@@ -94,7 +92,11 @@ public class Manager {
         BufferedReader reader = new BufferedReader(new FileReader(data_file));
         String cur_line = null;
         while ((cur_line = reader.readLine()) != null) {
-          createDatabaseIfNotExists(cur_line);
+          // modified from here
+          databases.put(cur_line, null);
+          // modify ended
+
+          // createDatabaseIfNotExists(cur_line); //original
           // 目前没加readlog
         }
         reader.close();
@@ -105,7 +107,7 @@ public class Manager {
   }
 
   private void persist() {
-    File data_file = new File("data/" + "manager.data");
+    File data_file = new File(filePath);
     if (!data_file.exists()) { // create file if not exists
       try {
         data_file.createNewFile();
@@ -113,16 +115,16 @@ public class Manager {
         throw new FileException(FileException.Create, data_file.getName());
       }
     }
-    // write to file (from beginning)
+    // write to file (from beginning), only database names
     try {
-      FileWriter writer = new FileWriter("data/" + "manager.data");
+      FileWriter writer = new FileWriter(filePath);
       for (String databaseName : databases.keySet()) {
         writer.write(databaseName);
         writer.write("\n");
       }
       writer.close();
     } catch (Exception e) {
-      throw new FileException(FileException.ReadWrite, "manager.data");
+      throw new FileException(FileException.ReadWrite, filePath);
     }
   }
 

@@ -39,4 +39,8 @@ public class Column implements Comparable<Column>, Serializable {
   public int get_Primary() {
     return primary;
   }
+
+  public ColumnType getType() {
+    return type;
+  }
 }
