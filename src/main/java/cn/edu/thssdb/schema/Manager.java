@@ -40,7 +40,6 @@ public class Manager implements Serializable {
     {
       throw new AlreadyExistsException(AlreadyExistsException.Database, databaseName);
     }
-
     Database newDB = new Database(databaseName);
     databases.put(databaseName, newDB);
     persist();
