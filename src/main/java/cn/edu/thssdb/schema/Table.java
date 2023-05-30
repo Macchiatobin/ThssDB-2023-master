@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static cn.edu.thssdb.type.ColumnType.*;
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Table implements Iterable<Row>, Serializable {
   ReentrantReadWriteLock lock;
@@ -19,8 +20,8 @@ public class Table implements Iterable<Row>, Serializable {
   public String tableName;
   public ArrayList<Column> columns;
   public BPlusTree<Entry, Row> index;
-  private int primaryIndex;
-  public static final String DATA_DIRECTORY = "data/";
+  private int primaryIndex; // index of primary key column
+  private String path; // data file path
 
   public Table(String databaseName, String tableName, Column[] columns) {
     // TODO
@@ -30,6 +31,7 @@ public class Table implements Iterable<Row>, Serializable {
     this.columns = new ArrayList<>(Arrays.asList(columns));
     this.index = new BPlusTree<>();
     this.primaryIndex = -1;
+    this.path = DATA_DIR + databaseName + "/" + tableName;
     for (int i = 0; i < this.columns.size(); i++) {
       if (this.columns.get(i).get_Primary() == 1) {
         primaryIndex = i;
@@ -68,6 +70,7 @@ public class Table implements Iterable<Row>, Serializable {
   // INSERT String
   public void insert(String val) {
     // TODO
+    lock.writeLock().lock();
     try {
       String[] tmp = val.split(",");
       ArrayList<Entry> entries = new ArrayList<>();
@@ -85,8 +88,8 @@ public class Table implements Iterable<Row>, Serializable {
   // DELETE Row
   public void delete(Row row) {
     // TODO
+    lock.writeLock().lock();
     try {
-      lock.writeLock().lock();
       Entry key = row.getEntries().get(primaryIndex);
       index.remove(key);
     } finally {
@@ -97,8 +100,8 @@ public class Table implements Iterable<Row>, Serializable {
   // DELETE Entry
   public void delete(Entry entry) {
     // TODO
+    lock.writeLock().lock();
     try {
-      lock.writeLock().lock();
       index.remove(entry);
     } finally {
       lock.writeLock().unlock();
@@ -108,8 +111,8 @@ public class Table implements Iterable<Row>, Serializable {
   // DELETE String
   public void delete(String val) {
     // TODO
+    lock.writeLock().lock();
     try {
-      lock.writeLock().lock();
       ColumnType columnType = columns.get(primaryIndex).getType();
       Entry primaryEntry = new Entry(getColumnTypeValue(columnType, val));
       index.remove(primaryEntry);
@@ -121,8 +124,8 @@ public class Table implements Iterable<Row>, Serializable {
   // DELETE All Row
   public void delete() {
     // TODO
+    lock.writeLock().lock();
     try {
-      lock.writeLock().lock();
       index.clear();
       index = new BPlusTree<>();
     } finally {
@@ -134,8 +137,8 @@ public class Table implements Iterable<Row>, Serializable {
     // TODO
     Entry oldIndex = oldRow.getEntries().get(primaryIndex);
     Entry newIndex = newRow.getEntries().get(primaryIndex);
+    lock.writeLock().lock();
     try {
-      lock.writeLock().lock();
       if (oldIndex.compareTo(newIndex) == 0) {
         index.update(newIndex, newRow);
       } else {
