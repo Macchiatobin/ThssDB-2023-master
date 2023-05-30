@@ -3,6 +3,7 @@ package cn.edu.thssdb.service;
 import cn.edu.thssdb.plan.LogicalGenerator;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
+import cn.edu.thssdb.query.MetaInfo;
 import cn.edu.thssdb.rpc.thrift.ConnectReq;
 import cn.edu.thssdb.rpc.thrift.ConnectResp;
 import cn.edu.thssdb.rpc.thrift.DisconnectReq;
@@ -13,15 +14,15 @@ import cn.edu.thssdb.rpc.thrift.GetTimeReq;
 import cn.edu.thssdb.rpc.thrift.GetTimeResp;
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.rpc.thrift.Status;
-import cn.edu.thssdb.schema.Column;
-import cn.edu.thssdb.schema.Database;
-import cn.edu.thssdb.schema.Manager;
+import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.StatusUtil;
 import org.apache.thrift.TException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -172,6 +173,42 @@ public class IServiceHandler implements IService.Iface {
       case INSERT:
         System.out.println("INSERT");
         System.out.println("[DEBUG] " + plan);
+
+        InsertPlan insertPlan = (InsertPlan) plan;
+        String tableName = insertPlan.getTableName();
+        Database dbForInsert = manager.getCurDB();
+        MetaInfo metaInfo = dbForInsert.metaInfos.get(tableName);
+        List<String> columnNames = insertPlan.getColumnNames();
+        List<String> entryValues = insertPlan.getEntryValues();
+        List<Column> columns = metaInfo.getColumns();
+        ArrayList<Entry> entries = new ArrayList<>(Collections.nCopies(columnNames.size(),null));
+        for (int i = 0; i < columnNames.size(); ++i)
+        {
+            int target_index = metaInfo.columnFind(columnNames.get(i)); // cur column index in columns list
+            if (entryValues.get(i) == null) // input value is null
+            {
+              continue;
+            }
+
+
+            switch (columns.get(i).getType())
+            {
+              case INT:
+                entries.set(target_index, new Entry(Integer.parseInt(entryValues.get(i))));
+              case LONG:
+                entries.set(target_index, new Entry(Long.parseLong(entryValues.get(i))));
+              case FLOAT:
+                entries.set(target_index, new Entry(Float.parseFloat(entryValues.get(i))));
+              case DOUBLE:
+                entries.set(target_index, new Entry(Double.parseDouble(entryValues.get(i))));
+              case STRING:
+                entries.set(target_index, new Entry(entryValues.get(i)));
+            }
+        }
+        Row rowToInsert = new Row(entries);
+        dbForInsert.getTable(tableName).insert(rowToInsert); // TODO: check
+
+
         return new ExecuteStatementResp(StatusUtil.success(), false);
 
       case DELETE:

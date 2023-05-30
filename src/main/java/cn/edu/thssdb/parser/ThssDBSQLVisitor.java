@@ -82,7 +82,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
       Column curColumn = new Column(cName, type, pk, nn, maxLength);
       columns.add(curColumn);
     }
-    if (ctx.tableConstraint() != null) // TODO: nullpointerException if no table constraint?!
+    if (ctx.tableConstraint() != null)
     {
       for (SQLParser.ColumnNameContext cn : ctx.tableConstraint().columnName()) {
         String keyColumnName = cn.getText(); // primary key column names
@@ -113,8 +113,34 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
   @Override
   public LogicalPlan visitInsertStmt(SQLParser.InsertStmtContext ctx) {
-    // TODO
-    return null;
+    String tableName = ctx.tableName().getText();
+    List<String> columnName = new ArrayList<>();
+    List<String> valueEntry = new ArrayList<>();
+
+    for (SQLParser.ColumnNameContext e : ctx.columnName())
+    {
+      String cur_columnName = e.IDENTIFIER().getText();
+      columnName.add(cur_columnName);
+    }
+
+    for (SQLParser.ValueEntryContext e : ctx.valueEntry())
+    {
+      List<SQLParser.LiteralValueContext> lctx = e.literalValue();
+      for (SQLParser.LiteralValueContext lc : lctx) {
+        String cur_value = "";
+        if (lc.NUMERIC_LITERAL() != null) {
+          cur_value = lc.NUMERIC_LITERAL().getText();
+          // TODO: parseInt? parseDouble? parseFloat?
+        } else if (lc.STRING_LITERAL() != null) {
+          cur_value = lc.STRING_LITERAL().getText();
+        } else if (lc.K_NULL() != null) {
+          cur_value = null;
+        }
+        valueEntry.add(cur_value);
+      }
+    }
+
+    return new InsertPlan(tableName, columnName, valueEntry);
   }
 
   @Override
