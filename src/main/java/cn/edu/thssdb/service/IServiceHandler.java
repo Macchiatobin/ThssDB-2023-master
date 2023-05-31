@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static cn.edu.thssdb.type.ColumnType.STRING;
 import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class IServiceHandler implements IService.Iface {
@@ -187,16 +188,19 @@ public class IServiceHandler implements IService.Iface {
         int entryValuesSize = entryValues.size();
 
         ArrayList<Column> columns = tableToInsert.columns; // columns
-        if (entryValuesSize != columns.size()) { // not enough entry
+        if (entryValuesSize != columns.size()) { // entry value size doesn't match column size
           return new ExecuteStatementResp(StatusUtil.fail("Input entry match failed."), false);
         }
         ArrayList<Entry> entries = new ArrayList<>(Collections.nCopies(columns.size(),null));
 
-        // TODO: check if input is valid (it should match to column n)
-
         if (columnNamesSize == 0) { // in order of original column order
           int current_entry_index = 0;
           for (Column c : columns) {
+            if (c.getType() == STRING) {
+              String cur_string_value = entryValues.get(current_entry_index);
+              String new_string_value = cur_string_value.substring(1, cur_string_value.length() - 1);
+              entryValues.set(current_entry_index, new_string_value);
+            }
             entries.set(current_entry_index,
                     new Entry(Table.getColumnTypeValue(c.getType(), entryValues.get(current_entry_index))));
             current_entry_index += 1;
@@ -208,12 +212,11 @@ public class IServiceHandler implements IService.Iface {
             int column_index = metaInfo.columnFind(columnNames.get(current_entry_index));
             ColumnType current_Type = columns.get(column_index).getType(); // current_entry column type
 
-            if (current_Type == ColumnType.STRING) { // delete quote
+            if (current_Type == STRING) { // delete quote
               String cur_string_value = entryValues.get(current_entry_index);
               String new_string_value = cur_string_value.substring(1, cur_string_value.length() - 1);
               entryValues.set(current_entry_index, new_string_value);
             }
-
             entries.set(column_index,
                     new Entry(Table.getColumnTypeValue(
                             current_Type, entryValues.get(current_entry_index))));
