@@ -15,6 +15,7 @@ import cn.edu.thssdb.rpc.thrift.GetTimeResp;
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.rpc.thrift.Status;
 import cn.edu.thssdb.schema.*;
+import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.StatusUtil;
 import org.apache.thrift.TException;
@@ -177,42 +178,45 @@ public class IServiceHandler implements IService.Iface {
         InsertPlan insertPlan = (InsertPlan) plan;
         String tableName = insertPlan.getTableName();
         Database dbForInsert = manager.getCurDB();
+        Table tableToInsert = dbForInsert.getTable(tableName);
         MetaInfo metaInfo = dbForInsert.metaInfos.get(tableName);
+
         List<String> columnNames = insertPlan.getColumnNames();
-        int columnNamesSize = columnNames.size();
         List<String> entryValues = insertPlan.getEntryValues();
-        List<Column> columns = metaInfo.getColumns();
+        int columnNamesSize = columnNames.size(); // need check if 0
+        int entryValuesSize = entryValues.size();
+
+        ArrayList<Column> columns = tableToInsert.columns; // columns
+        if (entryValuesSize != columns.size()) { // not enough entry
+          return new ExecuteStatementResp(StatusUtil.fail("Input entry match failed."), false);
+        }
         ArrayList<Entry> entries = new ArrayList<>(Collections.nCopies(columns.size(),null));
 
         // TODO: check if input is valid (it should match to column n)
 
-        for (int i = 0; i < entryValues.size(); ++i) {
-          int target_index = 0;
-          if (columnNamesSize == 0) target_index = i; // no column name is defined in input
-          else metaInfo.columnFind(columnNames.get(i)); // cur column index in columns list
-          if (entryValues.get(i) == null) // input value is null
-          {
-            continue;
+        if (columnNamesSize == 0) { // in order of original column order
+          int current_entry_index = 0;
+          for (Column c : columns) {
+            entries.set(current_entry_index,
+                    new Entry(Table.getColumnTypeValue(c.getType(), entryValues.get(current_entry_index))));
+            current_entry_index += 1;
           }
+        }
+        else { // may not be in order of original column order
+          // current_entry_index: index for entryValues
+          for (int current_entry_index = 0; current_entry_index < entryValues.size(); ++current_entry_index) {
+            int column_index = metaInfo.columnFind(columnNames.get(current_entry_index));
+            ColumnType current_Type = columns.get(column_index).getType(); // current_entry column type
 
+            if (current_Type == ColumnType.STRING) { // delete quote
+              String cur_string_value = entryValues.get(current_entry_index);
+              String new_string_value = cur_string_value.substring(1, cur_string_value.length() - 1);
+              entryValues.set(current_entry_index, new_string_value);
+            }
 
-          switch (columns.get(i).getType()) {
-            case INT:
-              entries.set(target_index, new Entry(Integer.parseInt(entryValues.get(i))));
-              break;
-            case LONG:
-              entries.set(target_index, new Entry(Long.parseLong(entryValues.get(i))));
-              break;
-            case FLOAT:
-              entries.set(target_index, new Entry(Float.parseFloat(entryValues.get(i))));
-              break;
-            case DOUBLE:
-              entries.set(target_index, new Entry(Double.parseDouble(entryValues.get(i))));
-              break;
-            case STRING:
-              String temp_str = entryValues.get(i);
-              String string_to_insert = temp_str.substring(1,temp_str.length() - 1); // delete quote
-              entries.set(target_index, new Entry(string_to_insert));
+            entries.set(column_index,
+                    new Entry(Table.getColumnTypeValue(
+                            current_Type, entryValues.get(current_entry_index))));
           }
         }
         Row rowToInsert = new Row(entries);
