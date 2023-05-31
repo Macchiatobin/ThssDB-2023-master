@@ -29,6 +29,7 @@ public class Database implements Serializable {
     this.tables = new HashMap<>();
     this.metaInfos = new HashMap<>();
     this.path = DATA_DIR + name + "/";
+    this.lock = new ReentrantReadWriteLock();
     recover();
   }
 
@@ -145,7 +146,7 @@ public class Database implements Serializable {
         if (restored != null) {
           this.name = restored.name;
           this.tables = restored.tables;
-          this.lock = new ReentrantReadWriteLock();
+          this.metaInfos = restored.metaInfos;
         }
       } catch (IOException e) {
         System.out.println("InputStream Error Occurred During Recovering Database object!");

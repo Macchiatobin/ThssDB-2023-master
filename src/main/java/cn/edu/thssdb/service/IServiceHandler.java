@@ -179,31 +179,39 @@ public class IServiceHandler implements IService.Iface {
         Database dbForInsert = manager.getCurDB();
         MetaInfo metaInfo = dbForInsert.metaInfos.get(tableName);
         List<String> columnNames = insertPlan.getColumnNames();
+        int columnNamesSize = columnNames.size();
         List<String> entryValues = insertPlan.getEntryValues();
         List<Column> columns = metaInfo.getColumns();
-        ArrayList<Entry> entries = new ArrayList<>(Collections.nCopies(columnNames.size(),null));
-        for (int i = 0; i < columnNames.size(); ++i)
-        {
-            int target_index = metaInfo.columnFind(columnNames.get(i)); // cur column index in columns list
-            if (entryValues.get(i) == null) // input value is null
-            {
-              continue;
-            }
+        ArrayList<Entry> entries = new ArrayList<>(Collections.nCopies(columns.size(),null));
+
+        for (int i = 0; i < entryValues.size(); ++i) {
+          int target_index = 0;
+          if (columnNamesSize == 0) target_index = i; // no column name is defined in input
+          else metaInfo.columnFind(columnNames.get(i)); // cur column index in columns list
+          if (entryValues.get(i) == null) // input value is null
+          {
+            continue;
+          }
 
 
-            switch (columns.get(i).getType())
-            {
-              case INT:
-                entries.set(target_index, new Entry(Integer.parseInt(entryValues.get(i))));
-              case LONG:
-                entries.set(target_index, new Entry(Long.parseLong(entryValues.get(i))));
-              case FLOAT:
-                entries.set(target_index, new Entry(Float.parseFloat(entryValues.get(i))));
-              case DOUBLE:
-                entries.set(target_index, new Entry(Double.parseDouble(entryValues.get(i))));
-              case STRING:
-                entries.set(target_index, new Entry(entryValues.get(i)));
-            }
+          switch (columns.get(i).getType()) {
+            case INT:
+              entries.set(target_index, new Entry(Integer.parseInt(entryValues.get(i))));
+              break;
+            case LONG:
+              entries.set(target_index, new Entry(Long.parseLong(entryValues.get(i))));
+              break;
+            case FLOAT:
+              entries.set(target_index, new Entry(Float.parseFloat(entryValues.get(i))));
+              break;
+            case DOUBLE:
+              entries.set(target_index, new Entry(Double.parseDouble(entryValues.get(i))));
+              break;
+            case STRING:
+              String temp_str = entryValues.get(i);
+              String string_to_insert = temp_str.substring(1,temp_str.length() - 1); // delete quote
+              entries.set(target_index, new Entry(string_to_insert));
+          }
         }
         Row rowToInsert = new Row(entries);
         dbForInsert.getTable(tableName).insert(rowToInsert); // TODO: check
