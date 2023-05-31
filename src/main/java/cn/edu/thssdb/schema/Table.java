@@ -37,7 +37,7 @@ public class Table implements Iterable<Row>, Serializable {
         primaryIndex = i;
       }
     }
-    recover();
+    recover(); // TODO: should i recover here?
   }
 
   private void recover() {
@@ -150,24 +150,35 @@ public class Table implements Iterable<Row>, Serializable {
     }
   }
 
-  private void serialize(ArrayList<Row> rows, String filename) throws IOException {
+  private void serialize() throws IOException { // persist
     // TODO
-    ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filename));
-    objectOutputStream.writeObject(rows);
-    objectOutputStream.close();
+    lock.writeLock().lock();
+    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(path));)
+    {
+      objectOutputStream.writeObject(this);
+    } finally {
+      lock.writeLock().unlock();
+    }
   }
 
-  private ArrayList<Row> deserialize(File file) {
-    // TODO
-    ArrayList<Row> rows;
-    try {
-      ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file));
-      rows = (ArrayList<Row>) objectInputStream.readObject();
-      objectInputStream.close();
+  private void deserialize() { // recover
+    lock.writeLock().lock();
+    try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(path));) {
+      Table restored = (Table) objectInputStream.readObject();
+
+      // TODO: restore only nodes that we need for now
+
+      if (restored != null) {
+        this.columns = restored.columns;
+        this.index = restored.index;
+        this.primaryIndex = restored.primaryIndex;
+        this.path = DATA_DIR + databaseName + "/" + tableName;
+      }
     } catch (Exception e) {
-      rows = null;
+      System.out.println(e);
+    } finally {
+      lock.writeLock().unlock();
     }
-    return rows;
   }
 
   private class TableIterator implements Iterator<Row> {
