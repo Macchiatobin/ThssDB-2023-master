@@ -18,7 +18,7 @@ import static cn.edu.thssdb.utils.Global.DATA_DIR;
 public class Database implements Serializable {
 
   private String name;
-  private HashMap<String, Table> tables;
+  transient private HashMap<String, Table> tables;
   public HashMap<String, MetaInfo> metaInfos;
   transient ReentrantReadWriteLock lock;
 
@@ -96,11 +96,19 @@ public class Database implements Serializable {
     MetaInfo mobj;
     lock.readLock().lock();
     try {
-      tobj = tables.get(tableName);
       mobj = metaInfos.get(tableName);
+      tobj = tables.get(tableName);
+
+      metaInfos.remove(tableName);
+      if (tobj != null) tables.remove(tableName); // remove from HashMap if exists in it
+
+      // delete corresponding file
+      deleteFolder(new File(this.path + tableName));
+
     } catch (Exception e) {
       tobj = null;
       mobj = null;
+
       System.out.println(e);
     } finally {
       lock.readLock().unlock();
@@ -145,8 +153,10 @@ public class Database implements Serializable {
         // recover
         if (restored != null) {
           this.name = restored.name;
-          this.tables = restored.tables;
+          //this.tables = restored.tables;
           this.metaInfos = restored.metaInfos;
+
+          // TODO: serialize tables from metaInfos?
         }
       } catch (IOException e) {
         System.out.println("InputStream Error Occurred During Recovering Database object!");
@@ -164,6 +174,7 @@ public class Database implements Serializable {
     lock.writeLock().lock();
     try {
       persist();
+      // TODO: table persist?
     } catch (Exception e) {
       System.out.println(e);
     } finally {

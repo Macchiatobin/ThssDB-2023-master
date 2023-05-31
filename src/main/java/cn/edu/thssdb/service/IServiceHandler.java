@@ -184,6 +184,8 @@ public class IServiceHandler implements IService.Iface {
         List<Column> columns = metaInfo.getColumns();
         ArrayList<Entry> entries = new ArrayList<>(Collections.nCopies(columns.size(),null));
 
+        // TODO: check if input is valid (it should match to column n)
+
         for (int i = 0; i < entryValues.size(); ++i) {
           int target_index = 0;
           if (columnNamesSize == 0) target_index = i; // no column name is defined in input
