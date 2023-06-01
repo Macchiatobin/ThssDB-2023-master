@@ -7,11 +7,15 @@ import java.io.Serializable;
 public final class BPlusTree<K extends Comparable<K>, V>
     implements Iterable<Pair<K, V>>, Serializable {
 
-  BPlusTreeNode<K, V> root;
+  transient public BPlusTreeNode<K, V> root;
   private int size;
+  public TreeNodeManager<K, V> nodeManager;
 
   public BPlusTree() {
     root = new BPlusTreeLeafNode<>(0);
+    root.id = 0; // TODO: is this good?
+    nodeManager = new TreeNodeManager<>(root);
+    // TODO: should put root into manager
   }
 
   public int size() {
@@ -57,6 +61,7 @@ public final class BPlusTree<K extends Comparable<K>, V>
       newRoot.children.set(0, root);
       newRoot.children.set(1, newSiblingNode);
       root = newRoot;
+      // TODO: should put root id to manager
     }
   }
 

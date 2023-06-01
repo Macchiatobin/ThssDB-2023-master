@@ -4,6 +4,7 @@ import cn.edu.thssdb.exception.AlreadyExistsException;
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.NotExistsException;
 import cn.edu.thssdb.index.BPlusTree;
+import cn.edu.thssdb.index.TreeNodeManager;
 import cn.edu.thssdb.query.MetaInfo;
 import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.query.QueryTable;
@@ -150,8 +151,8 @@ public class Database implements Serializable {
           this.metaInfos = restored.metaInfos;
 
           for (Table table : this.tables.values()) {
-            table.lock = new ReentrantReadWriteLock();
-            table.index = new BPlusTree<>();
+            TreeNodeManager nodeManager = table.index.nodeManager;
+            table.index.root = nodeManager.loadNode(nodeManager.root_id);
           }
         }
       } catch (IOException e) {

@@ -15,16 +15,17 @@ import static cn.edu.thssdb.type.ColumnType.*;
 import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Table implements Iterable<Row>, Serializable {
-  transient ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+  transient ReentrantReadWriteLock lock;
   private String databaseName;
   public String tableName;
   public ArrayList<Column> columns;
-  transient public BPlusTree<Entry, Row> index;
+  public BPlusTree<Entry, Row> index;
   private int primaryIndex; // index of primary key column
   private String path; // data file path
 
   public Table(String databaseName, String tableName, Column[] columns) {
     // TODO
+    this.lock = new ReentrantReadWriteLock();
     this.databaseName = databaseName;
     this.tableName = tableName;
     this.columns = new ArrayList<>(Arrays.asList(columns));
@@ -40,13 +41,11 @@ public class Table implements Iterable<Row>, Serializable {
     if (!tableFolder.exists()) tableFolder.mkdir(); // create folder if it doesn't exists
   }
 
-  /*
+  // maybe no use
   private void recover() {
-    File tableFolder = new File(this.path);
-    if (!tableFolder.exists()) tableFolder.mkdir(); // create folder if it doesn't exists
   }
 
-   */
+
 
   // INSERT Row
   public void insert(Row row) {
