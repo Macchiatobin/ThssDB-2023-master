@@ -1,6 +1,9 @@
 package cn.edu.thssdb.plan.impl;
 
 import cn.edu.thssdb.plan.LogicalPlan;
+import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
+import cn.edu.thssdb.schema.Manager;
+import cn.edu.thssdb.utils.StatusUtil;
 
 public class DropDatabasePlan extends LogicalPlan {
 
@@ -13,6 +16,13 @@ public class DropDatabasePlan extends LogicalPlan {
 
   public String getDatabaseName() {
     return databaseName;
+  }
+
+  @Override
+  public ExecuteStatementResp execute_plan() {
+    Manager manager = Manager.getInstance();
+    manager.deleteDatabase(databaseName);
+    return new ExecuteStatementResp(StatusUtil.success(), false);
   }
 
   @Override

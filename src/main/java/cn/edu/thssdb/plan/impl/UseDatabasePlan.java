@@ -19,6 +19,9 @@
 package cn.edu.thssdb.plan.impl;
 
 import cn.edu.thssdb.plan.LogicalPlan;
+import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
+import cn.edu.thssdb.schema.Manager;
+import cn.edu.thssdb.utils.StatusUtil;
 
 public class UseDatabasePlan extends LogicalPlan {
 
@@ -36,5 +39,12 @@ public class UseDatabasePlan extends LogicalPlan {
   @Override
   public String toString() {
     return "UseDatabasePlan{" + "databaseName='" + databaseName + '\'' + '}';
+  }
+
+  @Override
+  public ExecuteStatementResp execute_plan() {
+    Manager manager = Manager.getInstance();
+    manager.switchDatabase(databaseName);
+    return new ExecuteStatementResp(StatusUtil.success(), false);
   }
 }

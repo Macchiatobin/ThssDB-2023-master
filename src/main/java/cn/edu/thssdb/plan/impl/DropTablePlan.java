@@ -1,6 +1,10 @@
 package cn.edu.thssdb.plan.impl;
 
 import cn.edu.thssdb.plan.LogicalPlan;
+import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
+import cn.edu.thssdb.schema.Database;
+import cn.edu.thssdb.schema.Manager;
+import cn.edu.thssdb.utils.StatusUtil;
 
 public class DropTablePlan extends LogicalPlan {
 
@@ -13,6 +17,18 @@ public class DropTablePlan extends LogicalPlan {
 
   public String getTableName() {
     return tableName;
+  }
+
+  @Override
+  public ExecuteStatementResp execute_plan() {
+
+    Manager manager = Manager.getInstance();
+    Database dbForTableDrop = manager.getCurDB();
+    if (dbForTableDrop == null) {
+      return new ExecuteStatementResp(StatusUtil.fail("Use database first."), false);
+    }
+    dbForTableDrop.drop(tableName);
+    return new ExecuteStatementResp(StatusUtil.success(), false);
   }
 
   @Override

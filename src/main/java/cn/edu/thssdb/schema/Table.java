@@ -15,17 +15,16 @@ import static cn.edu.thssdb.type.ColumnType.*;
 import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Table implements Iterable<Row>, Serializable {
-  ReentrantReadWriteLock lock;
+  transient ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
   private String databaseName;
   public String tableName;
   public ArrayList<Column> columns;
-  public BPlusTree<Entry, Row> index;
+  transient public BPlusTree<Entry, Row> index;
   private int primaryIndex; // index of primary key column
   private String path; // data file path
 
   public Table(String databaseName, String tableName, Column[] columns) {
     // TODO
-    this.lock = new ReentrantReadWriteLock();
     this.databaseName = databaseName;
     this.tableName = tableName;
     this.columns = new ArrayList<>(Arrays.asList(columns));
@@ -37,16 +36,20 @@ public class Table implements Iterable<Row>, Serializable {
         primaryIndex = i;
       }
     }
-    recover(); // TODO: should i recover here?
+    File tableFolder = new File(this.path);
+    if (!tableFolder.exists()) tableFolder.mkdir(); // create folder if it doesn't exists
   }
 
+  /*
   private void recover() {
-    // TODO
+    File tableFolder = new File(this.path);
+    if (!tableFolder.exists()) tableFolder.mkdir(); // create folder if it doesn't exists
   }
+
+   */
 
   // INSERT Row
   public void insert(Row row) {
-    // TODO
     try {
       lock.writeLock().lock();
       Entry key = row.getEntries().get(primaryIndex);
@@ -110,7 +113,6 @@ public class Table implements Iterable<Row>, Serializable {
 
   // DELETE String
   public void delete(String val) {
-    // TODO
     lock.writeLock().lock();
     try {
       ColumnType columnType = columns.get(primaryIndex).getType();
@@ -123,7 +125,6 @@ public class Table implements Iterable<Row>, Serializable {
 
   // DELETE All Row
   public void delete() {
-    // TODO
     lock.writeLock().lock();
     try {
       index.clear();

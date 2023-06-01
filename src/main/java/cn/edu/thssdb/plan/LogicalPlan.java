@@ -1,5 +1,7 @@
 package cn.edu.thssdb.plan;
 
+import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
+
 public abstract class LogicalPlan {
 
   protected LogicalPlanType type;
@@ -28,4 +30,6 @@ public abstract class LogicalPlan {
     DELETE,
     UPDATE
   }
+
+  abstract public ExecuteStatementResp execute_plan(); // Plan execution abstract method, returns response
 }

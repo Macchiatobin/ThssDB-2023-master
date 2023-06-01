@@ -83,57 +83,27 @@ public class IServiceHandler implements IService.Iface {
       case CREATE_DB:
         System.out.println("CREATE_DB");
         System.out.println("[DEBUG] " + plan);
-
-        CreateDatabasePlan createDatabasePlan = (CreateDatabasePlan) plan;
-        manager.createDatabaseIfNotExists(createDatabasePlan.getDatabaseName());
-
-        return new ExecuteStatementResp(StatusUtil.success(), false);
+        break;
 
       case DROP_DB:
         System.out.println("DROP_DB");
         System.out.println("[DEBUG] " + plan);
-
-        DropDatabasePlan dropDatabasePlan = (DropDatabasePlan) plan;
-        manager.deleteDatabase(dropDatabasePlan.getDatabaseName());
-
-        return new ExecuteStatementResp(StatusUtil.success(), false);
+        break;
 
       case USE_DB:
         System.out.println("USE_DB");
         System.out.println("[DEBUG] " + plan);
-
-        UseDatabasePlan useDatabasePlan = (UseDatabasePlan) plan;
-        manager.switchDatabase(useDatabasePlan.getDatabaseName());
-
-        return new ExecuteStatementResp(StatusUtil.success(), false);
+        break;
 
       case CREATE_TABLE:
         System.out.println("CREATE_TABLE");
         System.out.println("[DEBUG] " + plan);
-
-        CreateTablePlan createTablePlan = (CreateTablePlan) plan; // downgrading
-        Database dbForTableCreate = manager.getCurDB();
-        if (dbForTableCreate == null) {
-          return new ExecuteStatementResp(StatusUtil.fail("Use database first."), false);
-        }
-        List<Column> cList = createTablePlan.getColumns();
-        dbForTableCreate.create(
-            createTablePlan.getTableName(), cList.toArray(new Column[cList.size()]));
-
-        return new ExecuteStatementResp(StatusUtil.success(), false);
+        break;
 
       case DROP_TABLE:
         System.out.println("DROP_TABLE");
         System.out.println("[DEBUG] " + plan);
-
-        DropTablePlan dropTablePlan = (DropTablePlan) plan;
-        Database dbForTableDrop = manager.getCurDB();
-        if (dbForTableDrop == null) {
-          return new ExecuteStatementResp(StatusUtil.fail("Use database first."), false);
-        }
-        dbForTableDrop.drop(dropTablePlan.getTableName());
-
-        return new ExecuteStatementResp(StatusUtil.success(), false);
+        break;
 
       case QUIT:
         System.out.println("QUIT");
@@ -141,20 +111,22 @@ public class IServiceHandler implements IService.Iface {
 
         // TODO: wtf does this quit mean
 
-        return new ExecuteStatementResp(StatusUtil.success(), false);
+        break;
 
       case SHOW_TABLE: // SHOW DATABASE tableName
         System.out.println("SHOW_TABLE");
         System.out.println("[DEBUG] " + plan);
-        return new ExecuteStatementResp(StatusUtil.success(), false);
 
+        // TODO: Plan, MetaInfo printing implementation
+
+        break;
       case AUTO_COMMIT:
         System.out.println("AUTO_COMMIT");
         System.out.println("[DEBUG] " + plan);
 
         // TODO
 
-        return new ExecuteStatementResp(StatusUtil.success(), false);
+        break;
 
       case BEGIN_TRANSACTION:
         System.out.println("BEGIN_TRANSACTION");
@@ -162,7 +134,7 @@ public class IServiceHandler implements IService.Iface {
 
         // TODO
 
-        return new ExecuteStatementResp(StatusUtil.success(), false);
+        break;
 
       case COMMIT:
         System.out.println("COMMIT");
@@ -170,76 +142,25 @@ public class IServiceHandler implements IService.Iface {
 
         // TODO
 
-        return new ExecuteStatementResp(StatusUtil.success(), false);
+        break;
 
       case INSERT:
         System.out.println("INSERT");
         System.out.println("[DEBUG] " + plan);
-
-        InsertPlan insertPlan = (InsertPlan) plan;
-        String tableName = insertPlan.getTableName();
-        Database dbForInsert = manager.getCurDB();
-        Table tableToInsert = dbForInsert.getTable(tableName);
-        MetaInfo metaInfo = dbForInsert.metaInfos.get(tableName);
-
-        List<String> columnNames = insertPlan.getColumnNames();
-        List<String> entryValues = insertPlan.getEntryValues();
-        int columnNamesSize = columnNames.size(); // need check if 0
-        int entryValuesSize = entryValues.size();
-
-        ArrayList<Column> columns = tableToInsert.columns; // columns
-        if (entryValuesSize != columns.size()) { // entry value size doesn't match column size
-          return new ExecuteStatementResp(StatusUtil.fail("Input entry match failed."), false);
-        }
-        ArrayList<Entry> entries = new ArrayList<>(Collections.nCopies(columns.size(),null));
-
-        if (columnNamesSize == 0) { // in order of original column order
-          int current_entry_index = 0;
-          for (Column c : columns) {
-            if (c.getType() == STRING) {
-              String cur_string_value = entryValues.get(current_entry_index);
-              String new_string_value = cur_string_value.substring(1, cur_string_value.length() - 1);
-              entryValues.set(current_entry_index, new_string_value);
-            }
-            entries.set(current_entry_index,
-                    new Entry(Table.getColumnTypeValue(c.getType(), entryValues.get(current_entry_index))));
-            current_entry_index += 1;
-          }
-        }
-        else { // may not be in order of original column order
-          // current_entry_index: index for entryValues
-          for (int current_entry_index = 0; current_entry_index < entryValues.size(); ++current_entry_index) {
-            int column_index = metaInfo.columnFind(columnNames.get(current_entry_index));
-            ColumnType current_Type = columns.get(column_index).getType(); // current_entry column type
-
-            if (current_Type == STRING) { // delete quote
-              String cur_string_value = entryValues.get(current_entry_index);
-              String new_string_value = cur_string_value.substring(1, cur_string_value.length() - 1);
-              entryValues.set(current_entry_index, new_string_value);
-            }
-            entries.set(column_index,
-                    new Entry(Table.getColumnTypeValue(
-                            current_Type, entryValues.get(current_entry_index))));
-          }
-        }
-        Row rowToInsert = new Row(entries);
-        dbForInsert.getTable(tableName).insert(rowToInsert); // TODO: check
-
-
-        return new ExecuteStatementResp(StatusUtil.success(), false);
+        break;
 
       case DELETE:
         System.out.println("DELETE");
         System.out.println("[DEBUG] " + plan);
-        return new ExecuteStatementResp(StatusUtil.success(), false);
+        break;
 
       case UPDATE:
         System.out.println("UPDATE");
         System.out.println("[DEBUG] " + plan);
-        return new ExecuteStatementResp(StatusUtil.success(), false);
+        break;
 
-      default:
+      default:break;
     }
-    return null;
+    return plan.execute_plan();
   }
 }
