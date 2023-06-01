@@ -1,6 +1,7 @@
 package cn.edu.thssdb.plan.impl;
 
 import cn.edu.thssdb.plan.LogicalPlan;
+import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 
 public class ShowTablePlan extends LogicalPlan {
 
@@ -18,5 +19,10 @@ public class ShowTablePlan extends LogicalPlan {
   @Override
   public String toString() {
     return "ShowTablePlan{" + "tableName='" + tableName + '\'' + '}';
+  }
+
+  @Override
+  public ExecuteStatementResp execute_plan() {
+    return null;
   }
 }
