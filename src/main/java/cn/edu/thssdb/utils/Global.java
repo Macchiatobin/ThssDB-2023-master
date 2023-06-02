@@ -20,4 +20,6 @@ public class Global {
   public static final String S_URL_INTERNAL = "jdbc:default:connection";
 
   public static final String DATA_DIR = "data/";
+
+  public static final int CACHE_SIZE = 10;
 }

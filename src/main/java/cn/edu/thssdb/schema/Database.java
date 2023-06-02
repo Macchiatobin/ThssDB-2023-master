@@ -75,6 +75,7 @@ public class Database implements Serializable {
     lock.writeLock().lock();
     try {
       tables.put(tableName, new Table(this.name, tableName, columns));
+      tables.get(tableName).index.nodeManager.path = this.path + tableName + "/";
       metaInfos.put(tableName, new MetaInfo(tableName, new ArrayList<>(Arrays.asList(columns))));
       persist();
     } catch (Exception e) {
@@ -151,8 +152,9 @@ public class Database implements Serializable {
           this.metaInfos = restored.metaInfos;
 
           for (Table table : this.tables.values()) {
+            table.lock = new ReentrantReadWriteLock();
             TreeNodeManager nodeManager = table.index.nodeManager;
-            table.index.root = nodeManager.loadNode(nodeManager.root_id);
+            nodeManager.recover();
           }
         }
       } catch (IOException e) {
@@ -164,7 +166,7 @@ public class Database implements Serializable {
       } finally {
         lock.writeLock().unlock();
       }
-    } else { //create meta file if doesn't exist
+    } else { //create meta file if it doesn't exist
       try {
         metaFile.createNewFile();
       } catch (Exception e) {

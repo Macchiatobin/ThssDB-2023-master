@@ -2,12 +2,16 @@ package cn.edu.thssdb.index;
 
 import cn.edu.thssdb.utils.Global;
 
+import javax.swing.tree.TreeNode;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.UUID;
 
 public final class BPlusTreeInternalNode<K extends Comparable<K>, V> extends BPlusTreeNode<K, V> {
 
-  ArrayList<BPlusTreeNode<K, V>> children;
+  //ArrayList<BPlusTreeNode<K, V>> children;
+  ArrayList<K> children;
 
   BPlusTreeInternalNode(int size) {
     keys = new ArrayList<>(Collections.nCopies((int) (1.5 * Global.fanout) + 1, null));
@@ -29,31 +33,31 @@ public final class BPlusTreeInternalNode<K extends Comparable<K>, V> extends BPl
   }
 
   @Override
-  boolean containsKey(K key) {
-    return searchChild(key).containsKey(key);
+  boolean containsKey(K key, TreeNodeManager<K, V> nodeManager) {
+    return searchChild(key).containsKey(key, nodeManager);
   }
 
   @Override
-  V get(K key) {
-    return searchChild(key).get(key);
+  V get(K key, TreeNodeManager<K, V> nodeManager) {
+    return searchChild(key).get(key, nodeManager);
   }
 
   @Override
-  void put(K key, V value) {
+  void put(K key, V value, TreeNodeManager<K, V> nodeManager) {
     BPlusTreeNode<K, V> child = searchChild(key);
-    child.put(key, value);
+    child.put(key, value, nodeManager);
     if (child.isOverFlow()) {
-      BPlusTreeNode<K, V> newSiblingNode = child.split();
+      BPlusTreeNode<K, V> newSiblingNode = child.split(nodeManager);
       insertChild(newSiblingNode.getFirstLeafKey(), newSiblingNode);
     }
   }
 
   @Override
-  void remove(K key) {
+  void remove(K key, TreeNodeManager<K, V> nodeManager) {
     int index = binarySearch(key);
     int childIndex = index >= 0 ? index + 1 : -index - 1;
     BPlusTreeNode<K, V> child = children.get(childIndex);
-    child.remove(key);
+    child.remove(key, nodeManager);
     if (child.isUnderFlow()) {
       BPlusTreeNode<K, V> childLeftSibling = getChildLeftSibling(key);
       BPlusTreeNode<K, V> childRightSibling = getChildRightSibling(key);
@@ -68,7 +72,7 @@ public final class BPlusTreeInternalNode<K extends Comparable<K>, V> extends BPl
         deleteChild(right.getFirstLeafKey());
       }
       if (left.isOverFlow()) {
-        BPlusTreeNode<K, V> newSiblingNode = left.split();
+        BPlusTreeNode<K, V> newSiblingNode = left.split(nodeManager);
         insertChild(newSiblingNode.getFirstLeafKey(), newSiblingNode);
       }
     } else if (index >= 0) keys.set(index, children.get(index + 1).getFirstLeafKey());
@@ -80,10 +84,11 @@ public final class BPlusTreeInternalNode<K extends Comparable<K>, V> extends BPl
   }
 
   @Override
-  BPlusTreeNode<K, V> split() {
+  BPlusTreeNode<K, V> split(TreeNodeManager<K, V> nodeManager) {
     int from = size() / 2 + 1;
     int to = size();
     BPlusTreeInternalNode<K, V> newSiblingNode = new BPlusTreeInternalNode<>(to - from);
+    // TODO: write to disk and load to cache
     for (int i = 0; i < to - from; i++) {
       newSiblingNode.keys.set(i, keys.get(i + from));
       newSiblingNode.children.set(i, children.get(i + from));

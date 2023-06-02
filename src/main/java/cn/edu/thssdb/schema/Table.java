@@ -15,7 +15,7 @@ import static cn.edu.thssdb.type.ColumnType.*;
 import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Table implements Iterable<Row>, Serializable {
-  transient ReentrantReadWriteLock lock;
+  transient ReentrantReadWriteLock lock; // New Object created by Database.class when recovering
   private String databaseName;
   public String tableName;
   public ArrayList<Column> columns;

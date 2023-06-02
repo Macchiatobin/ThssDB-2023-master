@@ -5,23 +5,24 @@ import cn.edu.thssdb.utils.Global;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.UUID;
 
 abstract class BPlusTreeNode<K extends Comparable<K>, V> implements Serializable {
   ArrayList<K> keys;
   int nodeSize;
-  public int id; // for node management
+  public UUID id; // for node management
 
-  abstract V get(K key);
+  abstract V get(K key, TreeNodeManager<K, V> nodeManager);
 
-  abstract void put(K key, V value);
+  abstract void put(K key, V value, TreeNodeManager<K, V> nodeManager);
 
-  abstract void remove(K key);
+  abstract void remove(K key, TreeNodeManager<K, V> nodeManager);
 
-  abstract boolean containsKey(K key);
+  abstract boolean containsKey(K key, TreeNodeManager<K, V> nodeManager);
 
-  abstract K getFirstLeafKey();
+  abstract K getFirstLeafKey(); // TODO: check
 
-  abstract BPlusTreeNode<K, V> split();
+  abstract BPlusTreeNode<K, V> split(TreeNodeManager<K, V> nodeManager);
 
   abstract void merge(BPlusTreeNode<K, V> sibling);
 

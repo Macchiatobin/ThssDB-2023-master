@@ -34,8 +34,9 @@ public class Manager implements Serializable {
   public void createDatabaseIfNotExists(String databaseName) {
     /* TODO */
     // v1 done
+    lock.writeLock().lock();
     try {
-      lock.writeLock().lock();
+
       if (databases.get(databaseName) != null) // exists already
       {
         throw new AlreadyExistsException(AlreadyExistsException.Database, databaseName);
@@ -50,10 +51,9 @@ public class Manager implements Serializable {
   }
 
   public void deleteDatabase(String databaseName) {
-    /* TODO */
     // v1 done
+    lock.writeLock().lock();
     try {
-      lock.writeLock().lock();
       if (databases.get(databaseName) == null)
         throw new NotExistsException(NotExistsException.Database, databaseName);
       databases.remove(databaseName);
@@ -69,8 +69,8 @@ public class Manager implements Serializable {
   public void switchDatabase(String databaseName) {
     /* TODO */
     // v1 done
+    lock.readLock().lock();
     try {
-      lock.readLock().lock();
       if (!databases.containsKey(databaseName))
         throw new NotExistsException(NotExistsException.Database, databaseName);
       curDB = getDB(databaseName);
@@ -135,8 +135,8 @@ public class Manager implements Serializable {
   }
 
   private Database getDB(String databaseName) {
+    lock.readLock().lock();
     try {
-      lock.readLock().lock();
       if (!databases.containsKey(databaseName))
         throw new NotExistsException(NotExistsException.Database, databaseName);
       return databases.get(databaseName);

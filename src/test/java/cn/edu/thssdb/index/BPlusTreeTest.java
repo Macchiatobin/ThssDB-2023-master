@@ -33,6 +33,7 @@ public class BPlusTreeTest {
       keys.add(key);
       values.add(hashCode);
       tree.put(key, hashCode);
+      //tree.put(key, hashCode); // original
       map.put(key, hashCode);
     }
   }
