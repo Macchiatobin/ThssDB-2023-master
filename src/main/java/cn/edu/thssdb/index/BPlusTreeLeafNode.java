@@ -13,7 +13,8 @@ import static cn.edu.thssdb.utils.Global.LEAF;
 public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode<K, V> {
 
   ArrayList<V> values;
-  //private BPlusTreeLeafNode<K, V> next; // TODO: need modify, should only save key of next leaf node
+  // private BPlusTreeLeafNode<K, V> next; // TODO: need modify, should only save key of next leaf
+  // node
   private UUID next;
 
   BPlusTreeLeafNode(int size, UUID parent_id) {
@@ -54,14 +55,9 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
       keysAdd(valueIndex, key);
     }
 
-    // modify start
     nodeManager.writeNodeToDisk(this);
-
-    if (valueIndex == 0) { // first key changed
-      // TODO: changes to be made in its parents
-    }
-
-    // modify end
+    // overflow check and split is done by caller
+    // need this, cause of root
   }
 
   @Override
@@ -70,11 +66,14 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
     if (index >= 0) {
       valuesRemove(index);
       keysRemove(index);
+
+      nodeManager.writeNodeToDisk(this); // maybe repeated but needed, same as put
     } else throw new KeyNotExistException();
   }
 
   @Override
-  K getFirstLeafKey() {
+  K getFirstLeafKey(TreeNodeManager<K, V> nodeManager) {
+    // no use for manager in leaf node
     return keys.get(0);
   }
 
@@ -82,9 +81,9 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
   BPlusTreeNode<K, V> split(TreeNodeManager<K, V> nodeManager, UUID parent_id) {
     int from = (size() + 1) / 2;
     int to = size();
-    //BPlusTreeLeafNode<K, V> newSiblingNode = new BPlusTreeLeafNode<>(to - from);
+    // BPlusTreeLeafNode<K, V> newSiblingNode = new BPlusTreeLeafNode<>(to - from);
     BPlusTreeLeafNode<K, V> newSiblingNode =
-            (BPlusTreeLeafNode<K, V>) nodeManager.newNode(to - from, LEAF, null, parent_id);
+        (BPlusTreeLeafNode<K, V>) nodeManager.newNode(to - from, LEAF, null, parent_id);
     // loaded to cache by manager
 
     for (int i = 0; i < to - from; i++) {
@@ -95,7 +94,7 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
     }
     nodeSize = from;
     newSiblingNode.next = next;
-    //next = newSiblingNode;
+    // next = newSiblingNode;
     next = newSiblingNode.id;
     return newSiblingNode;
 
@@ -103,7 +102,7 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
   }
 
   @Override
-  void merge(BPlusTreeNode<K, V> sibling) {
+  void merge(BPlusTreeNode<K, V> sibling, TreeNodeManager<K, V> nodeManager) {
     int index = size();
     BPlusTreeLeafNode<K, V> node = (BPlusTreeLeafNode<K, V>) sibling;
     int length = node.size();
@@ -113,6 +112,7 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
     }
     nodeSize = index + length;
     next = node.next;
+    // write to disk done by caller
   }
 
   @Override

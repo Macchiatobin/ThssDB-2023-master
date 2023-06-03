@@ -82,8 +82,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
       Column curColumn = new Column(cName, type, pk, nn, maxLength);
       columns.add(curColumn);
     }
-    if (ctx.tableConstraint() != null)
-    {
+    if (ctx.tableConstraint() != null) {
       for (SQLParser.ColumnNameContext cn : ctx.tableConstraint().columnName()) {
         String keyColumnName = cn.getText(); // primary key column names
         for (Column c : columns) {
@@ -117,14 +116,12 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     List<String> columnName = new ArrayList<>();
     List<String> valueEntry = new ArrayList<>();
 
-    for (SQLParser.ColumnNameContext e : ctx.columnName())
-    {
+    for (SQLParser.ColumnNameContext e : ctx.columnName()) {
       String cur_columnName = e.IDENTIFIER().getText();
       columnName.add(cur_columnName);
     }
 
-    for (SQLParser.ValueEntryContext e : ctx.valueEntry())
-    {
+    for (SQLParser.ValueEntryContext e : ctx.valueEntry()) {
       List<SQLParser.LiteralValueContext> lctx = e.literalValue();
       for (SQLParser.LiteralValueContext lc : lctx) {
         String cur_value = "";

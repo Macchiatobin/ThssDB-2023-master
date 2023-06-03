@@ -36,14 +36,12 @@ public class CreateTablePlan extends LogicalPlan {
       return new ExecuteStatementResp(StatusUtil.fail("Use database first."), false);
     }
     List<Column> cList = columns;
-    dbForTableCreate.create(
-            tableName, cList.toArray(new Column[cList.size()]));
+    dbForTableCreate.create(tableName, cList.toArray(new Column[cList.size()]));
     return new ExecuteStatementResp(StatusUtil.success(), false);
   }
 
   @Override
   public String toString() {
-    return "CreateTablePlan{" + "tableName='" + tableName + '\'' +
-            "; columns=" + columns + '}';
+    return "CreateTablePlan{" + "tableName='" + tableName + '\'' + "; columns=" + columns + '}';
   }
 }

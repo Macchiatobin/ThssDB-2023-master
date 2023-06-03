@@ -21,12 +21,12 @@ abstract class BPlusTreeNode<K extends Comparable<K>, V> implements Serializable
 
   abstract boolean containsKey(K key, TreeNodeManager<K, V> nodeManager);
 
-  abstract K getFirstLeafKey(); // TODO: check
+  abstract K getFirstLeafKey(TreeNodeManager<K, V> nodeManager); // TODO: check
 
   // split when overflows, returns current node's RIGHT sibling
   abstract BPlusTreeNode<K, V> split(TreeNodeManager<K, V> nodeManager, UUID parent_id);
 
-  abstract void merge(BPlusTreeNode<K, V> sibling);
+  abstract void merge(BPlusTreeNode<K, V> sibling, TreeNodeManager<K, V> nodeManager);
 
   int size() {
     return nodeSize;

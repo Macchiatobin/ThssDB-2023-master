@@ -5,17 +5,18 @@ import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 
 public class CommitPlan extends LogicalPlan {
 
-    public CommitPlan() {
-        super(LogicalPlanType.COMMIT);
-    }
+  public CommitPlan() {
+    super(LogicalPlanType.COMMIT);
+  }
 
-    @Override
-    public String toString() {
-        return "CommitPlan";
-    }
+  @Override
+  public String toString() {
+    return "CommitPlan";
+  }
 
-    @Override
-    public ExecuteStatementResp execute_plan() {
-        return null;
-    }
+  @Override
+  public ExecuteStatementResp execute_plan() {
+    // TODO
+    return null;
+  }
 }

@@ -3,7 +3,6 @@ package cn.edu.thssdb.service;
 import cn.edu.thssdb.plan.LogicalGenerator;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
-import cn.edu.thssdb.query.MetaInfo;
 import cn.edu.thssdb.rpc.thrift.ConnectReq;
 import cn.edu.thssdb.rpc.thrift.ConnectResp;
 import cn.edu.thssdb.rpc.thrift.DisconnectReq;
@@ -15,20 +14,15 @@ import cn.edu.thssdb.rpc.thrift.GetTimeResp;
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.rpc.thrift.Status;
 import cn.edu.thssdb.schema.*;
-import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.StatusUtil;
 import org.apache.thrift.TException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static cn.edu.thssdb.type.ColumnType.STRING;
 import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class IServiceHandler implements IService.Iface {
@@ -159,7 +153,8 @@ public class IServiceHandler implements IService.Iface {
         System.out.println("[DEBUG] " + plan);
         break;
 
-      default:break;
+      default:
+        break;
     }
     return plan.execute_plan();
   }

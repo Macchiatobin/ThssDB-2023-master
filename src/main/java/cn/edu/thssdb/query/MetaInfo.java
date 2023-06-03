@@ -19,14 +19,20 @@ public class MetaInfo implements Serializable {
   public int columnFind(String name) {
     /* TODO */
     // v1 done
-    for(int i = 0; i < columns.size(); i++) {
+    for (int i = 0; i < columns.size(); i++) {
       String cur_name = columns.get(i).getName();
-      if(cur_name.equals(name)){
+      if (cur_name.equals(name)) {
         return i;
       }
     }
     return -1;
   }
 
-  public List<Column> getColumns() { return this.columns; }
+  public String getTableName() {
+    return this.tableName;
+  }
+
+  public List<Column> getColumns() {
+    return this.columns;
+  }
 }

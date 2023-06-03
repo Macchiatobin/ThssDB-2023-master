@@ -10,15 +10,20 @@ import static cn.edu.thssdb.utils.Global.INTERNAL;
 public final class BPlusTree<K extends Comparable<K>, V>
     implements Iterable<Pair<K, V>>, Serializable {
 
-  public BPlusTreeNode<K, V> root; // recovered by Database.class
-  private int size; // recovered by Database.class
-  public TreeNodeManager<K, V> nodeManager; // recovered by Database.class
+  public transient BPlusTreeNode<K, V> root; // recovered by this.recover()
+  private int size; // recovered by table deserialize
+  public TreeNodeManager<K, V> nodeManager; // recovered by table deserialize
 
-  // only called when create table
+  // only called when creating, recovering table
   public BPlusTree() {
     root = new BPlusTreeLeafNode<>(0, null);
     root.id = UUID.randomUUID();
     nodeManager = new TreeNodeManager<>(root);
+  }
+
+  public void recover() { // called by table
+    nodeManager.recover();
+    this.root = nodeManager.loadNode(nodeManager.root_id);
   }
 
   public int size() {
@@ -74,17 +79,18 @@ public final class BPlusTree<K extends Comparable<K>, V>
       BPlusTreeNode<K, V> newSiblingNode = root.split(this.nodeManager, null);
       // cache load should be done in split.()
 
-      //BPlusTreeInternalNode<K, V> newRoot = new BPlusTreeInternalNode<>(1);
+      // BPlusTreeInternalNode<K, V> newRoot = new BPlusTreeInternalNode<>(1);
       BPlusTreeInternalNode<K, V> newRoot =
-              (BPlusTreeInternalNode) this.nodeManager.
-                      newNode(1, INTERNAL, newSiblingNode.getFirstLeafKey(), null);
-      //newRoot.keys.set(0, newSiblingNode.getFirstLeafKey()); -> done in newNode method
+          (BPlusTreeInternalNode)
+              this.nodeManager.newNode(
+                  1, INTERNAL, newSiblingNode.getFirstLeafKey(this.nodeManager), null);
+      // newRoot.keys.set(0, newSiblingNode.getFirstLeafKey()); -> done in newNode method
 
-      //newRoot.children.set(0, root);
+      // newRoot.children.set(0, root);
       newRoot.children.set(0, root.keys.get(0));
       newRoot.children_id.set(0, root.id);
       root.parent_id = newRoot.id;
-      //newRoot.children.set(1, newSiblingNode);
+      // newRoot.children.set(1, newSiblingNode);
       newRoot.children.set(1, newSiblingNode.keys.get(0));
       newRoot.children_id.set(1, newSiblingNode.id);
       newSiblingNode.parent_id = newRoot.id;
@@ -105,6 +111,6 @@ public final class BPlusTree<K extends Comparable<K>, V>
 
   @Override
   public BPlusTreeIterator<K, V> iterator() {
-    return new BPlusTreeIterator<>(this);
+    return new BPlusTreeIterator<>(this, this.nodeManager);
   }
 }
