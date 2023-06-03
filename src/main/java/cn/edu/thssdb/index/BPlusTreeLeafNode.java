@@ -8,16 +8,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.UUID;
 
+import static cn.edu.thssdb.utils.Global.LEAF;
+
 public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode<K, V> {
 
   ArrayList<V> values;
   //private BPlusTreeLeafNode<K, V> next; // TODO: need modify, should only save key of next leaf node
-  private K next;
+  private UUID next;
 
-  BPlusTreeLeafNode(int size) {
+  BPlusTreeLeafNode(int size, UUID parent_id) {
     keys = new ArrayList<>(Collections.nCopies((int) (1.5 * Global.fanout) + 1, null));
     values = new ArrayList<>(Collections.nCopies((int) (1.5 * Global.fanout) + 1, null));
     nodeSize = size;
+    this.parent_id = parent_id;
   }
 
   private void valuesAdd(int index, V value) {
@@ -50,6 +53,15 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
       valuesAdd(valueIndex, value);
       keysAdd(valueIndex, key);
     }
+
+    // modify start
+    nodeManager.writeNodeToDisk(this);
+
+    if (valueIndex == 0) { // first key changed
+      // TODO: changes to be made in its parents
+    }
+
+    // modify end
   }
 
   @Override
@@ -67,11 +79,14 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
   }
 
   @Override
-  BPlusTreeNode<K, V> split(TreeNodeManager<K, V> nodeManager) {
+  BPlusTreeNode<K, V> split(TreeNodeManager<K, V> nodeManager, UUID parent_id) {
     int from = (size() + 1) / 2;
     int to = size();
-    BPlusTreeLeafNode<K, V> newSiblingNode = new BPlusTreeLeafNode<>(to - from);
-    // TODO: write to disk and load to cache
+    //BPlusTreeLeafNode<K, V> newSiblingNode = new BPlusTreeLeafNode<>(to - from);
+    BPlusTreeLeafNode<K, V> newSiblingNode =
+            (BPlusTreeLeafNode<K, V>) nodeManager.newNode(to - from, LEAF, null, parent_id);
+    // loaded to cache by manager
+
     for (int i = 0; i < to - from; i++) {
       newSiblingNode.keys.set(i, keys.get(i + from));
       newSiblingNode.values.set(i, values.get(i + from));
@@ -80,8 +95,11 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
     }
     nodeSize = from;
     newSiblingNode.next = next;
-    next = newSiblingNode;
+    //next = newSiblingNode;
+    next = newSiblingNode.id;
     return newSiblingNode;
+
+    // write to disk is done by caller
   }
 
   @Override

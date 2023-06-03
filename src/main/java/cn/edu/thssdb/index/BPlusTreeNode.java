@@ -10,7 +10,8 @@ import java.util.UUID;
 abstract class BPlusTreeNode<K extends Comparable<K>, V> implements Serializable {
   ArrayList<K> keys;
   int nodeSize;
-  public UUID id; // for node management
+  UUID id; // for node management
+  UUID parent_id; // for node management
 
   abstract V get(K key, TreeNodeManager<K, V> nodeManager);
 
@@ -22,7 +23,8 @@ abstract class BPlusTreeNode<K extends Comparable<K>, V> implements Serializable
 
   abstract K getFirstLeafKey(); // TODO: check
 
-  abstract BPlusTreeNode<K, V> split(TreeNodeManager<K, V> nodeManager);
+  // split when overflows, returns current node's RIGHT sibling
+  abstract BPlusTreeNode<K, V> split(TreeNodeManager<K, V> nodeManager, UUID parent_id);
 
   abstract void merge(BPlusTreeNode<K, V> sibling);
 

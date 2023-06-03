@@ -8,15 +8,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static cn.edu.thssdb.utils.Global.INTERNAL;
+
 public final class BPlusTreeInternalNode<K extends Comparable<K>, V> extends BPlusTreeNode<K, V> {
 
   //ArrayList<BPlusTreeNode<K, V>> children;
   ArrayList<K> children;
+  ArrayList<UUID> children_id;
 
-  BPlusTreeInternalNode(int size) {
+  BPlusTreeInternalNode(int size, UUID parent_id) {
     keys = new ArrayList<>(Collections.nCopies((int) (1.5 * Global.fanout) + 1, null));
     children = new ArrayList<>((Collections.nCopies((int) (1.5 * Global.fanout) + 2, null)));
     this.nodeSize = size;
+    this.parent_id = parent_id;
   }
 
   private void childrenAdd(int index, BPlusTreeNode<K, V> node) {
@@ -49,6 +53,8 @@ public final class BPlusTreeInternalNode<K extends Comparable<K>, V> extends BPl
     if (child.isOverFlow()) {
       BPlusTreeNode<K, V> newSiblingNode = child.split(nodeManager);
       insertChild(newSiblingNode.getFirstLeafKey(), newSiblingNode);
+
+      // TODO: write disk: child and newSiblingNode
     }
   }
 
@@ -74,6 +80,7 @@ public final class BPlusTreeInternalNode<K extends Comparable<K>, V> extends BPl
       if (left.isOverFlow()) {
         BPlusTreeNode<K, V> newSiblingNode = left.split(nodeManager);
         insertChild(newSiblingNode.getFirstLeafKey(), newSiblingNode);
+        // TODO: write to disk left, newSiblingNode
       }
     } else if (index >= 0) keys.set(index, children.get(index + 1).getFirstLeafKey());
   }
@@ -84,16 +91,20 @@ public final class BPlusTreeInternalNode<K extends Comparable<K>, V> extends BPl
   }
 
   @Override
-  BPlusTreeNode<K, V> split(TreeNodeManager<K, V> nodeManager) {
+  BPlusTreeNode<K, V> split(TreeNodeManager<K, V> nodeManager, UUID parent_id) {
     int from = size() / 2 + 1;
     int to = size();
-    BPlusTreeInternalNode<K, V> newSiblingNode = new BPlusTreeInternalNode<>(to - from);
-    // TODO: write to disk and load to cache
+    //BPlusTreeInternalNode<K, V> newSiblingNode = new BPlusTreeInternalNode<>(to - from, parent_id);
+    BPlusTreeInternalNode<K, V> newSiblingNode =
+            (BPlusTreeInternalNode<K, V>) nodeManager.newNode(to - from, INTERNAL, null, parent_id);
+    // load to cache is done by manager
     for (int i = 0; i < to - from; i++) {
       newSiblingNode.keys.set(i, keys.get(i + from));
       newSiblingNode.children.set(i, children.get(i + from));
+      newSiblingNode.children_id.set(i, children_id.get(i + from));
     }
     newSiblingNode.children.set(to - from, children.get(to));
+    newSiblingNode.children_id.set(to - from, children_id.get(to));
     this.nodeSize = this.nodeSize - to + from - 1;
     return newSiblingNode;
   }

@@ -53,6 +53,9 @@ public class Table implements Iterable<Row>, Serializable {
       lock.writeLock().lock();
       Entry key = row.getEntries().get(primaryIndex);
       index.put(key, row);
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
     } finally {
       lock.writeLock().unlock();
     }
@@ -82,7 +85,10 @@ public class Table implements Iterable<Row>, Serializable {
         i++;
       }
       index.put(entries.get(primaryIndex), new Row(entries));
-    } finally {
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
+    }finally {
       lock.writeLock().unlock();
     }
   }
@@ -94,7 +100,10 @@ public class Table implements Iterable<Row>, Serializable {
     try {
       Entry key = row.getEntries().get(primaryIndex);
       index.remove(key);
-    } finally {
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
+    }finally {
       lock.writeLock().unlock();
     }
   }
@@ -105,7 +114,10 @@ public class Table implements Iterable<Row>, Serializable {
     lock.writeLock().lock();
     try {
       index.remove(entry);
-    } finally {
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
+    }finally {
       lock.writeLock().unlock();
     }
   }
@@ -117,7 +129,10 @@ public class Table implements Iterable<Row>, Serializable {
       ColumnType columnType = columns.get(primaryIndex).getType();
       Entry primaryEntry = new Entry(getColumnTypeValue(columnType, val));
       index.remove(primaryEntry);
-    } finally {
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
+    }finally {
       lock.writeLock().unlock();
     }
   }
@@ -128,6 +143,9 @@ public class Table implements Iterable<Row>, Serializable {
     try {
       index.clear();
       index = new BPlusTree<>();
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
     } finally {
       lock.writeLock().unlock();
     }
@@ -145,7 +163,10 @@ public class Table implements Iterable<Row>, Serializable {
         delete(oldRow);
         insert(newRow);
       }
-    } finally {
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
+    }finally {
       lock.writeLock().unlock();
     }
   }
@@ -181,6 +202,7 @@ public class Table implements Iterable<Row>, Serializable {
     }
   }
 
+  // TODO: use?
   private class TableIterator implements Iterator<Row> {
     private Iterator<Pair<Entry, Row>> iterator;
 

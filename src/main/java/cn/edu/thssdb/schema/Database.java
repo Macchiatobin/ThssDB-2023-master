@@ -76,6 +76,7 @@ public class Database implements Serializable {
     try {
       tables.put(tableName, new Table(this.name, tableName, columns));
       tables.get(tableName).index.nodeManager.path = this.path + tableName + "/";
+      // set folder path for node Manager
       metaInfos.put(tableName, new MetaInfo(tableName, new ArrayList<>(Arrays.asList(columns))));
       persist();
     } catch (Exception e) {
@@ -188,3 +189,4 @@ public class Database implements Serializable {
 
   }
 }
+
