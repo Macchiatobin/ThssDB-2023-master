@@ -98,8 +98,8 @@ public class Manager implements Serializable {
       try {
         BufferedReader reader = new BufferedReader(new FileReader(data_file));
         String cur_line = null;
-        while ((cur_line = reader.readLine()) != null) { // cur_line is databaseName
-          createDatabaseIfNotExists(cur_line); // load databases
+        while ((cur_line = reader.readLine()) != null) { //cur_line is databaseName
+          databases.put(cur_line, new Database(cur_line)); //load databases
         }
         reader.close();
       } catch (Exception e) {
