@@ -5,4 +5,9 @@ public class DuplicateKeyException extends RuntimeException {
   public String getMessage() {
     return "Exception: insertion caused duplicated keys!";
   }
+
+  @Override
+  public String toString() {
+    return "Duplicate Key!";
+  }
 }

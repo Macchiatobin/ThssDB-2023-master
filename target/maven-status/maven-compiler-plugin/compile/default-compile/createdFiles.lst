@@ -180,6 +180,7 @@ cn/edu/thssdb/sql/SQLParser$AuthLevelContext.class
 cn/edu/thssdb/sql/SQLBaseVisitor.class
 cn/edu/thssdb/sql/SQLVisitor.class
 cn/edu/thssdb/sql/SQLParser$TypeNameContext.class
+cn/edu/thssdb/plan/impl/InsertPlan.class
 cn/edu/thssdb/rpc/thrift/DisconnectReq$1.class
 cn/edu/thssdb/rpc/thrift/IService$disconnect_result$disconnect_resultStandardScheme.class
 cn/edu/thssdb/rpc/thrift/DisconnectResp$1.class

@@ -32,7 +32,6 @@ public class ThssDB {
   }
 
   private void start() {
-
     handler = new IServiceHandler();
     processor = new IService.Processor(handler);
     Runnable setup = () -> setUp(processor);

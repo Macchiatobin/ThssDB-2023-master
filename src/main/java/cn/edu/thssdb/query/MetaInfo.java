@@ -2,20 +2,21 @@ package cn.edu.thssdb.query;
 
 import cn.edu.thssdb.schema.Column;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-class MetaInfo {
+public class MetaInfo implements Serializable {
 
   private String tableName;
   private List<Column> columns;
 
-  MetaInfo(String tableName, ArrayList<Column> columns) {
+  public MetaInfo(String tableName, ArrayList<Column> columns) {
     this.tableName = tableName;
     this.columns = columns;
   }
 
-  int columnFind(String name) {
+  public int columnFind(String name) {
     /* TODO */
     // v1 done
     for (int i = 0; i < columns.size(); i++) {
@@ -25,5 +26,9 @@ class MetaInfo {
       }
     }
     return -1;
+  }
+
+  public List<Column> getColumns() {
+    return this.columns;
   }
 }

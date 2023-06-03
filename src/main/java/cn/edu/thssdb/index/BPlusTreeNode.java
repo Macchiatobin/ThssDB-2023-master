@@ -9,6 +9,7 @@ import java.util.Collections;
 abstract class BPlusTreeNode<K extends Comparable<K>, V> implements Serializable {
   ArrayList<K> keys;
   int nodeSize;
+  int id; // for page control
 
   abstract V get(K key);
 

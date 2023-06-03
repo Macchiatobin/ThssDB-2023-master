@@ -15,19 +15,17 @@ public class Manager implements Serializable {
   private HashMap<String, Database> databases;
   private Database curDB;
   private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-  private String filePath = DATA_DIR + "manager/";
+  private String metaPath = DATA_DIR + "manager_meta/";
 
   public static Manager getInstance() {
     return Manager.ManagerHolder.INSTANCE;
   }
 
   private Manager() {
-    /* TODO */
-    // v1 done
     databases = new HashMap<>();
     curDB = null;
-    loadData();
-    System.out.println("Manager loadData done");
+    loadData(); // recover
+    //    System.out.println("Manager loadData done");  // for debug
   }
 
   public Database getCurDB() {
@@ -58,11 +56,9 @@ public class Manager implements Serializable {
       lock.writeLock().lock();
       if (databases.get(databaseName) == null)
         throw new NotExistsException(NotExistsException.Database, databaseName);
-
       databases.remove(databaseName);
       String folderPath = DATA_DIR + databaseName;
-      File folder = new File(folderPath);
-      deleteFolder(folder);
+      deleteFolder(new File(folderPath));
       persist();
     } finally {
       lock.writeLock().unlock();
@@ -76,8 +72,8 @@ public class Manager implements Serializable {
       lock.readLock().lock();
       if (!databases.containsKey(databaseName))
         throw new NotExistsException(NotExistsException.Database, databaseName);
-      databases.put(
-          databaseName, new Database(databaseName)); // Load database(will read from file if exists)
+      //      databases.put(databaseName, new Database(databaseName)); // Load database(will read
+      // from file if exists)
       curDB = getDB(databaseName);
     } finally {
       lock.readLock().unlock();
@@ -92,11 +88,9 @@ public class Manager implements Serializable {
   }
 
   private void loadData() {
-    System.out.println("Entered Manager's loadData()");
     File data_dir = new File(DATA_DIR);
-    if (!data_dir.exists()) // create directory if not exists
-    data_dir.mkdir();
-    File data_file = new File(filePath);
+    if (!data_dir.exists()) data_dir.mkdir(); // create directory if not exists
+    File data_file = new File(metaPath);
     if (!data_file.exists()) { // create file if not exists
       try {
         data_file.createNewFile();
@@ -107,11 +101,9 @@ public class Manager implements Serializable {
       try {
         BufferedReader reader = new BufferedReader(new FileReader(data_file));
         String cur_line = null;
-        while ((cur_line = reader.readLine()) != null) {
-          System.out.println("cur_line: " + cur_line);
-          //   databases.put(cur_line, null); // modified by Macchiato (will cause bug)
-          createDatabaseIfNotExists(cur_line); // original
-          // 目前没加readlog
+        while ((cur_line = reader.readLine()) != null) { // cur_line is databaseName
+          databases.put(cur_line, new Database(cur_line)); // load databases
+          // createDatabaseIfNotExists(cur_line);  // original
         }
         reader.close();
       } catch (Exception e) {
@@ -120,8 +112,8 @@ public class Manager implements Serializable {
     }
   }
 
-  private void persist() {
-    File data_file = new File(filePath);
+  private void persist() { // only persists names of databases
+    File data_file = new File(metaPath);
     if (!data_file.exists()) { // create file if not exists
       try {
         data_file.createNewFile();
@@ -129,16 +121,17 @@ public class Manager implements Serializable {
         throw new FileException(FileException.Create, data_file.getName());
       }
     }
+
     // write to file (from beginning), only database names
     try {
-      FileWriter writer = new FileWriter(filePath);
+      FileWriter writer = new FileWriter(metaPath);
       for (String databaseName : databases.keySet()) {
         writer.write(databaseName);
         writer.write("\n");
       }
       writer.close();
     } catch (Exception e) {
-      throw new FileException(FileException.ReadWrite, filePath);
+      throw new FileException(FileException.ReadWrite, metaPath);
     }
   }
 

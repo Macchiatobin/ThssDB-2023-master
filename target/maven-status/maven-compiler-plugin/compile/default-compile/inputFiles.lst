@@ -36,6 +36,7 @@
 /Users/amyxin/Desktop/College/4大四/2023春/数据库原理/大作业/ThssDB-2023-master/src/main/java/cn/edu/thssdb/service/IServiceHandler.java
 /Users/amyxin/Desktop/College/4大四/2023春/数据库原理/大作业/ThssDB-2023-master/src/main/java/cn/edu/thssdb/schema/Manager.java
 /Users/amyxin/Desktop/College/4大四/2023春/数据库原理/大作业/ThssDB-2023-master/src/main/java/cn/edu/thssdb/utils/Cell.java
+/Users/amyxin/Desktop/College/4大四/2023春/数据库原理/大作业/ThssDB-2023-master/src/main/java/cn/edu/thssdb/plan/impl/InsertPlan.java
 /Users/amyxin/Desktop/College/4大四/2023春/数据库原理/大作业/ThssDB-2023-master/target/generated-sources/antlr/cn/edu/thssdb/sql/SQLBaseVisitor.java
 /Users/amyxin/Desktop/College/4大四/2023春/数据库原理/大作业/ThssDB-2023-master/target/generated-sources/antlr/cn/edu/thssdb/sql/SQLVisitor.java
 /Users/amyxin/Desktop/College/4大四/2023春/数据库原理/大作业/ThssDB-2023-master/src/main/java/cn/edu/thssdb/utils/Pair.java
