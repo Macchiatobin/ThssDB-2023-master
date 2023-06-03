@@ -5,25 +5,28 @@ import cn.edu.thssdb.utils.Global;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.UUID;
 
 abstract class BPlusTreeNode<K extends Comparable<K>, V> implements Serializable {
   ArrayList<K> keys;
   int nodeSize;
-  int id; // for page control
+  UUID id; // for node management
+  UUID parent_id; // for node management
 
-  abstract V get(K key);
+  abstract V get(K key, TreeNodeManager<K, V> nodeManager);
 
-  abstract void put(K key, V value);
+  abstract void put(K key, V value, TreeNodeManager<K, V> nodeManager);
 
-  abstract void remove(K key);
+  abstract void remove(K key, TreeNodeManager<K, V> nodeManager);
 
-  abstract boolean containsKey(K key);
+  abstract boolean containsKey(K key, TreeNodeManager<K, V> nodeManager);
 
-  abstract K getFirstLeafKey();
+  abstract K getFirstLeafKey(TreeNodeManager<K, V> nodeManager); // TODO: check
 
-  abstract BPlusTreeNode<K, V> split();
+  // split when overflows, returns current node's RIGHT sibling
+  abstract BPlusTreeNode<K, V> split(TreeNodeManager<K, V> nodeManager, UUID parent_id);
 
-  abstract void merge(BPlusTreeNode<K, V> sibling);
+  abstract void merge(BPlusTreeNode<K, V> sibling, TreeNodeManager<K, V> nodeManager);
 
   int size() {
     return nodeSize;

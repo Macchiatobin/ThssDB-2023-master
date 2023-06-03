@@ -1,7 +1,7 @@
 package cn.edu.thssdb.utils;
 
 public class Global {
-  public static int fanout = 129;
+  public static int fanout = 129; // original: 129
 
   public static int SUCCESS_CODE = 0;
   public static int FAILURE_CODE = -1;
@@ -20,4 +20,12 @@ public class Global {
   public static final String S_URL_INTERNAL = "jdbc:default:connection";
 
   public static final String DATA_DIR = "data/";
+
+  public static final int CACHE_SIZE = 20; // maximum cache size of node manager
+
+  // node types
+  public static final int INTERNAL = 0;
+  public static final int LEAF = 1;
+
+  public static final int INITIAL_LRU = 10;
 }

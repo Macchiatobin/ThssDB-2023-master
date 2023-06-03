@@ -1,5 +1,6 @@
 package cn.edu.thssdb.schema;
 
+import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.IllegalTypeException;
 import cn.edu.thssdb.index.BPlusTree;
 import cn.edu.thssdb.type.ColumnType;
@@ -15,39 +16,33 @@ import static cn.edu.thssdb.type.ColumnType.*;
 import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Table implements Iterable<Row>, Serializable {
-  transient ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+  transient ReentrantReadWriteLock lock;
   private String databaseName;
   public String tableName;
-  public ArrayList<Column> columns; // Amy: 是否要改成私有变量 + 公有接口？
-
-  public transient BPlusTree<Entry, Row> index;
+  public ArrayList<Column> columns;
+  public BPlusTree<Entry, Row> index;
   private int primaryIndex; // index of primary key column
   private String path; // data file path
+  private String metaPath;
 
   public Table(String databaseName, String tableName, Column[] columns) {
-    // TODO
+    this.lock = new ReentrantReadWriteLock();
     this.databaseName = databaseName;
     this.tableName = tableName;
     this.columns = new ArrayList<>(Arrays.asList(columns));
     this.index = new BPlusTree<>();
     this.primaryIndex = -1;
     this.path = DATA_DIR + databaseName + "/" + tableName;
+    this.metaPath = this.path + "/meta";
     for (int i = 0; i < this.columns.size(); i++) {
       if (this.columns.get(i).getPrimary() == 1) {
         primaryIndex = i;
       }
     }
     File tableFolder = new File(this.path);
-    if (!tableFolder.exists()) tableFolder.mkdir(); // create folder if it doesn't exists
+    if (!tableFolder.exists()) tableFolder.mkdir(); // create folder if it doesn't exist
+    deserialize();
   }
-
-  /*
-  private void recover() {
-    File tableFolder = new File(this.path);
-    if (!tableFolder.exists()) tableFolder.mkdir(); // create folder if it doesn't exists
-  }
-
-   */
 
   // INSERT Row
   public void insert(Row row) {
@@ -55,6 +50,9 @@ public class Table implements Iterable<Row>, Serializable {
       lock.writeLock().lock();
       Entry key = row.getEntries().get(primaryIndex);
       index.put(key, row);
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
     } finally {
       lock.writeLock().unlock();
     }
@@ -84,6 +82,9 @@ public class Table implements Iterable<Row>, Serializable {
         i++;
       }
       index.put(entries.get(primaryIndex), new Row(entries));
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
     } finally {
       lock.writeLock().unlock();
     }
@@ -96,6 +97,9 @@ public class Table implements Iterable<Row>, Serializable {
     try {
       Entry key = row.getEntries().get(primaryIndex);
       index.remove(key);
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
     } finally {
       lock.writeLock().unlock();
     }
@@ -107,6 +111,9 @@ public class Table implements Iterable<Row>, Serializable {
     lock.writeLock().lock();
     try {
       index.remove(entry);
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
     } finally {
       lock.writeLock().unlock();
     }
@@ -119,6 +126,9 @@ public class Table implements Iterable<Row>, Serializable {
       ColumnType columnType = columns.get(primaryIndex).getType();
       Entry primaryEntry = new Entry(getColumnTypeValue(columnType, val));
       index.remove(primaryEntry);
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
     } finally {
       lock.writeLock().unlock();
     }
@@ -130,6 +140,9 @@ public class Table implements Iterable<Row>, Serializable {
     try {
       index.clear();
       index = new BPlusTree<>();
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
     } finally {
       lock.writeLock().unlock();
     }
@@ -147,6 +160,9 @@ public class Table implements Iterable<Row>, Serializable {
         delete(oldRow);
         insert(newRow);
       }
+      serialize();
+    } catch (Exception e) {
+      System.out.println(e);
     } finally {
       lock.writeLock().unlock();
     }
@@ -154,9 +170,19 @@ public class Table implements Iterable<Row>, Serializable {
 
   private void serialize() throws IOException { // persist
     // TODO
+    // save as file, when changes made
+    File meta_file = new File(this.metaPath);
+    if (!meta_file.exists()) { // create meta file if not exists -> USUALLY NOT HAPPEN
+      try {
+        meta_file.createNewFile();
+      } catch (Exception e) {
+        throw new FileException(FileException.Create, meta_file.getName());
+      }
+    }
+
     lock.writeLock().lock();
     try (ObjectOutputStream objectOutputStream =
-        new ObjectOutputStream(new FileOutputStream(path)); ) {
+        new ObjectOutputStream(new FileOutputStream(meta_file)); ) {
       objectOutputStream.writeObject(this);
     } finally {
       lock.writeLock().unlock();
@@ -164,17 +190,17 @@ public class Table implements Iterable<Row>, Serializable {
   }
 
   private void deserialize() { // recover
+    File meta_file = new File(this.metaPath);
+    if (!meta_file.exists()) return; // no file, nothing to recover
+
     lock.writeLock().lock();
-    try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(path)); ) {
+    try (ObjectInputStream objectInputStream =
+        new ObjectInputStream(new FileInputStream(meta_file)); ) {
       Table restored = (Table) objectInputStream.readObject();
 
-      // TODO: restore only nodes that we need for now
-
       if (restored != null) {
-        this.columns = restored.columns;
         this.index = restored.index;
-        this.primaryIndex = restored.primaryIndex;
-        this.path = DATA_DIR + databaseName + "/" + tableName;
+        index.recover();
       }
     } catch (Exception e) {
       System.out.println(e);
@@ -183,6 +209,7 @@ public class Table implements Iterable<Row>, Serializable {
     }
   }
 
+  // TODO: use?
   private class TableIterator implements Iterator<Row> {
     private Iterator<Pair<Entry, Row>> iterator;
 

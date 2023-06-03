@@ -177,8 +177,7 @@ public class IServiceHandler implements IService.Iface {
         System.out.println("[DEBUG] " + plan);
         break;
 
-      default:
-        break;
+      default:break;
     }
     return plan.execute_plan();
   }

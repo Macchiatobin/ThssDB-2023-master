@@ -3,7 +3,6 @@ package cn.edu.thssdb.schema;
 import cn.edu.thssdb.exception.AlreadyExistsException;
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.NotExistsException;
-import cn.edu.thssdb.index.BPlusTree;
 import cn.edu.thssdb.query.MetaInfo;
 import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.query.QueryTable;
@@ -12,6 +11,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static cn.edu.thssdb.utils.FolderOperations.deleteFolder;
@@ -20,7 +20,7 @@ import static cn.edu.thssdb.utils.Global.DATA_DIR;
 public class Database implements Serializable {
 
   private String name;
-  private HashMap<String, Table> tables;
+  private transient HashMap<String, Table> tables;
   public HashMap<String, MetaInfo> metaInfos;
   transient ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -73,6 +73,8 @@ public class Database implements Serializable {
     lock.writeLock().lock();
     try {
       tables.put(tableName, new Table(this.name, tableName, columns));
+      tables.get(tableName).index.nodeManager.path = this.path + tableName + "/";
+      // set folder path for node Manager
       metaInfos.put(tableName, new MetaInfo(tableName, new ArrayList<>(Arrays.asList(columns))));
       persist();
     } catch (Exception e) {
@@ -102,7 +104,7 @@ public class Database implements Serializable {
 
       // delete corresponding file
       deleteFolder(new File(this.path + tableName));
-
+      persist();
     } catch (Exception e) {
       tobj = null;
       mobj = null;
@@ -143,12 +145,14 @@ public class Database implements Serializable {
         // recover
         if (restored != null) {
           this.name = restored.name;
-          this.tables = restored.tables;
           this.metaInfos = restored.metaInfos;
 
-          for (Table table : this.tables.values()) {
-            table.lock = new ReentrantReadWriteLock();
-            table.index = new BPlusTree<>();
+          // recover tables manually
+          this.tables = new HashMap<>();
+          for (MetaInfo info : this.metaInfos.values()) {
+            List<Column> columnList = info.getColumns();
+            Column[] array = new Column[columnList.size()];
+            tables.put(info.getTableName(), new Table(this.name, info.getTableName(), array));
           }
         }
       } catch (IOException e) {
@@ -160,7 +164,7 @@ public class Database implements Serializable {
       } finally {
         lock.writeLock().unlock();
       }
-    } else { // create meta file if doesn't exist
+    } else { // create meta file if it doesn't exist
       try {
         metaFile.createNewFile();
       } catch (Exception e) {

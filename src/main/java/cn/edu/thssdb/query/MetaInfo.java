@@ -28,6 +28,10 @@ public class MetaInfo implements Serializable {
     return -1;
   }
 
+  public String getTableName() {
+    return this.tableName;
+  }
+
   public List<Column> getColumns() {
     return this.columns;
   }
