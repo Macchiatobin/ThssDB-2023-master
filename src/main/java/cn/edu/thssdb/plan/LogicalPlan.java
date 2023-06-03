@@ -31,5 +31,6 @@ public abstract class LogicalPlan {
     UPDATE
   }
 
-  abstract public ExecuteStatementResp execute_plan(); // Plan execution abstract method, returns response
+  public abstract ExecuteStatementResp
+      execute_plan(); // Plan execution abstract method, returns response
 }

@@ -36,11 +36,30 @@ public class Column implements Comparable<Column>, Serializable {
     return name + ',' + type + ',' + primary + ',' + notNull + ',' + maxLength;
   }
 
-  public int get_Primary() {
+  public int getPrimary() {
     return primary;
   }
 
   public ColumnType getType() {
     return type;
+  }
+
+  // Added by Amy - 为ShowTable添加接口
+  public boolean isNotNull() {
+    return notNull;
+  }
+
+  public String getTypeString() {
+    if (type == ColumnType.STRING) return "STRING";
+    else if (type == ColumnType.LONG) return "LONG";
+    else if (type == ColumnType.INT) return "INT";
+    else if (type == ColumnType.FLOAT) return "FLOAT";
+    else if (type == ColumnType.DOUBLE) return "DOUBLE";
+
+    return "UNKNOWN_TYPE";
+  }
+
+  public int getMaxLength() {
+    return maxLength;
   }
 }

@@ -18,8 +18,9 @@ public class Table implements Iterable<Row>, Serializable {
   transient ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
   private String databaseName;
   public String tableName;
-  public ArrayList<Column> columns;
-  transient public BPlusTree<Entry, Row> index;
+  public ArrayList<Column> columns; // Amy: 是否要改成私有变量 + 公有接口？
+
+  public transient BPlusTree<Entry, Row> index;
   private int primaryIndex; // index of primary key column
   private String path; // data file path
 
@@ -32,7 +33,7 @@ public class Table implements Iterable<Row>, Serializable {
     this.primaryIndex = -1;
     this.path = DATA_DIR + databaseName + "/" + tableName;
     for (int i = 0; i < this.columns.size(); i++) {
-      if (this.columns.get(i).get_Primary() == 1) {
+      if (this.columns.get(i).getPrimary() == 1) {
         primaryIndex = i;
       }
     }
@@ -154,8 +155,8 @@ public class Table implements Iterable<Row>, Serializable {
   private void serialize() throws IOException { // persist
     // TODO
     lock.writeLock().lock();
-    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(path));)
-    {
+    try (ObjectOutputStream objectOutputStream =
+        new ObjectOutputStream(new FileOutputStream(path)); ) {
       objectOutputStream.writeObject(this);
     } finally {
       lock.writeLock().unlock();
@@ -164,7 +165,7 @@ public class Table implements Iterable<Row>, Serializable {
 
   private void deserialize() { // recover
     lock.writeLock().lock();
-    try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(path));) {
+    try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(path)); ) {
       Table restored = (Table) objectInputStream.readObject();
 
       // TODO: restore only nodes that we need for now

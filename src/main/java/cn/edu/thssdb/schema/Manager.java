@@ -24,7 +24,8 @@ public class Manager implements Serializable {
   private Manager() {
     databases = new HashMap<>();
     curDB = null;
-    loadData(); //recover
+    loadData(); // recover
+    //    System.out.println("Manager loadData done");  // for debug
   }
 
   public Database getCurDB() {
@@ -46,7 +47,6 @@ public class Manager implements Serializable {
     } finally {
       lock.writeLock().unlock();
     }
-
   }
 
   public void deleteDatabase(String databaseName) {
@@ -63,7 +63,6 @@ public class Manager implements Serializable {
     } finally {
       lock.writeLock().unlock();
     }
-
   }
 
   public void switchDatabase(String databaseName) {
@@ -73,11 +72,12 @@ public class Manager implements Serializable {
       lock.readLock().lock();
       if (!databases.containsKey(databaseName))
         throw new NotExistsException(NotExistsException.Database, databaseName);
+      //      databases.put(databaseName, new Database(databaseName)); // Load database(will read
+      // from file if exists)
       curDB = getDB(databaseName);
     } finally {
       lock.readLock().unlock();
     }
-
   }
 
   // 单例模式
@@ -101,8 +101,9 @@ public class Manager implements Serializable {
       try {
         BufferedReader reader = new BufferedReader(new FileReader(data_file));
         String cur_line = null;
-        while ((cur_line = reader.readLine()) != null) { //cur_line is databaseName
-          databases.put(cur_line, new Database(cur_line)); //load databases
+        while ((cur_line = reader.readLine()) != null) { // cur_line is databaseName
+          databases.put(cur_line, new Database(cur_line)); // load databases
+          // createDatabaseIfNotExists(cur_line);  // original
         }
         reader.close();
       } catch (Exception e) {

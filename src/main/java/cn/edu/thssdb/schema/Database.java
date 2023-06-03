@@ -58,8 +58,7 @@ public class Database implements Serializable {
     } catch (IOException e) {
       System.out.println("Database Metafile Serialization Failed!");
       System.out.println(e);
-    }
-    finally {
+    } finally {
       lock.writeLock().unlock();
     }
   }
@@ -129,9 +128,7 @@ public class Database implements Serializable {
         if (!created) throw new IOException();
       } catch (IOException e) {
         System.out.println("Database File Creation Failed!");
-      }
-      finally
-      {
+      } finally {
         lock.writeLock().unlock();
       }
     }
@@ -163,7 +160,7 @@ public class Database implements Serializable {
       } finally {
         lock.writeLock().unlock();
       }
-    } else { //create meta file if doesn't exist
+    } else { // create meta file if doesn't exist
       try {
         metaFile.createNewFile();
       } catch (Exception e) {
@@ -182,6 +179,5 @@ public class Database implements Serializable {
     } finally {
       lock.writeLock().unlock();
     }
-
   }
 }

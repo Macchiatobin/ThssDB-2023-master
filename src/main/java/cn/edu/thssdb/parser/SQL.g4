@@ -71,7 +71,7 @@ quitStmt :
     K_QUIT;
 
 showTableStmt :
-    K_SHOW K_DATABASE tableName;
+    K_SHOW K_TABLE tableName;
 
 insertStmt :
     K_INSERT K_INTO tableName ( '(' columnName ( ',' columnName )* ')' )?

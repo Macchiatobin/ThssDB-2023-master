@@ -1303,7 +1303,7 @@ public class SQLParser extends Parser {
 
 	public static class ShowTableStmtContext extends ParserRuleContext {
 		public TerminalNode K_SHOW() { return getToken(SQLParser.K_SHOW, 0); }
-		public TerminalNode K_DATABASE() { return getToken(SQLParser.K_DATABASE, 0); }
+		public TerminalNode K_TABLE() { return getToken(SQLParser.K_TABLE, 0); }
 		public TableNameContext tableName() {
 			return getRuleContext(TableNameContext.class,0);
 		}
@@ -1335,7 +1335,7 @@ public class SQLParser extends Parser {
 			setState(235);
 			match(K_SHOW);
 			setState(236);
-			match(K_DATABASE);
+			match(K_TABLE);
 			setState(237);
 			tableName();
 			}
@@ -3416,7 +3416,7 @@ public class SQLParser extends Parser {
 		"\2\u00e4\u00e2\3\2\2\2\u00e4\u00e5\3\2\2\2\u00e5\u00e6\3\2\2\2\u00e6\u00e7"+
 		"\5R*\2\u00e7\33\3\2\2\2\u00e8\u00e9\78\2\2\u00e9\u00ea\7#\2\2\u00ea\35"+
 		"\3\2\2\2\u00eb\u00ec\7\64\2\2\u00ec\37\3\2\2\2\u00ed\u00ee\78\2\2\u00ee"+
-		"\u00ef\7\"\2\2\u00ef\u00f0\5R*\2\u00f0!\3\2\2\2\u00f1\u00f2\7,\2\2\u00f2"+
+		"\u00ef\79\2\2\u00ef\u00f0\5R*\2\u00f0!\3\2\2\2\u00f1\u00f2\7,\2\2\u00f2"+
 		"\u00f3\7-\2\2\u00f3\u00ff\5R*\2\u00f4\u00f5\7\4\2\2\u00f5\u00fa\5V,\2"+
 		"\u00f6\u00f7\7\5\2\2\u00f7\u00f9\5V,\2\u00f8\u00f6\3\2\2\2\u00f9\u00fc"+
 		"\3\2\2\2\u00fa\u00f8\3\2\2\2\u00fa\u00fb\3\2\2\2\u00fb\u00fd\3\2\2\2\u00fc"+

@@ -3,7 +3,6 @@ package cn.edu.thssdb.service;
 import cn.edu.thssdb.plan.LogicalGenerator;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
-import cn.edu.thssdb.query.MetaInfo;
 import cn.edu.thssdb.rpc.thrift.ConnectReq;
 import cn.edu.thssdb.rpc.thrift.ConnectResp;
 import cn.edu.thssdb.rpc.thrift.DisconnectReq;
@@ -15,7 +14,10 @@ import cn.edu.thssdb.rpc.thrift.GetTimeResp;
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.rpc.thrift.Status;
 import cn.edu.thssdb.schema.*;
-import cn.edu.thssdb.type.ColumnType;
+import cn.edu.thssdb.schema.Column;
+import cn.edu.thssdb.schema.Database;
+import cn.edu.thssdb.schema.Manager;
+import cn.edu.thssdb.schema.Table;
 import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.StatusUtil;
 import org.apache.thrift.TException;
@@ -23,12 +25,9 @@ import org.apache.thrift.TException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static cn.edu.thssdb.type.ColumnType.STRING;
 import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class IServiceHandler implements IService.Iface {
@@ -113,13 +112,32 @@ public class IServiceHandler implements IService.Iface {
 
         break;
 
-      case SHOW_TABLE: // SHOW DATABASE tableName
+      case SHOW_TABLE:
         System.out.println("SHOW_TABLE");
         System.out.println("[DEBUG] " + plan);
+        ExecuteStatementResp resp = new ExecuteStatementResp(StatusUtil.success(), true);
+        String tableName = ((ShowTablePlan) plan).getTableName();
+        Database curDB = manager.getCurDB();
+        Table curTable = curDB.getTable(tableName);
+        resp.addToColumnsList("Table \'" + tableName + "\'\n" + "ColumnName");
+        resp.addToColumnsList("ColumnType");
+        resp.addToColumnsList("IsPrimaryKey");
+        resp.addToColumnsList("IsNotNull");
+        resp.addToColumnsList("MaxLength");
+        ArrayList<Column> columns = curTable.columns;
+        for (Column column : columns) {
+          ArrayList<String> curColumn = new ArrayList<>();
+          curColumn.add(column.getName());
+          curColumn.add(column.getTypeString());
+          curColumn.add("" + column.getPrimary());
+          curColumn.add(String.valueOf(column.isNotNull()));
+          curColumn.add("" + column.getMaxLength());
+          resp.addToRowList(curColumn);
+        }
+        return resp;
 
         // TODO: Plan, MetaInfo printing implementation
 
-        break;
       case AUTO_COMMIT:
         System.out.println("AUTO_COMMIT");
         System.out.println("[DEBUG] " + plan);
@@ -159,7 +177,8 @@ public class IServiceHandler implements IService.Iface {
         System.out.println("[DEBUG] " + plan);
         break;
 
-      default:break;
+      default:
+        break;
     }
     return plan.execute_plan();
   }
