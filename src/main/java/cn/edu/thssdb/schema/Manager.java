@@ -27,6 +27,7 @@ public class Manager implements Serializable {
     databases = new HashMap<>();
     curDB = null;
     loadData();
+    System.out.println("Manager loadData done");
   }
 
   public Database getCurDB() {
@@ -48,7 +49,6 @@ public class Manager implements Serializable {
     } finally {
       lock.writeLock().unlock();
     }
-
   }
 
   public void deleteDatabase(String databaseName) {
@@ -67,7 +67,6 @@ public class Manager implements Serializable {
     } finally {
       lock.writeLock().unlock();
     }
-
   }
 
   public void switchDatabase(String databaseName) {
@@ -77,12 +76,12 @@ public class Manager implements Serializable {
       lock.readLock().lock();
       if (!databases.containsKey(databaseName))
         throw new NotExistsException(NotExistsException.Database, databaseName);
-      databases.put(databaseName, new Database(databaseName)); // Load database(will read from file if exists)
+      databases.put(
+          databaseName, new Database(databaseName)); // Load database(will read from file if exists)
       curDB = getDB(databaseName);
     } finally {
       lock.readLock().unlock();
     }
-
   }
 
   // 单例模式
@@ -93,6 +92,7 @@ public class Manager implements Serializable {
   }
 
   private void loadData() {
+    System.out.println("Entered Manager's loadData()");
     File data_dir = new File(DATA_DIR);
     if (!data_dir.exists()) // create directory if not exists
     data_dir.mkdir();
@@ -108,11 +108,9 @@ public class Manager implements Serializable {
         BufferedReader reader = new BufferedReader(new FileReader(data_file));
         String cur_line = null;
         while ((cur_line = reader.readLine()) != null) {
-          // modified from here
-          databases.put(cur_line, null);
-          // modify ended
-
-          // createDatabaseIfNotExists(cur_line); //original
+          System.out.println("cur_line: " + cur_line);
+          //   databases.put(cur_line, null); // modified by Macchiato (will cause bug)
+          createDatabaseIfNotExists(cur_line); // original
           // 目前没加readlog
         }
         reader.close();
@@ -153,6 +151,5 @@ public class Manager implements Serializable {
     } finally {
       lock.readLock().unlock();
     }
-
   }
 }
