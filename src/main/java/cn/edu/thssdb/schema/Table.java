@@ -17,7 +17,7 @@ public class Table implements Iterable<Row>, Serializable {
   ReentrantReadWriteLock lock;
   private String databaseName;
   public String tableName;
-  public ArrayList<Column> columns;
+  public ArrayList<Column> columns; // Amy: 是否要改成私有变量 + 公有接口？
   public BPlusTree<Entry, Row> index;
   private int primaryIndex;
   public static final String DATA_DIRECTORY = "data/";
@@ -31,7 +31,7 @@ public class Table implements Iterable<Row>, Serializable {
     this.index = new BPlusTree<>();
     this.primaryIndex = -1;
     for (int i = 0; i < this.columns.size(); i++) {
-      if (this.columns.get(i).get_Primary() == 1) {
+      if (this.columns.get(i).getPrimary() == 1) {
         primaryIndex = i;
       }
     }

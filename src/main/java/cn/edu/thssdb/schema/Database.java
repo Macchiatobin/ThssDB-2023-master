@@ -113,6 +113,11 @@ public class Database implements Serializable {
     }
   }
 
+  // Added by Amy - 为ShowTable添加接口
+  public Table getTable(String tableName) {
+    return this.tables.get(tableName);
+  }
+
   public void quit() {
     persist();
   }
