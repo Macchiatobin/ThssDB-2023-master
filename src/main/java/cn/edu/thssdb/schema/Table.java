@@ -35,8 +35,6 @@ public class Table implements Iterable<Row>, Serializable {
     this.path = DATA_DIR + databaseName + "/" + tableName;
     this.metaPath = this.path + "/meta";
 
-
-
     for (int i = 0; i < this.columns.size(); i++) {
       if (this.columns.get(i).getPrimary() == 1) {
         primaryIndex = i;
@@ -48,9 +46,7 @@ public class Table implements Iterable<Row>, Serializable {
 
     if (!isFirst) {
       deserialize(); // recover index and call index.recover
-    }
-
-    else {
+    } else {
       this.index = new BPlusTree<>();
       this.index.nodeManager = new TreeNodeManager<>(index.root, path);
       serialize();
@@ -199,7 +195,7 @@ public class Table implements Iterable<Row>, Serializable {
       objectOutputStream.writeObject(this);
     } catch (Exception e) {
       System.out.println(e);
-    }finally {
+    } finally {
       lock.writeLock().unlock();
     }
   }

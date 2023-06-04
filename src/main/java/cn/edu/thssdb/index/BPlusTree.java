@@ -26,7 +26,6 @@ public final class BPlusTree<K extends Comparable<K>, V>
     nodeManager.recover(dataPath);
     this.root = nodeManager.loadNode(nodeManager.root_id);
     System.out.println("Node manager recovered!"); // THIS IS FOR DEBUGGING
-
   }
 
   public int size() {
