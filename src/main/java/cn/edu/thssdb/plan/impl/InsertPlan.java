@@ -1,17 +1,16 @@
 package cn.edu.thssdb.plan.impl;
 
+import static cn.edu.thssdb.type.ColumnType.STRING;
+
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.query.MetaInfo;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.StatusUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static cn.edu.thssdb.type.ColumnType.STRING;
 
 public class InsertPlan extends LogicalPlan {
 
@@ -26,8 +25,8 @@ public class InsertPlan extends LogicalPlan {
     this.entryValues = entryList;
   }
 
-  public String getTableName() {
-    return tableName;
+  public ArrayList<String> getTableName() {
+    return new ArrayList<>(Collections.singletonList(this.tableName));
   }
 
   public List<String> getColumnNames() {

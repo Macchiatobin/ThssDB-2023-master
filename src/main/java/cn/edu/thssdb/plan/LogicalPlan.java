@@ -1,6 +1,7 @@
 package cn.edu.thssdb.plan;
 
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
+import java.util.ArrayList;
 
 public abstract class LogicalPlan {
 
@@ -12,6 +13,10 @@ public abstract class LogicalPlan {
 
   public LogicalPlanType getType() {
     return type;
+  }
+
+  public ArrayList<String> getTableName() {
+    return null;
   }
 
   public enum LogicalPlanType {
@@ -28,7 +33,8 @@ public abstract class LogicalPlan {
     SHOW_TABLE,
     INSERT,
     DELETE,
-    UPDATE
+    UPDATE,
+    SELECT,
   }
 
   public abstract ExecuteStatementResp

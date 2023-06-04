@@ -1,22 +1,21 @@
 package cn.edu.thssdb.schema;
 
+import static cn.edu.thssdb.type.ColumnType.*;
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
+
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.IllegalTypeException;
 import cn.edu.thssdb.index.BPlusTree;
 import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.Pair;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static cn.edu.thssdb.type.ColumnType.*;
-import static cn.edu.thssdb.utils.Global.DATA_DIR;
-
 public class Table implements Iterable<Row>, Serializable {
-  transient ReentrantReadWriteLock lock;
+  public transient ReentrantReadWriteLock lock;
   private String databaseName;
   public String tableName;
   public ArrayList<Column> columns;
