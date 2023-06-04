@@ -10,7 +10,7 @@ public class TreeNodeManager<K extends Comparable<K>, V> implements Serializable
 
   // private HashMap<K, UUID> idMap; // Key to id map, used for node loading, always PERSIST
   // UUID is file name for a node
-  private transient HashMap<UUID, BPlusTreeNode<K, V>> cache = new HashMap<>();
+  //private transient HashMap<UUID, BPlusTreeNode<K, V>> cache = new HashMap<>();
   private transient LinkedHashMap<UUID, BPlusTreeNode<K, V>> accessOrderCache;
   public UUID root_id; // recovered by deserialization of table
 
@@ -19,12 +19,12 @@ public class TreeNodeManager<K extends Comparable<K>, V> implements Serializable
   // only used when first creation of table.index
   public TreeNodeManager(BPlusTreeNode<K, V> root, String path) {
     this.root_id = root.id;
-    this.cache = new HashMap<>();
+    //this.cache = new HashMap<>();
     this.accessOrderCache = new LinkedHashMap<>(16, 0.75f, true); // order by access order
     // idMap = new HashMap<>();
     // idMap.put(root_key, root.id);
 
-    cache.put(root.id, root); // cache should load root at the beginning
+    //cache.put(root.id, root); // cache should load root at the beginning
     accessOrderCache.put(root.id, root);
     this.path = path + "/";
 
@@ -34,7 +34,7 @@ public class TreeNodeManager<K extends Comparable<K>, V> implements Serializable
   // called by Database.class
   // recreate new cache and load root to cache
   public void recover(String dataPath) { // only used when recovering
-    this.cache = new HashMap<>(); // recover transient
+    //this.cache = new HashMap<>(); // recover transient
     this.accessOrderCache = new LinkedHashMap<>(16, 0.75f, true); // order by access
     this.path = dataPath + "/";
   }
@@ -58,7 +58,7 @@ public class TreeNodeManager<K extends Comparable<K>, V> implements Serializable
 
     // this.idMap.put(key, id);
 
-    this.cache.put(id, node);
+    //this.cache.put(id, node);
     this.accessOrderCache.put(id, node);
     // writing to disk should be done manually by caller,
     // after modifying more details about new node
@@ -71,8 +71,9 @@ public class TreeNodeManager<K extends Comparable<K>, V> implements Serializable
   // parents/siblings/childrens
   public void deleteNode(UUID id) {
     if (id == null) return;
-    if (cache.containsKey(id)) { // if it's in cache (it will be in cache if it's root node)
-      cache.remove(id);
+    //if (cache.containsKey(id)) { // if it's in cache (it will be in cache if it's root node)
+    if (accessOrderCache.containsKey(id)) {
+      //cache.remove(id);
       accessOrderCache.remove(id);
     }
 
@@ -81,7 +82,8 @@ public class TreeNodeManager<K extends Comparable<K>, V> implements Serializable
   }
 
   private void checkCache() {
-    if (cache.size() <= CACHE_SIZE) return; // no need to unload
+    //if (cache.size() <= CACHE_SIZE) return; // no need to unload
+    if (accessOrderCache.size() <= CACHE_SIZE) return;
 
     // cache full, unload one
     unloadNode(nodeToUnloadId());
@@ -101,22 +103,28 @@ public class TreeNodeManager<K extends Comparable<K>, V> implements Serializable
   public BPlusTreeNode<K, V> loadNode(UUID id) {
     if (id == null) return null;
 
+    /*
     if (cache.containsKey(id)) { // cache hit
       return cache.get(id);
+    }
+     */
+    if (accessOrderCache.containsKey(id)) {
+      return accessOrderCache.get(id);
     }
 
     checkCache(); // check cache first
     // read from disk
     BPlusTreeNode<K, V> node = readNodeFromDisk(id);
-    cache.put(node.id, node);
+    //cache.put(node.id, node);
     accessOrderCache.put(node.id, node);
     return node;
   }
 
   // called when cache is full and new node is needed
   void unloadNode(UUID id) {
-    writeNodeToDisk(cache.get(id)); // persist in case
-    cache.remove(id); // unload
+    //writeNodeToDisk(cache.get(id)); // persist in case
+    //cache.remove(id); // unload
+    writeNodeToDisk(accessOrderCache.get(id));
     accessOrderCache.remove(id);
   }
 
