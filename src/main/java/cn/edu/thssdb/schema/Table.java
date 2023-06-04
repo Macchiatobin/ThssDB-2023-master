@@ -35,24 +35,22 @@ public class Table implements Iterable<Row>, Serializable {
     this.path = DATA_DIR + databaseName + "/" + tableName;
     this.metaPath = this.path + "/meta";
 
+    for (int i = 0; i < this.columns.size(); i++) {
+      if (this.columns.get(i).getPrimary() == 1) {
+        primaryIndex = i;
+      }
+    }
+
+    File tableFolder = new File(this.path);
+    if (!tableFolder.exists()) tableFolder.mkdir(); // create folder if it doesn't exist
+
     if (!isFirst) {
       deserialize(); // recover index and call index.recover
-    }
-
-    else {
+    } else {
       this.index = new BPlusTree<>();
       this.index.nodeManager = new TreeNodeManager<>(index.root, path);
+      serialize();
     }
-
-      for (int i = 0; i < this.columns.size(); i++) {
-        if (this.columns.get(i).getPrimary() == 1) {
-          primaryIndex = i;
-        }
-      }
-
-      File tableFolder = new File(this.path);
-      if (!tableFolder.exists()) tableFolder.mkdir(); // create folder if it doesn't exist
-
   }
 
   // INSERT Row
@@ -62,8 +60,6 @@ public class Table implements Iterable<Row>, Serializable {
       Entry key = row.getEntries().get(primaryIndex);
       index.put(key, row);
       serialize();
-    } catch (IOException e) {
-      System.out.println(e);
     } catch (Exception e) {
       throw e;
     } finally {
@@ -181,7 +177,7 @@ public class Table implements Iterable<Row>, Serializable {
     }
   }
 
-  private void serialize() throws IOException { // persist
+  private void serialize() { // persist
     // TODO
     // save as file, when changes made
     File meta_file = new File(this.metaPath);
@@ -197,6 +193,8 @@ public class Table implements Iterable<Row>, Serializable {
     try (ObjectOutputStream objectOutputStream =
         new ObjectOutputStream(new FileOutputStream(meta_file)); ) {
       objectOutputStream.writeObject(this);
+    } catch (Exception e) {
+      System.out.println(e);
     } finally {
       lock.writeLock().unlock();
     }

@@ -151,7 +151,8 @@ public class Database implements Serializable {
           for (MetaInfo info : this.metaInfos.values()) {
             List<Column> columnList = info.getColumns();
             Column[] array = columnList.toArray(new Column[0]);
-            tables.put(info.getTableName(), new Table(this.name, info.getTableName(), array, false));
+            tables.put(
+                info.getTableName(), new Table(this.name, info.getTableName(), array, false));
           }
         }
       } catch (IOException e) {
