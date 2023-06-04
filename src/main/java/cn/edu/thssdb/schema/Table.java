@@ -3,6 +3,7 @@ package cn.edu.thssdb.schema;
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.IllegalTypeException;
 import cn.edu.thssdb.index.BPlusTree;
+import cn.edu.thssdb.index.TreeNodeManager;
 import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.Pair;
 
@@ -25,34 +26,46 @@ public class Table implements Iterable<Row>, Serializable {
   private String path; // data file path
   private String metaPath;
 
-  public Table(String databaseName, String tableName, Column[] columns) {
+  public Table(String databaseName, String tableName, Column[] columns, boolean isFirst) {
     this.lock = new ReentrantReadWriteLock();
     this.databaseName = databaseName;
     this.tableName = tableName;
     this.columns = new ArrayList<>(Arrays.asList(columns));
-    this.index = new BPlusTree<>();
     this.primaryIndex = -1;
     this.path = DATA_DIR + databaseName + "/" + tableName;
     this.metaPath = this.path + "/meta";
-    for (int i = 0; i < this.columns.size(); i++) {
-      if (this.columns.get(i).getPrimary() == 1) {
-        primaryIndex = i;
-      }
+
+    if (!isFirst) {
+      deserialize(); // recover index and call index.recover
     }
-    File tableFolder = new File(this.path);
-    if (!tableFolder.exists()) tableFolder.mkdir(); // create folder if it doesn't exist
-    deserialize();
+
+    else {
+      this.index = new BPlusTree<>();
+      this.index.nodeManager = new TreeNodeManager<>(index.root, path);
+    }
+
+      for (int i = 0; i < this.columns.size(); i++) {
+        if (this.columns.get(i).getPrimary() == 1) {
+          primaryIndex = i;
+        }
+      }
+
+      File tableFolder = new File(this.path);
+      if (!tableFolder.exists()) tableFolder.mkdir(); // create folder if it doesn't exist
+
   }
 
   // INSERT Row
   public void insert(Row row) {
+    lock.writeLock().lock();
     try {
-      lock.writeLock().lock();
       Entry key = row.getEntries().get(primaryIndex);
       index.put(key, row);
       serialize();
-    } catch (Exception e) {
+    } catch (IOException e) {
       System.out.println(e);
+    } catch (Exception e) {
+      throw e;
     } finally {
       lock.writeLock().unlock();
     }
@@ -200,7 +213,7 @@ public class Table implements Iterable<Row>, Serializable {
 
       if (restored != null) {
         this.index = restored.index;
-        index.recover();
+        index.recover(this.path);
       }
     } catch (Exception e) {
       System.out.println(e);
