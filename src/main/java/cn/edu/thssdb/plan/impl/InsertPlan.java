@@ -1,5 +1,6 @@
 package cn.edu.thssdb.plan.impl;
 
+import cn.edu.thssdb.exception.DuplicateKeyException;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.query.MetaInfo;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
@@ -101,7 +102,12 @@ public class InsertPlan extends LogicalPlan {
       }
     }
     Row rowToInsert = new Row(entries);
-    dbForInsert.getTable(tableName).insert(rowToInsert);
+    try {
+      dbForInsert.getTable(tableName).insert(rowToInsert);
+    }
+    catch (DuplicateKeyException e) {
+      return new ExecuteStatementResp(StatusUtil.fail(e.getMessage()), false);
+    }
 
     return new ExecuteStatementResp(StatusUtil.success(), false);
   }

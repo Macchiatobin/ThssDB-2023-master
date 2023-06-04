@@ -17,7 +17,7 @@ public class TreeNodeManager<K extends Comparable<K>, V> implements Serializable
   public String path; // path for table folder, where node files are, set when table created
 
   // only used when first creation of table.index
-  public TreeNodeManager(BPlusTreeNode<K, V> root) {
+  public TreeNodeManager(BPlusTreeNode<K, V> root, String path) {
     this.root_id = root.id;
     this.cache = new HashMap<>();
     this.accessOrderCache = new LinkedHashMap<>(16, 0.75f, true); // order by access order
@@ -26,21 +26,17 @@ public class TreeNodeManager<K extends Comparable<K>, V> implements Serializable
 
     cache.put(root.id, root); // cache should load root at the beginning
     accessOrderCache.put(root.id, root);
-
-    // this.path is set by Database.class when creating table for the first time
-    // just add uuid after that
+    this.path = path + "/";
 
     writeNodeToDisk(root);
   }
 
   // called by Database.class
   // recreate new cache and load root to cache
-  public void recover() { // only used when recovering
+  public void recover(String dataPath) { // only used when recovering
     this.cache = new HashMap<>(); // recover transient
     this.accessOrderCache = new LinkedHashMap<>(16, 0.75f, true); // order by access
-    loadNode(this.root_id);
-
-    System.out.println("Node manager recovered!"); // THIS IS FOR DEBUGGING
+    this.path = dataPath + "/";
   }
 
   // new node method
