@@ -18,17 +18,16 @@
  */
 package cn.edu.thssdb.parser;
 
+import static cn.edu.thssdb.type.ColumnType.*;
+
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
 import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.sql.SQLBaseVisitor;
 import cn.edu.thssdb.sql.SQLParser;
 import cn.edu.thssdb.type.ColumnType;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static cn.edu.thssdb.type.ColumnType.*;
 
 public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
@@ -108,6 +107,14 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
   @Override
   public LogicalPlan visitAutoCommitStmt(SQLParser.AutoCommitStmtContext ctx) {
     return new AutoCommitPlan();
+  }
+
+  public LogicalPlan visitBeginTransactionStmt(SQLParser.BeginTransactionStmtContext ctx) {
+    return new BeginTransactionPlan();
+  }
+
+  public LogicalPlan visitCommitStmt(SQLParser.CommitStmtContext ctx) {
+    return new CommitPlan();
   }
 
   @Override

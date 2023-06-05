@@ -1,18 +1,20 @@
 package cn.edu.thssdb.plan.impl;
 
+<<<<<<< HEAD
+import static cn.edu.thssdb.type.ColumnType.STRING;
+
+=======
 import cn.edu.thssdb.exception.DuplicateKeyException;
+>>>>>>> 126c6b867452d21e1dd7e8d044b885ae9106017e
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.query.MetaInfo;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.StatusUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static cn.edu.thssdb.type.ColumnType.STRING;
 
 public class InsertPlan extends LogicalPlan {
 
@@ -27,8 +29,8 @@ public class InsertPlan extends LogicalPlan {
     this.entryValues = entryList;
   }
 
-  public String getTableName() {
-    return tableName;
+  public ArrayList<String> getTableName() {
+    return new ArrayList<>(Collections.singletonList(this.tableName));
   }
 
   public List<String> getColumnNames() {

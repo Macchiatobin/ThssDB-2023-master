@@ -28,4 +28,13 @@ public class Global {
   public static final int LEAF = 1;
 
   public static final int INITIAL_LRU = 10;
+
+  public enum ISOLATION_LEVEL {
+    READ_UNCOMMITTED,
+    READ_COMMITTED,
+    SERIALIZABLE
+  }
+
+  public static ISOLATION_LEVEL DATABASE_ISOLATION_LEVEL = ISOLATION_LEVEL.READ_COMMITTED;
+  public static final boolean ISOLATION_STATUS = true;
 }
