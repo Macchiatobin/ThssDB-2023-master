@@ -176,11 +176,14 @@ public class IServiceHandler implements IService.Iface {
         System.out.println("[DEBUG] " + plan);
         break;
 
+<<<<<<< HEAD
       case SELECT:
         System.out.println("SELECT");
         System.out.println("[DEBUG] " + plan);
         break;
 
+=======
+>>>>>>> 126c6b867452d21e1dd7e8d044b885ae9106017e
       default:
         break;
     }

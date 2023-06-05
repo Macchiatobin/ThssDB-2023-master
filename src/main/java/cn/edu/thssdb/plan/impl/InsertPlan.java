@@ -1,7 +1,11 @@
 package cn.edu.thssdb.plan.impl;
 
+<<<<<<< HEAD
 import static cn.edu.thssdb.type.ColumnType.STRING;
 
+=======
+import cn.edu.thssdb.exception.DuplicateKeyException;
+>>>>>>> 126c6b867452d21e1dd7e8d044b885ae9106017e
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.query.MetaInfo;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
@@ -100,7 +104,11 @@ public class InsertPlan extends LogicalPlan {
       }
     }
     Row rowToInsert = new Row(entries);
-    dbForInsert.getTable(tableName).insert(rowToInsert);
+    try {
+      dbForInsert.getTable(tableName).insert(rowToInsert);
+    } catch (DuplicateKeyException e) {
+      return new ExecuteStatementResp(StatusUtil.fail(e.getMessage()), false);
+    }
 
     return new ExecuteStatementResp(StatusUtil.success(), false);
   }

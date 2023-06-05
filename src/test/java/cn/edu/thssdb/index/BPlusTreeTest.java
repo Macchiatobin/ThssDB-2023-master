@@ -19,6 +19,7 @@ public class BPlusTreeTest {
   @Before
   public void setUp() {
     tree = new BPlusTree<>();
+    tree.nodeManager = new TreeNodeManager<>(tree.root, ""); // added by macchiato
     keys = new ArrayList<>();
     values = new ArrayList<>();
     map = new HashMap<>();
