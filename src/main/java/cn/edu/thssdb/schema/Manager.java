@@ -34,9 +34,9 @@ public class Manager implements Serializable {
   public void createDatabaseIfNotExists(String databaseName) {
     /* TODO */
     // v1 done
-    lock.writeLock().lock();
+    //    lock.writeLock().lock();  //  为啥要挪出来？
     try {
-
+      lock.writeLock().lock(); // original
       if (databases.get(databaseName) != null) // exists already
       {
         throw new AlreadyExistsException(AlreadyExistsException.Database, databaseName);
@@ -98,8 +98,15 @@ public class Manager implements Serializable {
       try {
         BufferedReader reader = new BufferedReader(new FileReader(data_file));
         String cur_line = null;
-        while ((cur_line = reader.readLine()) != null) { //cur_line is databaseName
-          databases.put(cur_line, new Database(cur_line)); //load databases
+        while ((cur_line = reader.readLine()) != null) { // cur_line is databaseName
+          System.out.println("cur_line: " + cur_line);
+          System.out.println("Databases size: " + databases.size());
+          if (cur_line.equals("")) // ignore empty lines
+          continue;
+          databases.put(cur_line, new Database(cur_line)); // load databases
+          System.out.println("Database added");
+          System.out.println("Databases size: " + databases.size());
+          //          createDatabaseIfNotExists(cur_line); // original
         }
         reader.close();
       } catch (Exception e) {
@@ -132,8 +139,9 @@ public class Manager implements Serializable {
   }
 
   private Database getDB(String databaseName) {
-    lock.readLock().lock();
+    //    lock.readLock().lock(); // 为啥要挪出来？
     try {
+      lock.readLock().lock(); // original
       if (!databases.containsKey(databaseName))
         throw new NotExistsException(NotExistsException.Database, databaseName);
       return databases.get(databaseName);
