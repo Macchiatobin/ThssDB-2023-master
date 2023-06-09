@@ -99,14 +99,7 @@ public class Manager implements Serializable {
         BufferedReader reader = new BufferedReader(new FileReader(data_file));
         String cur_line = null;
         while ((cur_line = reader.readLine()) != null) { // cur_line is databaseName
-          System.out.println("cur_line: " + cur_line);
-          System.out.println("Databases size: " + databases.size());
-          if (cur_line.equals("")) // ignore empty lines
-          continue;
           databases.put(cur_line, new Database(cur_line)); // load databases
-          System.out.println("Database added");
-          System.out.println("Databases size: " + databases.size());
-          //          createDatabaseIfNotExists(cur_line); // original
         }
         reader.close();
       } catch (Exception e) {

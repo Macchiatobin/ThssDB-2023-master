@@ -72,8 +72,7 @@ public class Database implements Serializable {
 
     lock.writeLock().lock();
     try {
-      tables.put(tableName, new Table(this.name, tableName, columns));
-      tables.get(tableName).index.nodeManager.path = this.path + tableName + "/";
+      tables.put(tableName, new Table(this.name, tableName, columns, true));
       // set folder path for node Manager
       metaInfos.put(tableName, new MetaInfo(tableName, new ArrayList<>(Arrays.asList(columns))));
       persist();
@@ -151,8 +150,9 @@ public class Database implements Serializable {
           this.tables = new HashMap<>();
           for (MetaInfo info : this.metaInfos.values()) {
             List<Column> columnList = info.getColumns();
-            Column[] array = new Column[columnList.size()];
-            tables.put(info.getTableName(), new Table(this.name, info.getTableName(), array));
+            Column[] array = columnList.toArray(new Column[0]);
+            tables.put(
+                info.getTableName(), new Table(this.name, info.getTableName(), array, false));
           }
         }
       } catch (IOException e) {

@@ -2,6 +2,8 @@ package cn.edu.thssdb.plan.impl;
 
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class ShowTablePlan extends LogicalPlan {
 
@@ -12,7 +14,11 @@ public class ShowTablePlan extends LogicalPlan {
     this.tableName = tableName;
   }
 
-  public String getTableName() {
+  public ArrayList<String> getTableName() {
+    return new ArrayList<>(Collections.singletonList(this.tableName));
+  }
+
+  public String getSpecificTableName() {
     return tableName;
   }
 

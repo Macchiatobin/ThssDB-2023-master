@@ -6,7 +6,8 @@ import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.utils.StatusUtil;
-
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CreateTablePlan extends LogicalPlan {
@@ -20,8 +21,8 @@ public class CreateTablePlan extends LogicalPlan {
     this.columns = columnList;
   }
 
-  public String getTableName() {
-    return tableName;
+  public ArrayList<String> getTableName() {
+    return new ArrayList<>(Collections.singletonList(this.tableName));
   }
 
   public List<Column> getColumns() {

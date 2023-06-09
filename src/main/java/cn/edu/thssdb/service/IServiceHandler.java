@@ -1,5 +1,7 @@
 package cn.edu.thssdb.service;
 
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
+
 import cn.edu.thssdb.plan.LogicalGenerator;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
@@ -20,15 +22,12 @@ import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
 import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.StatusUtil;
-import org.apache.thrift.TException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static cn.edu.thssdb.utils.Global.DATA_DIR;
+import org.apache.thrift.TException;
 
 public class IServiceHandler implements IService.Iface {
 
@@ -116,7 +115,7 @@ public class IServiceHandler implements IService.Iface {
         System.out.println("SHOW_TABLE");
         System.out.println("[DEBUG] " + plan);
         ExecuteStatementResp resp = new ExecuteStatementResp(StatusUtil.success(), true);
-        String tableName = ((ShowTablePlan) plan).getTableName();
+        String tableName = ((ShowTablePlan) plan).getSpecificTableName();
         Database curDB = manager.getCurDB();
         Table curTable = curDB.getTable(tableName);
         resp.addToColumnsList("Table \'" + tableName + "\'\n" + "ColumnName");
@@ -174,6 +173,11 @@ public class IServiceHandler implements IService.Iface {
 
       case UPDATE:
         System.out.println("UPDATE");
+        System.out.println("[DEBUG] " + plan);
+        break;
+
+      case SELECT:
+        System.out.println("SELECT");
         System.out.println("[DEBUG] " + plan);
         break;
 

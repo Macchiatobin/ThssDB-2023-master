@@ -12,6 +12,7 @@ abstract class BPlusTreeNode<K extends Comparable<K>, V> implements Serializable
   int nodeSize;
   UUID id; // for node management
   UUID parent_id; // for node management
+  // maybe no need?
 
   abstract V get(K key, TreeNodeManager<K, V> nodeManager);
 

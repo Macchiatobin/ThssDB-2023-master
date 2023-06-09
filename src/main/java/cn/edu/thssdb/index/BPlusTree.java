@@ -18,12 +18,14 @@ public final class BPlusTree<K extends Comparable<K>, V>
   public BPlusTree() {
     root = new BPlusTreeLeafNode<>(0, null);
     root.id = UUID.randomUUID();
-    nodeManager = new TreeNodeManager<>(root);
+    // nodeManager = new TreeNodeManager<>(root);
+    // this.nodeManager is now initialized by Table()
   }
 
-  public void recover() { // called by table
-    nodeManager.recover();
+  public void recover(String dataPath) { // called by table
+    nodeManager.recover(dataPath);
     this.root = nodeManager.loadNode(nodeManager.root_id);
+    System.out.println("Node manager recovered!"); // THIS IS FOR DEBUGGING
   }
 
   public int size() {
