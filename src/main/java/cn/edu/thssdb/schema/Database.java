@@ -1,21 +1,20 @@
 package cn.edu.thssdb.schema;
 
+import static cn.edu.thssdb.utils.FolderOperations.deleteFolder;
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
+
 import cn.edu.thssdb.exception.AlreadyExistsException;
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.NotExistsException;
 import cn.edu.thssdb.query.MetaInfo;
 import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.query.QueryTable;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import static cn.edu.thssdb.utils.FolderOperations.deleteFolder;
-import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Database implements Serializable {
 
@@ -38,6 +37,10 @@ public class Database implements Serializable {
 
   public Table getTable(String tableName) {
     return tables.get(tableName);
+  }
+
+  public String getdatabaseName() {
+    return name;
   }
 
   private void persist() {

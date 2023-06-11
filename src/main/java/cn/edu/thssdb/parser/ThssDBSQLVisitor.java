@@ -32,6 +32,11 @@ import java.util.List;
 public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
   @Override
+  public LogicalPlan visitParse(SQLParser.ParseContext ctx) {
+    return visit(ctx.getChild(0));
+  }
+
+  @Override
   public LogicalPlan visitCreateDbStmt(SQLParser.CreateDbStmtContext ctx) {
     return new CreateDatabasePlan(ctx.databaseName().getText());
   }
