@@ -55,7 +55,13 @@ public class InsertPlan extends LogicalPlan {
   public ExecuteStatementResp execute_plan() {
     Manager manager = Manager.getInstance();
     Database dbForInsert = manager.getCurDB();
+    if (dbForInsert == null) {
+      return new ExecuteStatementResp(StatusUtil.fail("Use database first."), false);
+    }
     Table tableToInsert = dbForInsert.getTable(tableName);
+    if (tableToInsert == null) {
+      return new ExecuteStatementResp(StatusUtil.fail("Table doesn't exist!"), false);
+    }
     MetaInfo metaInfo = dbForInsert.metaInfos.get(tableName);
 
     int columnNamesSize = columnNames.size(); // need check if 0

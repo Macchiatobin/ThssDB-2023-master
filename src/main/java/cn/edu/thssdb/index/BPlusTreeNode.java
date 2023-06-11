@@ -57,6 +57,7 @@ abstract class BPlusTreeNode<K extends Comparable<K>, V> implements Serializable
     for (int i = index; i < nodeSize - 1; i++) {
       keys.set(i, keys.get(i + 1));
     }
+    keys.set(nodeSize - 1, null); // just added
     nodeSize--;
   }
 

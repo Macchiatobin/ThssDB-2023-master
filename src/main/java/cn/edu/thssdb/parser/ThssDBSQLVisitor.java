@@ -148,15 +148,28 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
   }
 
   @Override
-  public LogicalPlan visitDeleteStmt(SQLParser.DeleteStmtContext ctx) {
-    // TODO
-    return null;
+  public LogicalPlan visitDeleteStmt(SQLParser.DeleteStmtContext ctx) { // only one expression
+    String tableName = ctx.tableName().getText();
+    SQLParser.ConditionContext condition = ctx.multipleCondition().condition();
+    String attrname = condition.expression(0).getText();
+    String attrvalue = condition.expression(1).getText();
+    String comparator = condition.comparator().getText();
+
+    return new DeletePlan(tableName, attrname, attrvalue, comparator);
   }
 
   @Override
-  public LogicalPlan visitUpdateStmt(SQLParser.UpdateStmtContext ctx) {
-    // TODO
-    return null;
+  public LogicalPlan visitUpdateStmt(SQLParser.UpdateStmtContext ctx) { // only one where expression, set always '='
+    String tableName = ctx.tableName().getText();
+    String set_column_name = ctx.columnName().getText();
+    String set_attr_value = ctx.expression().getText();
+    SQLParser.ConditionContext condition = ctx.multipleCondition().condition();
+    String where_attr_name = condition.expression(0).getText();
+    String where_attr_value = condition.expression(1).getText();
+    String comparator = condition.comparator().getText();
+
+    return new UpdatePlan(tableName, set_column_name, set_attr_value,
+            where_attr_name, where_attr_value, comparator);
   }
 
   @Override
