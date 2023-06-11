@@ -39,7 +39,11 @@ public class CreateDatabasePlan extends LogicalPlan {
   @Override
   public ExecuteStatementResp execute_plan() {
     Manager manager = Manager.getInstance();
-    manager.createDatabaseIfNotExists(databaseName);
+    try {
+      manager.createDatabaseIfNotExists(databaseName);
+    } catch (Exception e) {
+      return new ExecuteStatementResp(StatusUtil.fail(e.toString()), false);
+    }
     return new ExecuteStatementResp(StatusUtil.success(), false);
   }
 
