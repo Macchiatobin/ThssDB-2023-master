@@ -115,7 +115,15 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     return new ShowTablePlan(ctx.tableName().getText());
   }
 
+  public LogicalPlan visitBeginTransactionStmt(SQLParser.BeginTransactionStmtContext ctx) {
+    return new BeginTransactionPlan();
+  }
+
   @Override
+  public LogicalPlan visitCommitStmt(SQLParser.CommitStmtContext ctx) {
+    return new CommitPlan();
+  }
+
   public LogicalPlan visitAutoCommitStmt(SQLParser.AutoCommitStmtContext ctx) {
     return new AutoCommitPlan();
   }
@@ -125,10 +133,6 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     /* TODO */
     // v1 done
     return new SelectPlan(ctx, getCurDB(), manager);
-  }
-
-  public LogicalPlan visitCommitStmt(SQLParser.CommitStmtContext ctx) {
-    return new CommitPlan();
   }
 
   @Override
