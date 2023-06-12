@@ -31,6 +31,7 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
 
   private void valuesRemove(int index) {
     for (int i = index; i < nodeSize - 1; i++) values.set(i, values.get(i + 1));
+    values.set(nodeSize - 1, null); // just added
   }
 
   @Override
@@ -49,7 +50,7 @@ public class BPlusTreeLeafNode<K extends Comparable<K>, V> extends BPlusTreeNode
   void put(K key, V value, TreeNodeManager<K, V> nodeManager) {
     int index = binarySearch(key);
     int valueIndex = index >= 0 ? index : -index - 1;
-    if (index >= 0) throw new DuplicateKeyException();
+    if (index >= 0 && index < nodeSize) throw new DuplicateKeyException();
     else {
       valuesAdd(valueIndex, value);
       keysAdd(valueIndex, key);
