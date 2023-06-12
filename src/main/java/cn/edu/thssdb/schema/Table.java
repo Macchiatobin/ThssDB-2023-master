@@ -52,6 +52,24 @@ public class Table implements Iterable<Row>, Serializable {
     }
   }
 
+  public int getPrimaryIndex() {
+    return primaryIndex;
+  }
+
+  // GET Row (Used when update)
+  public Row get(Entry entry) {
+    Row result = null;
+    lock.readLock().lock();
+    try {
+      result = index.get(entry);
+    } catch (Exception e) { // key not exists
+      return null;
+    } finally {
+      lock.readLock().unlock();
+    }
+    return result;
+  }
+
   // INSERT Row
   public void insert(Row row) {
     lock.writeLock().lock();
@@ -156,18 +174,11 @@ public class Table implements Iterable<Row>, Serializable {
     }
   }
 
-  public void update(Row oldRow, Row newRow) {
-    // TODO
-    Entry oldIndex = oldRow.getEntries().get(primaryIndex);
-    Entry newIndex = newRow.getEntries().get(primaryIndex);
+  public void update(Row oldRow, Row newRow) { // simple implementation
     lock.writeLock().lock();
     try {
-      if (oldIndex.compareTo(newIndex) == 0) {
-        index.update(newIndex, newRow);
-      } else {
-        delete(oldRow);
-        insert(newRow);
-      }
+      delete(oldRow);
+      insert(newRow);
       serialize();
     } catch (Exception e) {
       System.out.println(e);
