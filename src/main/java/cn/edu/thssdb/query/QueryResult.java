@@ -6,7 +6,6 @@ import cn.edu.thssdb.exception.InvalidColumnNameException;
 import cn.edu.thssdb.schema.Entry;
 import cn.edu.thssdb.schema.Row;
 import cn.edu.thssdb.utils.Cell;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +20,8 @@ public class QueryResult {
   private boolean isDistinct;
   private HashSet<String> hash_set;
   private ArrayList<Row> results;
+  public boolean mWhetherRight;
+  public String mErrorMessage;
 
   public QueryResult(
       QueryTable queryTable, boolean isDistinct, String[] columns) { // originally QueryTable[]
@@ -34,11 +35,18 @@ public class QueryResult {
     this.metaInfoInfos = new ArrayList<>();
     this.table = queryTable;
     this.isDistinct = isDistinct;
+    mWhetherRight = true;
+    mErrorMessage = "";
     System.out.println("QueryResult QueryResult(): variable initializations done"); // debug
     this.metaInfoInfos.addAll(queryTable.GenerateMetaInfo());
     System.out.println("QueryResult QueryResult(): add metaInfoInfos done"); // debug
     setColumns(columns); // select columns
     System.out.println("QueryResult QueryResult(): set columns done"); // debug
+  }
+
+  public QueryResult(String errorMessage) {
+    mWhetherRight = false;
+    mErrorMessage = errorMessage;
   }
 
   public ArrayList<Row> getRows() {

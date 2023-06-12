@@ -1,8 +1,12 @@
 package cn.edu.thssdb.service;
 
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
+
+import cn.edu.thssdb.parser.MySQLParser;
 import cn.edu.thssdb.plan.LogicalGenerator;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
+import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.rpc.thrift.ConnectReq;
 import cn.edu.thssdb.rpc.thrift.ConnectResp;
 import cn.edu.thssdb.rpc.thrift.DisconnectReq;
@@ -20,20 +24,18 @@ import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
 import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.StatusUtil;
-import org.apache.thrift.TException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static cn.edu.thssdb.utils.Global.DATA_DIR;
+import org.apache.thrift.TException;
 
 public class IServiceHandler implements IService.Iface {
 
   private Manager manager;
   private static final AtomicInteger sessionCnt = new AtomicInteger(0);
+  public static MySQLParser handler;
 
   public IServiceHandler() {
     this.manager = Manager.getInstance();
@@ -72,6 +74,10 @@ public class IServiceHandler implements IService.Iface {
 
   @Override
   public ExecuteStatementResp executeStatement(ExecuteStatementReq req) throws TException {
+    long the_session = req.getSessionId();
+    ArrayList<QueryResult> the_result;
+    ArrayList<QueryResult> result = new ArrayList<>();
+
     if (req.getSessionId() < 0) {
       return new ExecuteStatementResp(
           StatusUtil.fail("You are not connected. Please connect first."), false);
@@ -165,22 +171,63 @@ public class IServiceHandler implements IService.Iface {
       case INSERT:
         System.out.println("INSERT");
         System.out.println("[DEBUG] " + plan);
+
+        if (!manager.transaction_sessions.contains(the_session)) {
+          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+          the_result = handler.evaluate("INSERT", the_session);
+          result.addAll(the_result);
+          handler.evaluate("AUTO COMMIT", the_session);
+
+        } else {
+          the_result = handler.evaluate("INSERT", the_session);
+          result.addAll(the_result);
+        }
         break;
 
       case DELETE:
         System.out.println("DELETE");
         System.out.println("[DEBUG] " + plan);
+        if (!manager.transaction_sessions.contains(the_session)) {
+          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+          the_result = handler.evaluate("DELETE", the_session);
+          result.addAll(the_result);
+          handler.evaluate("AUTO COMMIT", the_session);
+
+        } else {
+          the_result = handler.evaluate("DELETE", the_session);
+          result.addAll(the_result);
+        }
         break;
 
       case UPDATE:
         System.out.println("UPDATE");
         System.out.println("[DEBUG] " + plan);
+        if (!manager.transaction_sessions.contains(the_session)) {
+          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+          the_result = handler.evaluate("UPDATE", the_session);
+          result.addAll(the_result);
+          handler.evaluate("AUTO COMMIT", the_session);
+
+        } else {
+          the_result = handler.evaluate("UPDATE", the_session);
+          result.addAll(the_result);
+        }
         break;
 
       case SELECT:
         /* TODO */
         System.out.println("SELECT");
         System.out.println("[DEBUG] " + plan);
+        if (!manager.transaction_sessions.contains(the_session)) {
+          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+          the_result = handler.evaluate("SELECT", the_session);
+          result.addAll(the_result);
+          handler.evaluate("AUTO COMMIT", the_session);
+
+        } else {
+          the_result = handler.evaluate("SELECT", the_session);
+          result.addAll(the_result);
+        }
         //        return ((SelectPlan)plan).execute_plan(req); // 加了个req参数，用于和transaction交互
         break;
 

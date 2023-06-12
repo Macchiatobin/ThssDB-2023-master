@@ -18,6 +18,8 @@
  */
 package cn.edu.thssdb.parser;
 
+import static cn.edu.thssdb.type.ColumnType.*;
+
 import cn.edu.thssdb.exception.*;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
@@ -27,11 +29,8 @@ import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.sql.SQLBaseVisitor;
 import cn.edu.thssdb.sql.SQLParser;
 import cn.edu.thssdb.type.ColumnType;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static cn.edu.thssdb.type.ColumnType.*;
 
 public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
@@ -116,7 +115,15 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     return new ShowTablePlan(ctx.tableName().getText());
   }
 
+  public LogicalPlan visitBeginTransactionStmt(SQLParser.BeginTransactionStmtContext ctx) {
+    return new BeginTransactionPlan();
+  }
+
   @Override
+  public LogicalPlan visitCommitStmt(SQLParser.CommitStmtContext ctx) {
+    return new CommitPlan();
+  }
+
   public LogicalPlan visitAutoCommitStmt(SQLParser.AutoCommitStmtContext ctx) {
     return new AutoCommitPlan();
   }
@@ -126,10 +133,6 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     /* TODO */
     // v1 done
     return new SelectPlan(ctx, getCurDB(), manager);
-  }
-
-  public LogicalPlan visitCommitStmt(SQLParser.CommitStmtContext ctx) {
-    return new CommitPlan();
   }
 
   @Override
