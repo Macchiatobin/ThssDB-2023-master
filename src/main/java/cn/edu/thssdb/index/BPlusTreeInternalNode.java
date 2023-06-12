@@ -1,5 +1,6 @@
 package cn.edu.thssdb.index;
 
+import cn.edu.thssdb.exception.KeyNotExistException;
 import cn.edu.thssdb.utils.Global;
 
 import java.util.ArrayList;
@@ -44,8 +45,8 @@ public final class BPlusTreeInternalNode<K extends Comparable<K>, V> extends BPl
   @Override
   V get(K key, TreeNodeManager<K, V> nodeManager) {
     // return searchChild(key).get(key, nodeManager);
-    BPlusTreeNode<K, V> child_found = nodeManager.loadNode(searchChild(key));
-    return child_found.get(key, nodeManager);
+     BPlusTreeNode<K, V> child_found = nodeManager.loadNode(searchChild(key));
+     return child_found.get(key, nodeManager);
   }
 
   @Override

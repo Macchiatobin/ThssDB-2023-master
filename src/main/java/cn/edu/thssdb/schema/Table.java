@@ -62,8 +62,8 @@ public class Table implements Iterable<Row>, Serializable {
     lock.readLock().lock();
     try {
       result = index.get(entry);
-    } catch (Exception e) {
-      throw e;
+    } catch (Exception e) { // key not exists
+      return null;
     } finally {
       lock.readLock().unlock();
     }
