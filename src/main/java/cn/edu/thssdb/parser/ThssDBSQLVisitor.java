@@ -63,15 +63,11 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
   @Override
   public LogicalPlan visitCreateTableStmt(SQLParser.CreateTableStmtContext ctx) {
-    String tableName = ctx.tableName().getText().toLowerCase(); // convert names to lowercase
+    String tableName = ctx.tableName().getText(); // need to convert to lowercase
     List<Column> columns = new ArrayList<>();
     List<String> pkName = new ArrayList<>();
     for (SQLParser.ColumnDefContext element : ctx.columnDef()) {
-      String cName =
-          element
-              .columnName()
-              .getText()
-              .toLowerCase(); // column name  // convert names to lowercase
+      String cName = element.columnName().getText(); // column name  // need to convert to lowercase
       String cType = element.typeName().getText().toUpperCase(); // column type
       ColumnType type = INT;
       int maxLength = 0;
@@ -178,7 +174,8 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
   }
 
   @Override
-  public LogicalPlan visitUpdateStmt(SQLParser.UpdateStmtContext ctx) { // only one where expression, set always '='
+  public LogicalPlan visitUpdateStmt(
+      SQLParser.UpdateStmtContext ctx) { // only one where expression, set always '='
     String tableName = ctx.tableName().getText();
     String set_column_name = ctx.columnName().getText();
     String set_attr_value = ctx.expression().getText();
@@ -187,8 +184,8 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     String where_attr_value = condition.expression(1).getText();
     String comparator = condition.comparator().getText();
 
-    return new UpdatePlan(tableName, set_column_name, set_attr_value,
-            where_attr_name, where_attr_value, comparator);
+    return new UpdatePlan(
+        tableName, set_column_name, set_attr_value, where_attr_name, where_attr_value, comparator);
   }
 
   @Override

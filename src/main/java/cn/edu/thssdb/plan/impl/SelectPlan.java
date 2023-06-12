@@ -40,14 +40,14 @@ public class SelectPlan extends LogicalPlan {
 
     // Single query table
     if (ctx.K_JOIN().size() == 0) {
-      return cur_db.createSingleQueryTable(ctx.tableName(0).getText().toLowerCase());
+      return cur_db.createSingleQueryTable(ctx.tableName(0).getText()); // original: toLowerCase()
     }
     // Joined query table
     else {
       MultipleCondition multiple_condition = obtainMultipleCondition(ctx.multipleCondition());
       ArrayList<String> table_names = new ArrayList<>();
       for (SQLParser.TableNameContext subCtx : ctx.tableName()) {
-        table_names.add(subCtx.getText().toLowerCase());
+        table_names.add(subCtx.getText());
       }
       return cur_db.createJoinedQueryTable(table_names, multiple_condition);
     }
@@ -56,6 +56,7 @@ public class SelectPlan extends LogicalPlan {
   @Override
   public ExecuteStatementResp execute_plan() {
     /* TODO */
+    // v1 done
 
     boolean is_distinct;
     if (ctx.K_DISTINCT() != null) is_distinct = true;
@@ -65,7 +66,7 @@ public class SelectPlan extends LogicalPlan {
 
     /* "SELECT": Obtain selected column names */
     for (int i = 0; i < col_num; i++) {
-      String cur_col_name = ctx.resultColumn(i).getText().toLowerCase();
+      String cur_col_name = ctx.resultColumn(i).getText(); // original: toLowerCase()
       if (cur_col_name.equals("*")) {
         col_names = null;
         break;
@@ -86,8 +87,8 @@ public class SelectPlan extends LogicalPlan {
       System.out.println("Table names: " + ctx.tableQuery()); // for debugging
       query_table = createQueryTable(ctx.tableQuery(0));
       for (SQLParser.TableNameContext cur_ctx : ctx.tableQuery(0).tableName()) {
-        System.out.println("Table name: " + cur_ctx.getText().toLowerCase()); // for debugging
-        table_names.add(cur_ctx.getText().toLowerCase());
+        System.out.println("Table name: " + cur_ctx.getText()); // for debugging
+        table_names.add(cur_ctx.getText()); // original: toLowerCase()
       }
     } catch (Exception e) {
       throw new QueryResultException();
@@ -155,6 +156,8 @@ public class SelectPlan extends LogicalPlan {
       statement_res.addToRowList(null_row);
     }
 
+    System.out.println("SelectPlan executePlan(): done, ready to return");
+    System.out.println("--------------------------------------------------------");
     return statement_res;
   }
 
@@ -237,7 +240,7 @@ public class SelectPlan extends LogicalPlan {
     int n = ctx.columnName().size();
     String[] composite_names = new String[n];
     for (int i = 0; i < n; i++) {
-      composite_names[i] = ctx.columnName(i).getText().toLowerCase();
+      composite_names[i] = ctx.columnName(i).getText(); // original: toLowerCase()
     }
     return composite_names;
   }

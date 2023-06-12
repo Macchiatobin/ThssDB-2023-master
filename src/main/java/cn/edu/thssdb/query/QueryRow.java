@@ -60,7 +60,7 @@ public class QueryRow extends Row {
                   + "cur_table.columns.get(j).getName()): "
                   + cur_table.columns.get(j).getName()); // debug
           // remember to convert to lower case before comparing
-          if ((col_name.toLowerCase()).equals((cur_table.columns.get(j).getName()).toLowerCase())) {
+          if (col_name.equalsIgnoreCase(cur_table.columns.get(j).getName())) {
             System.out.println(
                 "QueryRow getColumnComparer(): column names \'" + col_name + "\' equal"); // debug
             num_hits++;
@@ -86,14 +86,18 @@ public class QueryRow extends Row {
       System.out.println(
           "QueryRow getColumnComparer(): formatted as \"tableName.columnName\""); // debug
       String[] sep_names = separateColumnName(col_name);
+      System.out.println("QueryRow getColumnComparer(): separateColumnName() done"); // debug
       String table_name = sep_names[0];
       String entry_name = sep_names[1];
       int total_index = 0;
       boolean is_found = false;
       for (Table table : query_tables) {
-        if (table_name.equals(table.tableName)) {
+        System.out.println("QueryRow getColumnComparer(): entered table search loop"); // debug
+        if (table_name.equalsIgnoreCase(table.tableName)) {
+          System.out.println("QueryRow getColumnComparer(): matching table found"); // debug
           for (int j = 0; j < table.columns.size(); j++) {
-            if (entry_name.equals(table.columns.get(j).getName())) {
+            if (entry_name.equalsIgnoreCase(table.columns.get(j).getName())) {
+              System.out.println("QueryRow getColumnComparer(): matching entry found"); // debug
               is_found = true;
               index = total_index + j;
               col_type = table.columns.get(j).getType();
@@ -105,6 +109,8 @@ public class QueryRow extends Row {
         total_index += table.columns.size();
       }
       if (!is_found) {
+        System.out.println(
+            "QueryRow getColumnComparer(): no matching entry found, throw ColumnNotFoundException"); // debug
         throw new ColumnNotFoundException(col_name);
       }
     }
@@ -114,8 +120,8 @@ public class QueryRow extends Row {
     if (comparer_value == null) {
       return new Expression(ComparerType.NULL, null);
     }
-    Expression the_comparer = new Expression(comparer_type, "" + comparer_value);
-    return the_comparer;
+    Expression cur_comparer = new Expression(comparer_type, "" + comparer_value);
+    return cur_comparer;
   }
 
   // convert ColumnType to ComparerType

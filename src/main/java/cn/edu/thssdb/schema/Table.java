@@ -28,8 +28,8 @@ public class Table implements Iterable<Row>, Serializable {
 
   public Table(String databaseName, String tableName, Column[] columns, boolean isFirst) {
     this.lock = new ReentrantReadWriteLock();
-    this.databaseName = databaseName.toLowerCase();
-    this.tableName = tableName.toLowerCase();
+    this.databaseName = databaseName;
+    this.tableName = tableName;
     this.columns = new ArrayList<>(Arrays.asList(columns));
     this.primaryIndex = -1;
     this.path = DATA_DIR + databaseName + "/" + tableName;

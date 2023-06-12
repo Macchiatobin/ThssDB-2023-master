@@ -66,19 +66,17 @@ public class QueryResult {
     // return selected columns
     else {
       System.out.println("QueryResult setColumns(): columns is not null"); // debug
-      for (String col_name : columns) {
-        System.out.println(col_name.toLowerCase());
-        System.out.println(getColIndex(col_name.toLowerCase()));
-        this.col_indexes.add(getColIndex(col_name.toLowerCase()));
-        this.col_names.add(col_name.toLowerCase());
+      for (String col_name : columns) { // 需考虑大小写转换
+        System.out.println(col_name);
+        System.out.println(getColIndex(col_name));
+        this.col_indexes.add(getColIndex(col_name));
+        this.col_names.add(col_name);
       }
     }
   }
 
   public int getColIndex(String col_name) {
-
-    // change to lower case
-    col_name = col_name.toLowerCase();
+    // 需考虑大小写转换
     // formatted as "columnname" only
     int index = 0;
     if (!col_name.contains(".")) {

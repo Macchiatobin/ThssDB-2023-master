@@ -12,7 +12,7 @@ public class Column implements Comparable<Column>, Serializable {
   private int maxLength;
 
   public Column(String name, ColumnType type, int primary, boolean notNull, int maxLength) {
-    this.name = name.toLowerCase(); // convert to lower case
+    this.name = name; // need to convert to lower case when comparing
     this.type = type;
     this.primary = primary;
     this.notNull = notNull;
