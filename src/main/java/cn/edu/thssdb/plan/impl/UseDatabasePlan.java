@@ -44,7 +44,11 @@ public class UseDatabasePlan extends LogicalPlan {
   @Override
   public ExecuteStatementResp execute_plan() {
     Manager manager = Manager.getInstance();
-    manager.switchDatabase(databaseName);
+    try {
+      manager.switchDatabase(databaseName);
+    } catch (Exception e) {
+      return new ExecuteStatementResp(StatusUtil.fail(e.toString()), false);
+    }
     return new ExecuteStatementResp(StatusUtil.success(), false);
   }
 }
