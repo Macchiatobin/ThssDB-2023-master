@@ -7,6 +7,7 @@ import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.StatusUtil;
 
+import javax.management.openmbean.KeyAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +61,6 @@ public class UpdatePlan extends LogicalPlan {
         return new ExecuteStatementResp(StatusUtil.fail("Table doesn't exist."), false);
       }
 
-      // TODO: modify below code from DELETE-PLAN
       MetaInfo cur_metaInfo = cur_db.metaInfos.get(tableName);
       List<Column> cur_columns = cur_metaInfo.getColumns();
       int set_column_index = cur_metaInfo.columnFind(set_attrName);
@@ -69,6 +69,14 @@ public class UpdatePlan extends LogicalPlan {
       Column where_column = cur_columns.get(where_column_index);
       ColumnType set_column_type = set_column.getType();
       ColumnType where_column_type = where_column.getType();
+
+      if (set_column_index == cur_tb.getPrimaryIndex()) { // set attribute is key
+        Row new_key_row = cur_tb.get(new Entry(Table.getColumnTypeValue(set_column_type, set_attrValue)));
+        // check if there's already a data with new key
+        if (new_key_row != null) {
+          throw new KeyAlreadyExistsException();
+        }
+      }
 
       Entry entry_to_delete = new Entry(Table.getColumnTypeValue(where_column_type, where_attrValue));
       Row old_row = cur_tb.get(entry_to_delete); // get old row
