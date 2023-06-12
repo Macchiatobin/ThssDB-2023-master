@@ -1,19 +1,20 @@
 package cn.edu.thssdb.schema;
 
-import static cn.edu.thssdb.type.ColumnType.*;
-import static cn.edu.thssdb.utils.Global.DATA_DIR;
-
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.IllegalTypeException;
 import cn.edu.thssdb.index.BPlusTree;
 import cn.edu.thssdb.index.TreeNodeManager;
 import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.Pair;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static cn.edu.thssdb.type.ColumnType.*;
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Table implements Iterable<Row>, Serializable {
   public transient ReentrantReadWriteLock lock;
@@ -27,8 +28,8 @@ public class Table implements Iterable<Row>, Serializable {
 
   public Table(String databaseName, String tableName, Column[] columns, boolean isFirst) {
     this.lock = new ReentrantReadWriteLock();
-    this.databaseName = databaseName;
-    this.tableName = tableName;
+    this.databaseName = databaseName.toLowerCase();
+    this.tableName = tableName.toLowerCase();
     this.columns = new ArrayList<>(Arrays.asList(columns));
     this.primaryIndex = -1;
     this.path = DATA_DIR + databaseName + "/" + tableName;
@@ -50,6 +51,11 @@ public class Table implements Iterable<Row>, Serializable {
       this.index.nodeManager = new TreeNodeManager<>(index.root, path);
       serialize();
     }
+  }
+
+  // return primary index
+  public int getPrimaryIndex() {
+    return primaryIndex;
   }
 
   // INSERT Row

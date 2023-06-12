@@ -116,6 +116,7 @@ public class Client {
     req.setStatement(statement);
     try {
       ExecuteStatementResp resp = client.executeStatement(req);
+      if (resp == null) System.out.println("Client: resp is null!!!"); // debug
       if (resp.status.code == Global.SUCCESS_CODE) {
         if (resp.hasResult) {
           StringBuilder column_str = new StringBuilder();
@@ -128,6 +129,8 @@ public class Client {
           println("----------------------------------------------------------------");
 
           for (List<String> row : resp.rowList) {
+            if (row.size() == 0) // empty result rows
+            break;
             StringBuilder row_str = new StringBuilder();
             for (int i = 0; i < column_size; ++i) {
               row_str.append(row.get(i));

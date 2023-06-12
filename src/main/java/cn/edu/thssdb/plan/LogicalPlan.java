@@ -1,6 +1,7 @@
 package cn.edu.thssdb.plan;
 
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
+
 import java.util.ArrayList;
 
 public abstract class LogicalPlan {

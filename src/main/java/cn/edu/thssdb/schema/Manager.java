@@ -5,6 +5,7 @@ import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.NotExistsException;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -14,6 +15,7 @@ import static cn.edu.thssdb.utils.Global.DATA_DIR;
 public class Manager implements Serializable {
   private HashMap<String, Database> databases;
   private Database curDB;
+  public ArrayList<Long> transaction_sessions;
   private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
   private String metaPath = DATA_DIR + "manager_meta/";
 
