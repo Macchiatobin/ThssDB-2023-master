@@ -71,6 +71,8 @@ public class IServiceHandler implements IService.Iface {
 
   @Override
   public ExecuteStatementResp executeStatement(ExecuteStatementReq req) throws TException {
+    long currentSession = req.getSessionId();
+
     if (req.getSessionId() < 0) {
       return new ExecuteStatementResp(
           StatusUtil.fail("You are not connected. Please connect first."), false);

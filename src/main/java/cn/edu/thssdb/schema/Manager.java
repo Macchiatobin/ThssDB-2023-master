@@ -1,21 +1,27 @@
 package cn.edu.thssdb.schema;
 
+import static cn.edu.thssdb.utils.FolderOperations.deleteFolder;
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
+
 import cn.edu.thssdb.exception.AlreadyExistsException;
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.NotExistsException;
-
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import static cn.edu.thssdb.utils.FolderOperations.deleteFolder;
-import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Manager implements Serializable {
   private HashMap<String, Database> databases;
   private Database curDB;
   private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
   private String metaPath = DATA_DIR + "manager_meta/";
+
+  // Transaction Lock
+  public HashMap<Long, ArrayList<String>> readLockMap; // 记录每个session取得了哪些表的s锁
+  public HashMap<Long, ArrayList<String>> writeLockMap; // 记录每个session取得了哪些表的x锁
+  public ArrayList<Long> inTransactionList; // 处于transaction状态的session列表
+  public ArrayList<Long> lockTransactionList; // 由于锁阻塞的session队列
 
   public static Manager getInstance() {
     return Manager.ManagerHolder.INSTANCE;
@@ -25,6 +31,10 @@ public class Manager implements Serializable {
     databases = new HashMap<>();
     curDB = null;
     loadData(); // recover
+    readLockMap = new HashMap<>();
+    writeLockMap = new HashMap<>();
+    inTransactionList = new ArrayList<>();
+    lockTransactionList = new ArrayList<>();
   }
 
   public Database getCurDB() {
