@@ -25,7 +25,6 @@ public class DeletePlan extends LogicalPlan {
     this.attrName = attrname; // condition attribute name
     this.attrValue = attrvalue; // condition attribute value
 
-
     if (comp == "=") this.comparator = COMP_EQ;
     else if (comp == ">=") this.comparator = COMP_GE;
     else if (comp == ">") this.comparator = COMP_GT;
@@ -39,8 +38,15 @@ public class DeletePlan extends LogicalPlan {
 
   @Override
   public String toString() {
-    return "DeletePlan{" + "tableName='" + tableName + '\'' + ";where attr_name='" +
-            attrName + "',attr_value='" + attrValue + "'}";
+    return "DeletePlan{"
+        + "tableName='"
+        + tableName
+        + '\''
+        + ";where attr_name='"
+        + attrName
+        + "',attr_value='"
+        + attrValue
+        + "'}";
   }
 
   @Override

@@ -5,6 +5,7 @@ import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.NotExistsException;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -14,6 +15,7 @@ import static cn.edu.thssdb.utils.Global.DATA_DIR;
 public class Manager implements Serializable {
   private HashMap<String, Database> databases;
   private Database curDB;
+  public ArrayList<Long> transaction_sessions;
   private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
   private String metaPath = DATA_DIR + "manager_meta/";
 
@@ -34,9 +36,9 @@ public class Manager implements Serializable {
   public void createDatabaseIfNotExists(String databaseName) {
     /* TODO */
     // v1 done
-    lock.writeLock().lock();
+    //    lock.writeLock().lock();  //  为啥要挪出来？
     try {
-
+      lock.writeLock().lock(); // original
       if (databases.get(databaseName) != null) // exists already
       {
         throw new AlreadyExistsException(AlreadyExistsException.Database, databaseName);
@@ -132,8 +134,9 @@ public class Manager implements Serializable {
   }
 
   private Database getDB(String databaseName) {
-    lock.readLock().lock();
+    //    lock.readLock().lock(); // 为啥要挪出来？
     try {
+      lock.readLock().lock(); // original
       if (!databases.containsKey(databaseName))
         throw new NotExistsException(NotExistsException.Database, databaseName);
       return databases.get(databaseName);

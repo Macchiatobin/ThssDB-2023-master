@@ -1,7 +1,5 @@
 package cn.edu.thssdb.service;
 
-import static cn.edu.thssdb.utils.Global.DATA_DIR;
-
 import cn.edu.thssdb.plan.LogicalGenerator;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
@@ -22,12 +20,15 @@ import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
 import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.StatusUtil;
+import org.apache.thrift.TException;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.apache.thrift.TException;
+
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class IServiceHandler implements IService.Iface {
 
@@ -76,7 +77,7 @@ public class IServiceHandler implements IService.Iface {
           StatusUtil.fail("You are not connected. Please connect first."), false);
     }
     // TODO: implement execution logic，需要实现日志记录等
-    LogicalPlan plan = LogicalGenerator.generate(req.statement);
+    LogicalPlan plan = LogicalGenerator.generate(manager, req.statement);
     switch (plan.getType()) {
       case CREATE_DB:
         System.out.println("CREATE_DB");
@@ -177,8 +178,10 @@ public class IServiceHandler implements IService.Iface {
         break;
 
       case SELECT:
+        /* TODO */
         System.out.println("SELECT");
         System.out.println("[DEBUG] " + plan);
+        //        return ((SelectPlan)plan).execute_plan(req); // 加了个req参数，用于和transaction交互
         break;
 
       default:

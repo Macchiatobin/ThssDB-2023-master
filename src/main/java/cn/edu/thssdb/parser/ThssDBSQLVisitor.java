@@ -18,18 +18,30 @@
  */
 package cn.edu.thssdb.parser;
 
-import static cn.edu.thssdb.type.ColumnType.*;
-
+import cn.edu.thssdb.exception.*;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
 import cn.edu.thssdb.schema.Column;
+import cn.edu.thssdb.schema.Database;
+import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.sql.SQLBaseVisitor;
 import cn.edu.thssdb.sql.SQLParser;
 import cn.edu.thssdb.type.ColumnType;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import static cn.edu.thssdb.type.ColumnType.*;
+
 public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
+
+  private Manager manager;
+  private long session; // TODO: transaction交互
+
+  public ThssDBSQLVisitor(Manager manager) {
+    super();
+    this.manager = manager;
+  }
 
   @Override
   public LogicalPlan visitCreateDbStmt(SQLParser.CreateDbStmtContext ctx) {
@@ -51,11 +63,11 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
   @Override
   public LogicalPlan visitCreateTableStmt(SQLParser.CreateTableStmtContext ctx) {
-    String tableName = ctx.tableName().getText();
+    String tableName = ctx.tableName().getText(); // need to convert to lowercase
     List<Column> columns = new ArrayList<>();
     List<String> pkName = new ArrayList<>();
     for (SQLParser.ColumnDefContext element : ctx.columnDef()) {
-      String cName = element.columnName().getText(); // column name
+      String cName = element.columnName().getText(); // column name  // need to convert to lowercase
       String cType = element.typeName().getText().toUpperCase(); // column type
       ColumnType type = INT;
       int maxLength = 0;
@@ -109,8 +121,11 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     return new AutoCommitPlan();
   }
 
-  public LogicalPlan visitBeginTransactionStmt(SQLParser.BeginTransactionStmtContext ctx) {
-    return new BeginTransactionPlan();
+  @Override
+  public LogicalPlan visitSelectStmt(SQLParser.SelectStmtContext ctx) {
+    /* TODO */
+    // v1 done
+    return new SelectPlan(ctx, getCurDB(), manager);
   }
 
   public LogicalPlan visitCommitStmt(SQLParser.CommitStmtContext ctx) {
@@ -159,7 +174,8 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
   }
 
   @Override
-  public LogicalPlan visitUpdateStmt(SQLParser.UpdateStmtContext ctx) { // only one where expression, set always '='
+  public LogicalPlan visitUpdateStmt(
+      SQLParser.UpdateStmtContext ctx) { // only one where expression, set always '='
     String tableName = ctx.tableName().getText();
     String set_column_name = ctx.columnName().getText();
     String set_attr_value = ctx.expression().getText();
@@ -168,8 +184,8 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     String where_attr_value = condition.expression(1).getText();
     String comparator = condition.comparator().getText();
 
-    return new UpdatePlan(tableName, set_column_name, set_attr_value,
-            where_attr_name, where_attr_value, comparator);
+    return new UpdatePlan(
+        tableName, set_column_name, set_attr_value, where_attr_name, where_attr_value, comparator);
   }
 
   @Override
@@ -177,5 +193,15 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     return new QuitPlan();
   }
 
+  /** 自定义方法 */
+  private Database getCurDB() {
+    Database curDB = manager.getCurDB();
+    if (curDB == null) {
+      throw new NotExistsException(NotExistsException.Database, "obtained from getCurDB()");
+    }
+    return curDB;
+  }
+
   // TODO: parser to more logical plan
+
 }

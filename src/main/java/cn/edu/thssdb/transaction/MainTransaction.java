@@ -5,6 +5,7 @@ import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
 import cn.edu.thssdb.utils.Global;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantReadWriteLock;

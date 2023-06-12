@@ -32,7 +32,27 @@ public class MetaInfo implements Serializable {
     return this.tableName;
   }
 
+  public String GetFormattedName(int i) {
+    if (i < 0 || i >= columns.size()) {
+      throw new IndexOutOfBoundsException();
+    }
+    return tableName + "." + columns.get(i).getName();
+  }
+
   public List<Column> getColumns() {
     return this.columns;
+  }
+
+  int getColumnsNum() {
+    return columns.size();
+  }
+
+  int getColIndex(String name) {
+    for (int i = 0; i < columns.size(); i++) {
+      if (columns.get(i).getName().equalsIgnoreCase(name)) {
+        return i;
+      }
+    }
+    return -1;
   }
 }

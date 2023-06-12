@@ -8,6 +8,7 @@ import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.StatusUtil;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,8 +23,8 @@ public class UpdatePlan extends LogicalPlan {
   private String where_attrValue;
   private String tableName;
   int where_comparator;
-  public UpdatePlan(String tableName, String san, String sav,
-                    String wan, String wav, String comp) {
+
+  public UpdatePlan(String tableName, String san, String sav, String wan, String wav, String comp) {
     super(LogicalPlanType.UPDATE);
     this.tableName = tableName;
     this.set_attrName = san;
@@ -71,24 +72,28 @@ public class UpdatePlan extends LogicalPlan {
       ColumnType where_column_type = where_column.getType();
 
       if (set_column_index == cur_tb.getPrimaryIndex()) { // set attribute is key
-        Row new_key_row = cur_tb.get(new Entry(Table.getColumnTypeValue(set_column_type, set_attrValue)));
+        Row new_key_row =
+            cur_tb.get(new Entry(Table.getColumnTypeValue(set_column_type, set_attrValue)));
         // check if there's already a data with new key
         if (new_key_row != null) {
           throw new KeyAlreadyExistsException();
         }
       }
 
-      Entry entry_to_delete = new Entry(Table.getColumnTypeValue(where_column_type, where_attrValue));
+      Entry entry_to_delete =
+          new Entry(Table.getColumnTypeValue(where_column_type, where_attrValue));
       Row old_row = cur_tb.get(entry_to_delete); // get old row
       ArrayList<Entry> entries = old_row.getEntries();
 
       ArrayList<Entry> new_entries = new ArrayList<>();
       int it = 0;
-      for (Entry e: entries) { // copy into new entry
-        new_entries.add(new Entry(Table.getColumnTypeValue(cur_columns.get(it).getType(), e.toString())));
+      for (Entry e : entries) { // copy into new entry
+        new_entries.add(
+            new Entry(Table.getColumnTypeValue(cur_columns.get(it).getType(), e.toString())));
         ++it;
       }
-      new_entries.set(set_column_index, new Entry(Table.getColumnTypeValue(set_column_type, set_attrValue)));
+      new_entries.set(
+          set_column_index, new Entry(Table.getColumnTypeValue(set_column_type, set_attrValue)));
       // modify set value
 
       // create new row with modified entries
@@ -99,7 +104,6 @@ public class UpdatePlan extends LogicalPlan {
     } catch (Exception e) {
       return new ExecuteStatementResp(StatusUtil.fail(e.toString()), false);
     }
-
 
     return new ExecuteStatementResp(StatusUtil.success(), false);
   }

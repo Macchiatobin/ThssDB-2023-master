@@ -20,6 +20,7 @@ package cn.edu.thssdb.plan;
 
 import cn.edu.thssdb.parser.SQLParseError;
 import cn.edu.thssdb.parser.ThssDBSQLVisitor;
+import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.sql.SQLLexer;
 import cn.edu.thssdb.sql.SQLParser;
 import org.antlr.v4.runtime.CharStream;
@@ -31,8 +32,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class LogicalGenerator {
 
-  public static LogicalPlan generate(String sql) throws ParseCancellationException {
-    ThssDBSQLVisitor dbsqlVisitor = new ThssDBSQLVisitor();
+  public static LogicalPlan generate(Manager manager, String sql)
+      throws ParseCancellationException { // manager added
+    ThssDBSQLVisitor dbsqlVisitor = new ThssDBSQLVisitor(manager); // manager added
 
     CharStream charStream1 = CharStreams.fromString(sql);
 
