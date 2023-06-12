@@ -71,14 +71,12 @@ public class IServiceHandler implements IService.Iface {
 
   @Override
   public ExecuteStatementResp executeStatement(ExecuteStatementReq req) throws TException {
-    long currentSession = req.getSessionId();
-
     if (req.getSessionId() < 0) {
       return new ExecuteStatementResp(
           StatusUtil.fail("You are not connected. Please connect first."), false);
     }
     // TODO: implement execution logic，需要实现日志记录等
-    LogicalPlan plan = LogicalGenerator.generate(req.statement);
+    LogicalPlan plan = LogicalGenerator.generate(manager, req.statement);
     switch (plan.getType()) {
       case CREATE_DB:
         System.out.println("CREATE_DB");
@@ -179,8 +177,10 @@ public class IServiceHandler implements IService.Iface {
         break;
 
       case SELECT:
+        /* TODO */
         System.out.println("SELECT");
         System.out.println("[DEBUG] " + plan);
+        //        return ((SelectPlan)plan).execute_plan(req); // 加了个req参数，用于和transaction交互
         break;
 
       default:
