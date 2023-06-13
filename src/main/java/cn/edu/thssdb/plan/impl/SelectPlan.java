@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SelectPlan extends LogicalPlan {
+  ArrayList<QueryResult> the_result;
+  ArrayList<QueryResult> result = new ArrayList<>();
 
   private SQLParser.SelectStmtContext ctx;
   private Database cur_db;
@@ -27,11 +29,6 @@ public class SelectPlan extends LogicalPlan {
     this.cur_db = cur_db;
     this.manager = manager;
     this.my_parser = new MySQLParser(this.manager);
-  }
-
-  @Override
-  public ExecuteStatementResp execute_plan(long the_session) {
-    return null;
   }
 
   @Override
@@ -59,6 +56,11 @@ public class SelectPlan extends LogicalPlan {
 
   @Override
   public ExecuteStatementResp execute_plan() {
+    return null;
+  }
+
+  @Override
+  public ExecuteStatementResp execute_plan(long the_session) {
     /* TODO */
     // v1 done
 
@@ -114,8 +116,22 @@ public class SelectPlan extends LogicalPlan {
     }
 
     QueryResult query_res = null;
-    long session = 0;
     // Transaction Lock
+    if (!manager.transaction_sessions.contains(the_session)) {
+      System.out.println("Auto Commit:" + the_session);
+      System.out.println(!manager.transaction_sessions.contains(the_session));
+      my_parser.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+      the_result = my_parser.evaluate("SELECT", the_session);
+      result.addAll(the_result);
+      my_parser.evaluate("AUTO COMMIT", the_session);
+
+    } else {
+      System.out.println("Commit:" + the_session);
+      System.out.println(!manager.transaction_sessions.contains(the_session));
+      the_result = my_parser.evaluate("SELECT", the_session);
+      result.addAll(the_result);
+    }
+    long session = 0;
     if (manager.transaction_sessions.contains(session)) {
       // manager.session_queue.add(session);
       while (true) {

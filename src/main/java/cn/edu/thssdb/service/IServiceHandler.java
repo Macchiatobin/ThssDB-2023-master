@@ -156,18 +156,20 @@ public class IServiceHandler implements IService.Iface {
       case BEGIN_TRANSACTION:
         System.out.println("BEGIN_TRANSACTION");
         System.out.println("[DEBUG] " + plan);
+        return plan.execute_plan(the_session);
 
         // TODO
 
-        break;
+        //        break;
 
       case COMMIT:
         System.out.println("COMMIT");
         System.out.println("[DEBUG] " + plan);
+        return plan.execute_plan(the_session);
 
         // TODO
 
-        break;
+        //        break;
 
       case INSERT:
         System.out.println("INSERT");

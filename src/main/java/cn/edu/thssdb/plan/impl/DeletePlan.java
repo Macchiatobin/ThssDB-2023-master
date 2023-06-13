@@ -73,7 +73,7 @@ public class DeletePlan extends LogicalPlan {
       System.out.println("Auto Commit:" + the_session);
       System.out.println(!manager.transaction_sessions.contains(the_session));
       handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
-      the_result = handler.evaluate("INSERT", the_session);
+      the_result = handler.evaluate("DELETE", the_session);
       result.addAll(the_result);
       handler.evaluate("AUTO COMMIT", the_session);
 
