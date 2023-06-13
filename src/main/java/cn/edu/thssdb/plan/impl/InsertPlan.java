@@ -112,6 +112,8 @@ public class InsertPlan extends LogicalPlan {
       dbForInsert.getTable(tableName).insert(rowToInsert);
     } catch (DuplicateKeyException e) {
       return new ExecuteStatementResp(StatusUtil.fail(e.getMessage()), false);
+    } catch (Exception e) {
+      return new ExecuteStatementResp(StatusUtil.fail(e.toString()), false);
     }
 
     return new ExecuteStatementResp(StatusUtil.success(), false);

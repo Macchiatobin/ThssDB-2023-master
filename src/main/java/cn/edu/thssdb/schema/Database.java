@@ -150,7 +150,7 @@ public class Database implements Serializable {
     if (metaFile.exists()) {
       lock.writeLock().lock();
       try (FileInputStream fileInputStream = new FileInputStream(this.metaPath);
-          ObjectInputStream inputStream = new ObjectInputStream(fileInputStream); ) {
+           ObjectInputStream inputStream = new ObjectInputStream(fileInputStream);) {
         Database restored = (Database) inputStream.readObject(); // read from file
 
         // recover
@@ -164,9 +164,11 @@ public class Database implements Serializable {
             List<Column> columnList = info.getColumns();
             Column[] array = columnList.toArray(new Column[0]);
             tables.put(
-                info.getTableName(), new Table(this.name, info.getTableName(), array, false));
+                    info.getTableName(), new Table(this.name, info.getTableName(), array, false));
           }
         }
+      } catch (EOFException e) { // when some database got no table in it, no error!
+        System.out.println("Empty database:" + this.name + ", this is no error!");
       } catch (IOException e) {
         System.out.println("InputStream Error Occurred During Recovering Database object!");
         System.out.println(e);
