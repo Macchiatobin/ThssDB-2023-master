@@ -22,15 +22,14 @@ import org.antlr.v4.runtime.CommonTokenStream;
 public class Manager implements Serializable {
   private HashMap<String, Database> databases;
   private Database curDB;
-  public ArrayList<Long> transaction_sessions;
   private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
   private String metaPath = DATA_DIR + "manager_meta/";
 
   // Transaction Lock
+  public ArrayList<Long> transaction_sessions; // 处于transaction状态的session列表
+  public ArrayList<Long> lockTransactionList; // 由于锁阻塞的session队列
   public HashMap<Long, ArrayList<String>> readLockMap; // 记录每个session取得了哪些表的s锁
   public HashMap<Long, ArrayList<String>> writeLockMap; // 记录每个session取得了哪些表的x锁
-  public ArrayList<Long> inTransactionList; // 处于transaction状态的session列表
-  public ArrayList<Long> lockTransactionList; // 由于锁阻塞的session队列
 
   public static Manager getInstance() {
     return Manager.ManagerHolder.INSTANCE;
@@ -42,7 +41,7 @@ public class Manager implements Serializable {
     loadData(); // recover
     readLockMap = new HashMap<>();
     writeLockMap = new HashMap<>();
-    inTransactionList = new ArrayList<>();
+    transaction_sessions = new ArrayList<>();
     lockTransactionList = new ArrayList<>();
   }
 
@@ -128,7 +127,7 @@ public class Manager implements Serializable {
     }
   }
 
-  private void persist() { // only persists names of databases
+  public void persist() { // only persists names of databases
     File data_file = new File(metaPath);
     if (!data_file.exists()) { // create file if not exists
       try {
@@ -168,8 +167,10 @@ public class Manager implements Serializable {
     Database current_base = getCurDB();
     String database_name = current_base.getName();
     String filename = "data/" + database_name + ".log";
+    System.out.println("Log File: " + filename);
     try {
       FileWriter writer = new FileWriter(filename, true);
+      System.out.println("Log File Create Success: " + filename);
       System.out.println(statement);
       writer.write(statement + "\n");
       writer.close();

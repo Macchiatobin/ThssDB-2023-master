@@ -7,15 +7,14 @@ import cn.edu.thssdb.benchmark.common.TableSchema;
 import cn.edu.thssdb.benchmark.generator.BaseDataGenerator;
 import cn.edu.thssdb.benchmark.generator.TransactionDataGenerator;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
-import org.apache.thrift.TException;
-import org.junit.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import org.apache.thrift.TException;
+import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TransactionTestExecutor extends TestExecutor {
 
