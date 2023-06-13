@@ -2,7 +2,6 @@ package cn.edu.thssdb.plan.impl;
 
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
-import cn.edu.thssdb.transaction.MainTransaction;
 
 public class BeginTransactionPlan extends LogicalPlan {
 
@@ -18,8 +17,6 @@ public class BeginTransactionPlan extends LogicalPlan {
   @Override
   public ExecuteStatementResp execute_plan() {
     // TODO
-    MainTransaction mainTransaction = new MainTransaction("your_database_name");
-
     return null;
   }
 }
