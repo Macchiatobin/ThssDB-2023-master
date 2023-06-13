@@ -1,19 +1,20 @@
 package cn.edu.thssdb.schema;
 
-import static cn.edu.thssdb.utils.FolderOperations.deleteFolder;
-import static cn.edu.thssdb.utils.Global.DATA_DIR;
-
 import cn.edu.thssdb.exception.AlreadyExistsException;
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.NotExistsException;
 import cn.edu.thssdb.exception.QueryResultException;
 import cn.edu.thssdb.query.*;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static cn.edu.thssdb.utils.FolderOperations.deleteFolder;
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Database implements Serializable {
 
@@ -153,7 +154,7 @@ public class Database implements Serializable {
     if (metaFile.exists()) {
       lock.writeLock().lock();
       try (FileInputStream fileInputStream = new FileInputStream(this.metaPath);
-           ObjectInputStream inputStream = new ObjectInputStream(fileInputStream);) {
+          ObjectInputStream inputStream = new ObjectInputStream(fileInputStream); ) {
         Database restored = (Database) inputStream.readObject(); // read from file
 
         // recover
@@ -167,7 +168,7 @@ public class Database implements Serializable {
             List<Column> columnList = info.getColumns();
             Column[] array = columnList.toArray(new Column[0]);
             tables.put(
-                    info.getTableName(), new Table(this.name, info.getTableName(), array, false));
+                info.getTableName(), new Table(this.name, info.getTableName(), array, false));
           }
         }
       } catch (EOFException e) { // when some database got no table in it, no error!

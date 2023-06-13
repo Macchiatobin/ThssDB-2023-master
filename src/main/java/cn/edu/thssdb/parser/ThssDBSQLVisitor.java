@@ -18,8 +18,6 @@
  */
 package cn.edu.thssdb.parser;
 
-import static cn.edu.thssdb.type.ColumnType.*;
-
 import cn.edu.thssdb.exception.*;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
@@ -29,8 +27,11 @@ import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.sql.SQLBaseVisitor;
 import cn.edu.thssdb.sql.SQLParser;
 import cn.edu.thssdb.type.ColumnType;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static cn.edu.thssdb.type.ColumnType.*;
 
 public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
