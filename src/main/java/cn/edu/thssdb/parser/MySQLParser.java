@@ -14,7 +14,7 @@ import java.util.Arrays;
 /** 描述:处理sql的主类，需要传入manager */
 public class MySQLParser {
   private Manager manager;
-  private String[] wal_cmds = {"INSERT", "DELETE", "UPDATE", "BEGIN", "COMMIT"};
+  private String[] wal_cmds = {"insert", "delete", "update", "begin", "commit"};
 
   public MySQLParser(Manager manager) {
     this.manager = manager;

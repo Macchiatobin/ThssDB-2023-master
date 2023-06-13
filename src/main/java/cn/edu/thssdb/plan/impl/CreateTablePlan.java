@@ -6,7 +6,6 @@ import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.utils.StatusUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +27,11 @@ public class CreateTablePlan extends LogicalPlan {
 
   public List<Column> getColumns() {
     return columns;
+  }
+
+  @Override
+  public ExecuteStatementResp execute_plan(long the_session) {
+    return null;
   }
 
   @Override

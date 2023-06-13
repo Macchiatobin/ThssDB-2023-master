@@ -1,30 +1,38 @@
 package cn.edu.thssdb.plan.impl;
 
+import static cn.edu.thssdb.type.ColumnType.STRING;
+
 import cn.edu.thssdb.exception.DuplicateKeyException;
+import cn.edu.thssdb.parser.MySQLParser;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.query.MetaInfo;
+import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.StatusUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static cn.edu.thssdb.type.ColumnType.STRING;
-
 public class InsertPlan extends LogicalPlan {
+  private Manager manager;
+  public static MySQLParser handler;
+  ArrayList<QueryResult> the_result;
+  ArrayList<QueryResult> result = new ArrayList<>();
 
   private String tableName;
   private List<String> columnNames;
   private List<String> entryValues;
 
-  public InsertPlan(String tableName, List<String> columnList, List<String> entryList) {
+  public InsertPlan(
+      String tableName, List<String> columnList, List<String> entryList, Manager manager) {
     super(LogicalPlanType.INSERT);
     this.tableName = tableName;
     this.columnNames = columnList;
     this.entryValues = entryList;
+    this.manager = manager;
+    handler = new MySQLParser(manager);
   }
 
   public ArrayList<String> getTableName() {
@@ -37,6 +45,11 @@ public class InsertPlan extends LogicalPlan {
 
   public List<String> getEntryValues() {
     return entryValues;
+  }
+
+  @Override
+  public ExecuteStatementResp execute_plan() {
+    return null;
   }
 
   @Override
@@ -53,7 +66,7 @@ public class InsertPlan extends LogicalPlan {
   }
 
   @Override
-  public ExecuteStatementResp execute_plan() {
+  public ExecuteStatementResp execute_plan(long the_session) {
     Manager manager = Manager.getInstance();
     Database dbForInsert = manager.getCurDB();
     if (dbForInsert == null) {
@@ -108,12 +121,70 @@ public class InsertPlan extends LogicalPlan {
       }
     }
     Row rowToInsert = new Row(entries);
-    try {
-      dbForInsert.getTable(tableName).insert(rowToInsert);
-    } catch (DuplicateKeyException e) {
-      return new ExecuteStatementResp(StatusUtil.fail(e.getMessage()), false);
-    } catch (Exception e) {
-      return new ExecuteStatementResp(StatusUtil.fail(e.toString()), false);
+
+    // Transaction Lock
+    if (!manager.transaction_sessions.contains(the_session)) {
+      System.out.println("Auto Commit:" + the_session);
+      System.out.println(!manager.transaction_sessions.contains(the_session));
+      handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+      the_result = handler.evaluate("INSERT", the_session);
+      result.addAll(the_result);
+      handler.evaluate("AUTO COMMIT", the_session);
+
+    } else {
+      System.out.println("Commit:" + the_session);
+      System.out.println(!manager.transaction_sessions.contains(the_session));
+      the_result = handler.evaluate("INSERT", the_session);
+      result.addAll(the_result);
+    }
+
+    long session = 0;
+    if (manager.transaction_sessions.contains(session)) {
+      Table the_table = dbForInsert.getTable(tableName);
+      while (true) {
+        if (!manager.lockTransactionList.contains(session)) // 新加入一个session
+        {
+          int get_lock = the_table.acquireWriteLock(session);
+          if (get_lock != -1) {
+            if (get_lock == 1) {
+              ArrayList<String> tmp = manager.writeLockMap.get(session);
+              tmp.add(tableName);
+              manager.writeLockMap.put(session, tmp);
+            }
+            break;
+          } else {
+            manager.lockTransactionList.add(session);
+          }
+        } else // 之前等待的session
+        {
+          if (manager.lockTransactionList.get(0) == session) // 只查看阻塞队列开头session
+          {
+            int get_lock = the_table.acquireWriteLock(session);
+            if (get_lock != -1) {
+              if (get_lock == 1) {
+                ArrayList<String> tmp = manager.writeLockMap.get(session);
+                tmp.add(tableName);
+                manager.writeLockMap.put(session, tmp);
+              }
+              manager.lockTransactionList.remove(0);
+              break;
+            }
+          }
+        }
+        try {
+          // System.out.print("session: "+session+": ");
+          // System.out.println(manager.session_queue);
+          Thread.sleep(500); // 休眠3秒
+        } catch (Exception e) {
+          System.out.println("Got an exception!");
+        }
+      }
+    } else {
+      try {
+        dbForInsert.getTable(tableName).insert(rowToInsert);
+      } catch (DuplicateKeyException e) {
+        return new ExecuteStatementResp(StatusUtil.fail(e.getMessage()), false);
+      }
     }
 
     return new ExecuteStatementResp(StatusUtil.success(), false);
