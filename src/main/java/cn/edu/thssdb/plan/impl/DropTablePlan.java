@@ -5,7 +5,6 @@ import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.utils.StatusUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -20,6 +19,11 @@ public class DropTablePlan extends LogicalPlan {
 
   public ArrayList<String> getTableName() {
     return new ArrayList<>(Collections.singletonList(this.tableName));
+  }
+
+  @Override
+  public ExecuteStatementResp execute_plan(long the_session) {
+    return null;
   }
 
   @Override

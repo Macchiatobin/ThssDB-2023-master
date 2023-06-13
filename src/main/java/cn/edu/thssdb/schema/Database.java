@@ -1,19 +1,20 @@
 package cn.edu.thssdb.schema;
 
-import static cn.edu.thssdb.utils.FolderOperations.deleteFolder;
-import static cn.edu.thssdb.utils.Global.DATA_DIR;
-
 import cn.edu.thssdb.exception.AlreadyExistsException;
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.NotExistsException;
 import cn.edu.thssdb.exception.QueryResultException;
 import cn.edu.thssdb.query.*;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static cn.edu.thssdb.utils.FolderOperations.deleteFolder;
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Database implements Serializable {
 

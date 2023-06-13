@@ -37,6 +37,11 @@ public class CreateDatabasePlan extends LogicalPlan {
   }
 
   @Override
+  public ExecuteStatementResp execute_plan(long the_session) {
+    return null;
+  }
+
+  @Override
   public ExecuteStatementResp execute_plan() {
     Manager manager = Manager.getInstance();
     try {

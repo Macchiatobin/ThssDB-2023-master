@@ -11,7 +11,6 @@ import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.sql.SQLParser;
 import cn.edu.thssdb.type.*;
 import cn.edu.thssdb.utils.StatusUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +27,11 @@ public class SelectPlan extends LogicalPlan {
     this.cur_db = cur_db;
     this.manager = manager;
     this.my_parser = new MySQLParser(this.manager);
+  }
+
+  @Override
+  public ExecuteStatementResp execute_plan(long the_session) {
+    return null;
   }
 
   @Override
@@ -109,25 +113,77 @@ public class SelectPlan extends LogicalPlan {
       System.out.println("WHERE recursive part done"); // debug
     }
 
-    // TODO: 和transaction交互
-
     QueryResult query_res = null;
-    // execute select
-    try {
-      // debug: check null
-      if (query_table == null) System.out.println("query_table is null!");
-      if (col_names == null) System.out.println("col_names is null!(Correct if \'select *\')");
-      if (multiple_condition == null)
-        System.out.println("multiple_condition is null!(Correct if no \'WHERE\' clause)");
+    long session = 0;
+    // Transaction Lock
+    if (manager.transaction_sessions.contains(session)) {
+      // manager.session_queue.add(session);
+      while (true) {
+        if (!manager.lockTransactionList.contains(session)) // 新加入一个session
+        {
+          ArrayList<Integer> lock_result = new ArrayList<>();
+          for (String name : table_names) {
+            Table the_table = cur_db.getTable(name);
+            int get_lock = the_table.acquireReadLock(session);
+            lock_result.add(get_lock);
+          }
+          if (lock_result.contains(-1)) {
+            for (String table_name : table_names) {
+              Table the_table = cur_db.getTable(table_name);
+              the_table.releaseReadLock(session);
+            }
+            manager.lockTransactionList.add(session);
 
-      // debug: check isDistinct
-      if (is_distinct) System.out.println("isDistinct: true");
-      else System.out.println("isDistinct: false");
+          } else {
+            break;
+          }
+        } else // 之前等待的session
+        {
+          if (manager.lockTransactionList.get(0) == session) // 只查看阻塞队列开头session
+          {
+            ArrayList<Integer> lock_result = new ArrayList<>();
+            for (String name : table_names) {
+              Table the_table = cur_db.getTable(name);
+              int get_lock = the_table.acquireReadLock(session);
+              lock_result.add(get_lock);
+            }
+            if (!lock_result.contains(-1)) {
+              manager.lockTransactionList.remove(0);
+              break;
+            } else {
+              for (String table_name : table_names) {
+                Table the_table = cur_db.getTable(table_name);
+                the_table.releaseReadLock(session);
+              }
+            }
+          }
+        }
+        try {
+          // System.out.print("session: "+session+": ");
+          // System.out.println(manager.session_queue);
+          Thread.sleep(500); // 休眠3秒
+        } catch (Exception e) {
+          System.out.println("Got an exception!");
+        }
+      }
+    } else {
+      // execute select
+      try {
+        // debug: check null
+        if (query_table == null) System.out.println("query_table is null!");
+        if (col_names == null) System.out.println("col_names is null!(Correct if \'select *\')");
+        if (multiple_condition == null)
+          System.out.println("multiple_condition is null!(Correct if no \'WHERE\' clause)");
 
-      query_res = cur_db.select(query_table, col_names, multiple_condition, is_distinct);
-      System.out.println("WHERE select execution done"); // debug
-    } catch (Exception e) {
-      throw new QueryResultException(); // 但是这样好像会把更细节的报错也都返回成QueryResultException
+        // debug: check isDistinct
+        if (is_distinct) System.out.println("isDistinct: true");
+        else System.out.println("isDistinct: false");
+
+        query_res = cur_db.select(query_table, col_names, multiple_condition, is_distinct);
+        System.out.println("WHERE select execution done"); // debug
+      } catch (Exception e) {
+        throw new QueryResultException(); // 但是这样好像会把更细节的报错也都返回成QueryResultException
+      }
     }
 
     // build return result
