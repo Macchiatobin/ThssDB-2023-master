@@ -171,6 +171,8 @@ public class Database implements Serializable {
                 info.getTableName(), new Table(this.name, info.getTableName(), array, false));
           }
         }
+      } catch (EOFException e) { // when some database got no table in it, no error!
+        System.out.println("Empty database:" + this.name + ", this is no error!");
       } catch (IOException e) {
         System.out.println("InputStream Error Occurred During Recovering Database object!");
         System.out.println(e);

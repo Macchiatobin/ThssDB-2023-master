@@ -1,8 +1,5 @@
 package cn.edu.thssdb.schema;
 
-import static cn.edu.thssdb.utils.FolderOperations.deleteFolder;
-import static cn.edu.thssdb.utils.Global.DATA_DIR;
-
 import cn.edu.thssdb.exception.AlreadyExistsException;
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.IllegalSQLStatementException;
@@ -11,13 +8,17 @@ import cn.edu.thssdb.parser.SQLParseError;
 import cn.edu.thssdb.parser.ThssDBSQLVisitor;
 import cn.edu.thssdb.sql.SQLLexer;
 import cn.edu.thssdb.sql.SQLParser;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
+
+import static cn.edu.thssdb.utils.FolderOperations.deleteFolder;
+import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Manager implements Serializable {
   private HashMap<String, Database> databases;
