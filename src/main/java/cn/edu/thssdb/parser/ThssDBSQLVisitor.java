@@ -116,9 +116,17 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     return new ShowTablePlan(ctx.tableName().getText());
   }
 
+  public LogicalPlan visitBeginTransactionStmt(SQLParser.BeginTransactionStmtContext ctx) {
+    return new BeginTransactionPlan(manager);
+  }
+
   @Override
+  public LogicalPlan visitCommitStmt(SQLParser.CommitStmtContext ctx) {
+    return new CommitPlan(manager, getCurDB());
+  }
+
   public LogicalPlan visitAutoCommitStmt(SQLParser.AutoCommitStmtContext ctx) {
-    return new AutoCommitPlan();
+    return new AutoCommitPlan(manager, getCurDB());
   }
 
   @Override
@@ -126,10 +134,6 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     /* TODO */
     // v1 done
     return new SelectPlan(ctx, getCurDB(), manager);
-  }
-
-  public LogicalPlan visitCommitStmt(SQLParser.CommitStmtContext ctx) {
-    return new CommitPlan();
   }
 
   @Override
@@ -159,7 +163,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
       }
     }
 
-    return new InsertPlan(tableName, columnName, valueEntry);
+    return new InsertPlan(tableName, columnName, valueEntry, manager);
   }
 
   @Override
@@ -170,7 +174,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     String attrvalue = condition.expression(1).getText();
     String comparator = condition.comparator().getText();
 
-    return new DeletePlan(tableName, attrname, attrvalue, comparator);
+    return new DeletePlan(tableName, attrname, attrvalue, comparator, manager);
   }
 
   @Override
@@ -185,7 +189,13 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     String comparator = condition.comparator().getText();
 
     return new UpdatePlan(
-        tableName, set_column_name, set_attr_value, where_attr_name, where_attr_value, comparator);
+        tableName,
+        set_column_name,
+        set_attr_value,
+        where_attr_name,
+        where_attr_value,
+        comparator,
+        manager);
   }
 
   @Override

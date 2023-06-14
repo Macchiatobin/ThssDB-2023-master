@@ -1,7 +1,6 @@
 package cn.edu.thssdb.plan;
 
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
-
 import java.util.ArrayList;
 
 public abstract class LogicalPlan {
@@ -40,4 +39,6 @@ public abstract class LogicalPlan {
 
   public abstract ExecuteStatementResp
       execute_plan(); // Plan execution abstract method, returns response
+
+  public abstract ExecuteStatementResp execute_plan(long the_session);
 }

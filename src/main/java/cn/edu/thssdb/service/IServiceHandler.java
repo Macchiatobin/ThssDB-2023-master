@@ -1,8 +1,10 @@
 package cn.edu.thssdb.service;
 
+import cn.edu.thssdb.parser.MySQLParser;
 import cn.edu.thssdb.plan.LogicalGenerator;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
+import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.rpc.thrift.ConnectReq;
 import cn.edu.thssdb.rpc.thrift.ConnectResp;
 import cn.edu.thssdb.rpc.thrift.DisconnectReq;
@@ -34,9 +36,11 @@ public class IServiceHandler implements IService.Iface {
 
   private Manager manager;
   private static final AtomicInteger sessionCnt = new AtomicInteger(0);
+  public static MySQLParser handler;
 
   public IServiceHandler() {
     this.manager = Manager.getInstance();
+    handler = new MySQLParser(manager);
 
     // Create Data File Directory
     String dataPath = DATA_DIR;
@@ -72,6 +76,10 @@ public class IServiceHandler implements IService.Iface {
 
   @Override
   public ExecuteStatementResp executeStatement(ExecuteStatementReq req) throws TException {
+    long the_session = req.getSessionId();
+    ArrayList<QueryResult> the_result;
+    ArrayList<QueryResult> result = new ArrayList<>();
+
     if (req.getSessionId() < 0) {
       return new ExecuteStatementResp(
           StatusUtil.fail("You are not connected. Please connect first."), false);
@@ -149,40 +157,90 @@ public class IServiceHandler implements IService.Iface {
       case BEGIN_TRANSACTION:
         System.out.println("BEGIN_TRANSACTION");
         System.out.println("[DEBUG] " + plan);
+        return plan.execute_plan(the_session);
 
         // TODO
 
-        break;
+        //        break;
 
       case COMMIT:
         System.out.println("COMMIT");
         System.out.println("[DEBUG] " + plan);
+        return plan.execute_plan(the_session);
 
         // TODO
 
-        break;
+        //        break;
 
       case INSERT:
         System.out.println("INSERT");
         System.out.println("[DEBUG] " + plan);
-        break;
+        return plan.execute_plan(the_session);
+        //        if (!manager.transaction_sessions.contains(the_session)) {
+        //          System.out.println(the_session);
+        //
+        //          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+        //          the_result = handler.evaluate("INSERT", the_session);
+        //          result.addAll(the_result);
+        //          handler.evaluate("AUTO COMMIT", the_session);
+        //
+        //        } else {
+        //          the_result = handler.evaluate("INSERT", the_session);
+        //          result.addAll(the_result);
+        //        }
 
       case DELETE:
         System.out.println("DELETE");
         System.out.println("[DEBUG] " + plan);
-        break;
+        return plan.execute_plan(the_session);
+
+        //      if (!manager.transaction_sessions.contains(the_session)) {
+        //          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+        //          the_result = handler.evaluate("DELETE", the_session);
+        //          result.addAll(the_result);
+        //          handler.evaluate("AUTO COMMIT", the_session);
+        //
+        //        } else {
+        //          the_result = handler.evaluate("DELETE", the_session);
+        //          result.addAll(the_result);
+        //        }
+        //        break;
 
       case UPDATE:
         System.out.println("UPDATE");
         System.out.println("[DEBUG] " + plan);
-        break;
+        return plan.execute_plan(the_session);
+
+        //        if (!manager.transaction_sessions.contains(the_session)) {
+        //          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+        //          the_result = handler.evaluate("UPDATE", the_session);
+        //          result.addAll(the_result);
+        //          handler.evaluate("AUTO COMMIT", the_session);
+        //
+        //        } else {
+        //          the_result = handler.evaluate("UPDATE", the_session);
+        //          result.addAll(the_result);
+        //        }
+        //        break;
 
       case SELECT:
         /* TODO */
         System.out.println("SELECT");
         System.out.println("[DEBUG] " + plan);
+        return plan.execute_plan(the_session);
+
+        //        if (!manager.transaction_sessions.contains(the_session)) {
+        //          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+        //          the_result = handler.evaluate("SELECT", the_session);
+        //          result.addAll(the_result);
+        //          handler.evaluate("AUTO COMMIT", the_session);
+        //
+        //        } else {
+        //          the_result = handler.evaluate("SELECT", the_session);
+        //          result.addAll(the_result);
+        //        }
         //        return ((SelectPlan)plan).execute_plan(req); // 加了个req参数，用于和transaction交互
-        break;
+        //        break;
 
       default:
         break;

@@ -6,7 +6,6 @@ import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.utils.StatusUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,14 +30,23 @@ public class CreateTablePlan extends LogicalPlan {
   }
 
   @Override
+  public ExecuteStatementResp execute_plan(long the_session) {
+    return null;
+  }
+
+  @Override
   public ExecuteStatementResp execute_plan() {
     Manager manager = Manager.getInstance();
     Database dbForTableCreate = manager.getCurDB();
     if (dbForTableCreate == null) {
       return new ExecuteStatementResp(StatusUtil.fail("Use database first."), false);
     }
-    List<Column> cList = columns;
-    dbForTableCreate.create(tableName, cList.toArray(new Column[cList.size()]));
+    try {
+      List<Column> cList = columns;
+      dbForTableCreate.create(tableName, cList.toArray(new Column[cList.size()]));
+    } catch (Exception e) {
+      return new ExecuteStatementResp(StatusUtil.fail(e.toString()), false);
+    }
     return new ExecuteStatementResp(StatusUtil.success(), false);
   }
 

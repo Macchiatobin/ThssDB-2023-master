@@ -19,9 +19,18 @@ public class DropDatabasePlan extends LogicalPlan {
   }
 
   @Override
+  public ExecuteStatementResp execute_plan(long the_session) {
+    return null;
+  }
+
+  @Override
   public ExecuteStatementResp execute_plan() {
     Manager manager = Manager.getInstance();
-    manager.deleteDatabase(databaseName);
+    try {
+      manager.deleteDatabase(databaseName);
+    } catch (Exception e) {
+      return new ExecuteStatementResp(StatusUtil.fail(e.toString()), false);
+    }
     return new ExecuteStatementResp(StatusUtil.success(), false);
   }
 
