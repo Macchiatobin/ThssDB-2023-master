@@ -23,8 +23,6 @@ public class Condition {
   // Obtain query result recursively
   public boolean executeQuery(QueryRow row) {
 
-    System.out.println("Condition executeQuery(): entered method"); // debug
-
     // Don't execute queries with null comparisons
     if (left_exp == null || right_exp == null) throw new NullComparisonException();
     else if (left_exp.comparer_type == ComparerType.NULL
@@ -65,12 +63,30 @@ public class Condition {
       throw new MisMatchTypeException(left_type, right_type);
       else {
         boolean res = false;
-        if (comparator_type == ComparatorType.EQ) res = left_val.compareTo(right_val) == 0;
-        else if (comparator_type == ComparatorType.NE) res = left_val.compareTo(right_val) != 0;
-        else if (comparator_type == ComparatorType.GT) res = left_val.compareTo(right_val) > 0;
-        else if (comparator_type == ComparatorType.LT) res = left_val.compareTo(right_val) < 0;
-        else if (comparator_type == ComparatorType.GE) res = left_val.compareTo(right_val) >= 0;
-        else if (comparator_type == ComparatorType.LE) res = left_val.compareTo(right_val) <= 0;
+        if (comparator_type == ComparatorType.EQ) {
+          System.out.println("Condition executeQuery(): comparator_type EQ");
+          res = left_val.compareTo(right_val) == 0;
+        }
+        else if (comparator_type == ComparatorType.NE) {
+          System.out.println("Condition executeQuery(): comparator_type NE");
+          res = left_val.compareTo(right_val) != 0;
+        }
+        else if (comparator_type == ComparatorType.GT) {
+          System.out.println("Condition executeQuery(): comparator_type GT");
+          res = left_val.compareTo(right_val) > 0;
+        }
+        else if (comparator_type == ComparatorType.LT) {
+          System.out.println("Condition executeQuery(): comparator_type LT");
+          res = left_val.compareTo(right_val) < 0;
+        }
+        else if (comparator_type == ComparatorType.GE) {
+          System.out.println("Condition executeQuery(): comparator_type GE");
+          res = left_val.compareTo(right_val) >= 0;
+        }
+        else if (comparator_type == ComparatorType.LE) {
+          System.out.println("Condition executeQuery(): comparator_type LE");
+          res = left_val.compareTo(right_val) <= 0;
+        }
 
         return res;
       }
