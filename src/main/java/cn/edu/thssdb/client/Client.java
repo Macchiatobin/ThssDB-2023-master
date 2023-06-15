@@ -130,7 +130,7 @@ public class Client {
 
           for (List<String> row : resp.rowList) {
             if (row.size() == 0) // empty result rows
-              break;
+            break;
             StringBuilder row_str = new StringBuilder();
             for (int i = 0; i < column_size; ++i) {
               row_str.append(row.get(i));

@@ -18,9 +18,8 @@ public class QueryRow extends Row {
 
   public QueryRow(LinkedList<Row> rows, ArrayList<Table> tables) {
     super();
-    query_tables = new ArrayList<>();
+    this.query_tables = new ArrayList<>();
     this.entries = new ArrayList<>();
-
     for (int i = rows.size() - 1; i >= 0; i--) entries.addAll(rows.get(i).getEntries());
     for (Table tb : tables) query_tables.add(tb);
   }
@@ -28,15 +27,15 @@ public class QueryRow extends Row {
   public QueryRow(Row row, Table table) {
     super();
     query_tables = new ArrayList<>();
-    query_tables.add(table);
     this.entries = new ArrayList<>();
     entries.addAll(row.getEntries());
+    query_tables.add(table);
   }
 
   // return the comparer of column col_name
   public Expression getColumnComparer(String col_name) {
 
-    System.out.println("QueryRow getColumnComparer(): entered method"); // debug
+    //    System.out.println("QueryRow getColumnComparer(): entered method"); // debug
 
     ComparerType comparer_type = ComparerType.NULL;
     ColumnType col_type = ColumnType.INT;
@@ -49,20 +48,23 @@ public class QueryRow extends Row {
       int num_hits = 0;
       int total_index = 0;
       for (int i = 0; i < query_tables.size(); i++) {
-        System.out.println("QueryRow getColumnComparer(): entered i loop " + i); // debug
+        //        System.out.println("QueryRow getColumnComparer(): entered i loop " + i); // debug
         Table cur_table = query_tables.get(i);
-        System.out.println("QueryRow getColumnComparer(): obtained cur_table"); // debug
+        //        System.out.println("QueryRow getColumnComparer(): obtained cur_table"); // debug
         for (int j = 0; j < cur_table.columns.size(); j++) {
-          System.out.println("QueryRow getColumnComparer(): entered j loop " + j); // debug
-          System.out.println("QueryRow getColumnComparer(): col_name: " + col_name); // debug
-          System.out.println(
-              "QueryRow getColumnComparer(): "
-                  + "cur_table.columns.get(j).getName()): "
-                  + cur_table.columns.get(j).getName()); // debug
+          //          System.out.println("QueryRow getColumnComparer(): entered j loop " + j); //
+          // debug
+          //          System.out.println("QueryRow getColumnComparer(): col_name: " + col_name); //
+          // debug
+          //          System.out.println(
+          //              "QueryRow getColumnComparer(): "
+          //                  + "cur_table.columns.get(j).getName()): "
+          //                  + cur_table.columns.get(j).getName()); // debug
           // remember to convert to lower case before comparing
           if (col_name.equalsIgnoreCase(cur_table.columns.get(j).getName())) {
-            System.out.println(
-                "QueryRow getColumnComparer(): column names \'" + col_name + "\' equal"); // debug
+            //            System.out.println(
+            //                "QueryRow getColumnComparer(): column names \'" + col_name + "\'
+            // equal"); // debug
             num_hits++;
             index = total_index + j;
             col_type = cur_table.columns.get(j).getType();
@@ -70,7 +72,7 @@ public class QueryRow extends Row {
         }
         total_index += cur_table.columns.size();
       }
-      System.out.println("QueryRow getColumnComparer(): num_hits = " + num_hits); // debug
+      //      System.out.println("QueryRow getColumnComparer(): num_hits = " + num_hits); // debug
       if (num_hits < 1) {
         System.out.println(
             "QueryRow getColumnComparer(): num_hits < 1, throw ColumnNotFoundException"); // debug
@@ -86,18 +88,22 @@ public class QueryRow extends Row {
       System.out.println(
           "QueryRow getColumnComparer(): formatted as \"tableName.columnName\""); // debug
       String[] sep_names = separateColumnName(col_name);
-      System.out.println("QueryRow getColumnComparer(): separateColumnName() done"); // debug
+      //      System.out.println("QueryRow getColumnComparer(): separateColumnName() done"); //
+      // debug
       String table_name = sep_names[0];
       String entry_name = sep_names[1];
       int total_index = 0;
       boolean is_found = false;
       for (Table table : query_tables) {
-        System.out.println("QueryRow getColumnComparer(): entered table search loop"); // debug
+        //        System.out.println("QueryRow getColumnComparer(): entered table search loop"); //
+        // debug
         if (table_name.equalsIgnoreCase(table.tableName)) {
-          System.out.println("QueryRow getColumnComparer(): matching table found"); // debug
+          //          System.out.println("QueryRow getColumnComparer(): matching table found"); //
+          // debug
           for (int j = 0; j < table.columns.size(); j++) {
             if (entry_name.equalsIgnoreCase(table.columns.get(j).getName())) {
-              System.out.println("QueryRow getColumnComparer(): matching entry found"); // debug
+              //              System.out.println("QueryRow getColumnComparer(): matching entry
+              // found"); // debug
               is_found = true;
               index = total_index + j;
               col_type = table.columns.get(j).getType();

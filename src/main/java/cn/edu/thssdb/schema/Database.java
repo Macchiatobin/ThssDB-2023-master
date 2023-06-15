@@ -3,7 +3,6 @@ package cn.edu.thssdb.schema;
 import cn.edu.thssdb.exception.AlreadyExistsException;
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.NotExistsException;
-import cn.edu.thssdb.exception.QueryResultException;
 import cn.edu.thssdb.query.*;
 
 import java.io.*;
@@ -122,13 +121,11 @@ public class Database implements Serializable {
     try {
       lock.readLock().lock();
       table.setMultipleCondition(mult_con); // may be null
-      System.out.println("Database.select(): setMultipleCondition done"); // debug
       QueryResult query_res = new QueryResult(table, isDistinct, columns);
-      System.out.println("Database.select(): new QueryResult() constructed"); // debug
-      query_res.obtainResults();
+      query_res.obtainResults(); // join的问题所在?
       System.out.println("Database.select(): obtainResults() done"); // debug
-      if (query_res == null) // 按理来说不该是null
-      throw new QueryResultException();
+      //      if (query_res == null) // 按理来说不该是null
+      //      throw new QueryResultException();
       return query_res;
     } finally {
       lock.readLock().unlock();

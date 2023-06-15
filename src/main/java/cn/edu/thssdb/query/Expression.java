@@ -17,4 +17,18 @@ public class Expression {
       this.comparer_value = value;
     else this.comparer_value = null;
   }
+
+  public String getText() {
+    switch (comparer_type) {
+      case NUMBER:
+        return Double.toString((Double) comparer_value);
+      case STRING:
+      case COLUMN:
+        return (String) comparer_value;
+      case NULL:
+        return "null";
+    }
+
+    return (String) comparer_value;
+  }
 }

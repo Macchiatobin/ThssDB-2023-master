@@ -22,6 +22,7 @@ public class SingleQueryTable extends QueryTable implements Iterator<Row> {
 
   // add the next row directly to the queue (ignoring the select condition)
   private void AddNext() {
+    System.out.println("SingleQueryTable AddNext(): added next entry directly!"); // debug
     if (iterator.hasNext()) {
       QueryRow cur_row = new QueryRow(iterator.next(), table);
       row_queue.add(cur_row);
@@ -35,29 +36,32 @@ public class SingleQueryTable extends QueryTable implements Iterator<Row> {
       System.out.println(
           "SingleQueryTable findAndAddNext(): case 1 - multiple_condition is null"); // debug
       AddNext();
-      System.out.println("SingleQueryTable findAndAddNext(): AddNext() done"); // debug
+      //      System.out.println("SingleQueryTable findAndAddNext(): AddNext() done"); // debug
       return;
     }
     // discarded speeding up for constant values
-    System.out.println("SingleQueryTable findAndAddNext(): case 2 - other"); // debug
+    System.out.println(
+        "SingleQueryTable findAndAddNext(): case 2 - multiple_condition is not null"); // debug
     executeAddNext();
-    System.out.println("SingleQueryTable findAndAddNext(): executeAddNext() done"); // debug
+    //    System.out.println("SingleQueryTable findAndAddNext(): executeAddNext() done"); // debug
   }
 
   // add next selected row
   private void executeAddNext() {
+    System.out.println("SingleQueryTable executeAddNext(): add all satisfying entries!"); // debug
     while (iterator.hasNext()) {
-      System.out.println("SingleQueryTable executeAddNext(): entered loop"); // debug
+      //      System.out.println("SingleQueryTable executeAddNext(): entered loop"); // debug
       Row cur_row = iterator.next();
-      System.out.println("SingleQueryTable executeAddNext(): obtained next row iterator");
+      //      System.out.println("SingleQueryTable executeAddNext(): obtained next row iterator");
       QueryRow cur_query_row = new QueryRow(cur_row, table);
-      System.out.println("SingleQueryTable executeAddNext(): constructed new QueryRow");
+      //      System.out.println("SingleQueryTable executeAddNext(): constructed new QueryRow");  //
+      // debug
       if (multiple_condition.executeQuery(cur_query_row) != true) { // executeQuery recursively
-        System.out.println("SingleQueryTable executeAddNext(): loop continue");
+        //        System.out.println("SingleQueryTable executeAddNext(): loop continue");
         continue;
       }
       row_queue.add(cur_query_row);
-      System.out.println("SingleQueryTable executeAddNext(): new QueryRow added");
+      //      System.out.println("SingleQueryTable executeAddNext(): new QueryRow added");  // debug
       break;
     }
   }
