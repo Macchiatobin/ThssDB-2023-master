@@ -208,7 +208,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
   /** 自定义方法 */
   private Database getCurDB() {
-    Database curDB = manager.getCurDB();
+    Database curDB = Manager.getInstance().getCurDB();
     if (curDB == null) {
       throw new NotExistsException(NotExistsException.Database, "obtained from getCurDB()");
     }
