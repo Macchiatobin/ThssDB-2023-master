@@ -10,6 +10,7 @@ import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.StatusUtil;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static cn.edu.thssdb.utils.Global.*;
@@ -136,11 +137,32 @@ public class DeletePlan extends LogicalPlan {
         }
         MetaInfo cur_metaInfo = cur_db.metaInfos.get(tableName);
         List<Column> cur_columns = cur_metaInfo.getColumns();
-        int cur_column_index = cur_metaInfo.columnFind(attrName);
-        Column cur_column = cur_columns.get(cur_column_index);
-        ColumnType cur_column_type = cur_column.getType();
+        int cur_column_index = cur_metaInfo.columnFind(attrName); // where_attr index
+        Column cur_column = cur_columns.get(cur_column_index); // where column
+        ColumnType cur_column_type = cur_column.getType(); // where column type
         Entry entry_to_delete = new Entry(Table.getColumnTypeValue(cur_column_type, attrValue));
-        cur_tb.delete(entry_to_delete);
+
+        if (cur_column_index == cur_tb.getPrimaryIndex()) { // delete on primary key
+          cur_tb.delete(entry_to_delete); // throw IllegalArgumentException, if key doesn't exist
+        }
+
+        else { // delete on non-primary key
+          Iterator<Row> iterator = cur_tb.iterator();
+          ArrayList<Entry> entries_to_delete = new ArrayList<>(); // key entries to delete
+          while (iterator.hasNext()) {
+            Row cur_row = iterator.next();
+            ArrayList<Entry> entries = cur_row.getEntries();
+            if (entries.get(cur_column_index).equals(entry_to_delete)) { // got row to delete
+              entries_to_delete.add(new Entry(entries.get(cur_tb.getPrimaryIndex()).value)); // add its primary key to delete list
+            }
+          }
+
+          for (Entry cur_entry : entries_to_delete) {
+            cur_tb.delete(cur_entry); // maybe throw some error
+          }
+
+        }
+
       } catch (Exception e) {
         return new ExecuteStatementResp(StatusUtil.fail(e.toString()), false);
       }
