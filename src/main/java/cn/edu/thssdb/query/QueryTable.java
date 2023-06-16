@@ -44,17 +44,21 @@ public abstract class QueryTable implements Iterator<Row> {
       if (first_flag) first_flag = false;
     }
 
-    QueryRow res_row;
-    if (!row_queue.isEmpty()) {
-      res_row = row_queue.poll();
-      if (row_queue.isEmpty()) findAndAddNext();
-      System.out.println("QueryTable next(): !row_queue.isEmpty() -> findAndAddNext done"); // debug
-    } else res_row = null;
+    QueryRow res_row = null;
+    if (!row_queue.isEmpty()) res_row = row_queue.poll();
+    else return null;
+    if (row_queue.isEmpty()) findAndAddNext();
+
+    System.out.println("QueryTable next(): !row_queue.isEmpty() -> findAndAddNext done"); // debug
 
     return res_row;
   }
 
   public void setMultipleCondition(MultipleCondition multCon) {
     this.multiple_condition = multCon;
+  }
+
+  public MultipleCondition getMultipleCondition() {
+    return this.multiple_condition;
   }
 }

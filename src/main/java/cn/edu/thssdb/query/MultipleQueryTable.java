@@ -13,13 +13,13 @@ public class MultipleQueryTable extends QueryTable implements Iterator<Row> {
 
   private ArrayList<Table> tables;
   private ArrayList<Iterator<Row>> row_iterators;
-  private MultipleCondition multiple_condition;
+  private MultipleCondition mult_con_for_join; // JOIN逻辑关键
   private LinkedList<Row> rows_to_join;
 
   public MultipleQueryTable(ArrayList<Table> tables, MultipleCondition mult_con) {
     super();
     this.tables = tables;
-    this.multiple_condition = mult_con;
+    this.mult_con_for_join = mult_con;  // 注意这里是给join表依赖的条件赋值，如果不小心写成了给整个where查询条件赋值貌似会join成笛卡尔积
     this.row_iterators = new ArrayList<>();
     this.columns = new ArrayList<>();
     this.rows_to_join = new LinkedList<>();
@@ -31,12 +31,16 @@ public class MultipleQueryTable extends QueryTable implements Iterator<Row> {
 
   // find and add the next satisfying row to the queue
   @Override
-  public void findAndAddNext() {
+  public void findAndAddNext() { // JOIN的问题所在？
     while (true) {
       QueryRow cur_row = joinRowsForQuery();
       if (cur_row == null) return;
-      if (multiple_condition == null || multiple_condition.executeQuery(cur_row) == true) {
-        if (multiple_condition == null || multiple_condition.executeQuery(cur_row) == true) {
+      // if (multiple_condition == null || multiple_condition.executeQuery(cur_row) == true) { //
+      // JOIN问题所在！！！multiple_condition变量混淆！！
+      if (mult_con_for_join == null
+          || mult_con_for_join.executeQuery(cur_row) == true) { // join表依赖的条件
+        if (multiple_condition == null
+            || multiple_condition.executeQuery(cur_row) == true) { // 整个查询的where条件
           row_queue.add(cur_row);
           return;
         }
