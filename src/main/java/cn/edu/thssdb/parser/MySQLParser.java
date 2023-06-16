@@ -5,10 +5,11 @@ import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.sql.SQLLexer;
 import cn.edu.thssdb.sql.SQLParser;
-import java.util.ArrayList;
-import java.util.Arrays;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /** 描述:处理sql的主类，需要传入manager */
 public class MySQLParser {
