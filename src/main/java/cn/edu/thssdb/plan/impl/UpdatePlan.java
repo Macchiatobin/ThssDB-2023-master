@@ -130,7 +130,7 @@ public class UpdatePlan extends LogicalPlan {
         }
       }
     } else {
-      try {
+      try { // currently update only WHERE is primary key
         if (cur_db == null) {
           return new ExecuteStatementResp(StatusUtil.fail("Use database first."), false);
         }

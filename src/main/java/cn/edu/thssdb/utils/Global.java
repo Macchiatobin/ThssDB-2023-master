@@ -21,7 +21,7 @@ public class Global {
 
   public static final String DATA_DIR = "data/";
 
-  public static final int CACHE_SIZE = 5; // maximum cache size of node manager
+  public static final int CACHE_SIZE = 4; // maximum cache size of node manager
 
   public static final int COMP_EQ = 0; // =
   public static final int COMP_GE = 1; // >=
