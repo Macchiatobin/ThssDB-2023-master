@@ -171,6 +171,10 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     SQLParser.ConditionContext condition = ctx.multipleCondition().condition();
     String attrname = condition.expression(0).getText();
     String attrvalue = condition.expression(1).getText();
+    if (attrvalue.startsWith("'") && attrvalue.endsWith("'")) {
+      int strLength = attrvalue.length();
+      attrvalue = attrvalue.substring(1, strLength - 1);
+    }
     String comparator = condition.comparator().getText();
 
     return new DeletePlan(tableName, attrname, attrvalue, comparator, manager);

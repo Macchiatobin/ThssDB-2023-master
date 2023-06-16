@@ -12,7 +12,10 @@ public class Entry implements Comparable<Entry>, Serializable {
 
   @Override
   public int compareTo(Entry e) {
-    return value.compareTo(e.value);
+    if (value.getClass() != e.value.getClass()) {
+      throw new IllegalArgumentException("Mismatched types: " + value.getClass() + " and " + e.value.getClass());
+    }
+    return value.compareTo(e.value); // TODO: 确实是这里发生错误
   }
 
   @Override
