@@ -1,8 +1,5 @@
 package cn.edu.thssdb.plan.impl;
 
-import static cn.edu.thssdb.utils.Global.*;
-import static cn.edu.thssdb.utils.Global.COMP_NE;
-
 import cn.edu.thssdb.parser.MySQLParser;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.query.MetaInfo;
@@ -11,9 +8,14 @@ import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.StatusUtil;
+
+import javax.management.openmbean.KeyAlreadyExistsException;
+
 import java.util.ArrayList;
 import java.util.List;
-import javax.management.openmbean.KeyAlreadyExistsException;
+
+import static cn.edu.thssdb.utils.Global.*;
+import static cn.edu.thssdb.utils.Global.COMP_NE;
 
 public class UpdatePlan extends LogicalPlan {
   private Manager manager;

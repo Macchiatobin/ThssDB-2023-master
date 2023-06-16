@@ -1,7 +1,5 @@
 package cn.edu.thssdb.plan.impl;
 
-import static cn.edu.thssdb.type.ColumnType.STRING;
-
 import cn.edu.thssdb.exception.DuplicateKeyException;
 import cn.edu.thssdb.parser.MySQLParser;
 import cn.edu.thssdb.plan.LogicalPlan;
@@ -11,9 +9,12 @@ import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.type.ColumnType;
 import cn.edu.thssdb.utils.StatusUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static cn.edu.thssdb.type.ColumnType.STRING;
 
 public class InsertPlan extends LogicalPlan {
   private Manager manager;
