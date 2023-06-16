@@ -1,0 +1,41 @@
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - Finish performance test after 2364 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - INSERT operation count: 415
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - INSERT per second: 44.7401723117606
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - INSERT-0.0: 3.4646 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - INSERT-0.25: 11.529775 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - INSERT-0.5: 19.20285 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - INSERT-0.75: 30.125575 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - INSERT-0.9: 42.00505 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - INSERT-0.99: 72.29454499999994 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - INSERT-1.0: 90.5573 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - UPDATE operation count: 26
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - UPDATE per second: 27.319656902936515
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - UPDATE-0.0: 0.4742 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - UPDATE-0.25: 10.99285 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - UPDATE-0.5: 27.8678 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - UPDATE-0.75: 52.9823 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - UPDATE-0.9: 69.69223999999997 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - UPDATE-0.99: 114.08779200000004 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - UPDATE-1.0: 108.1145 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - DELETE operation count: 29
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - DELETE per second: 55.28959354522594
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - DELETE-0.0: 0.3018 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - DELETE-0.25: 6.24735 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - DELETE-0.5: 12.1734 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - DELETE-0.75: 24.3859 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - DELETE-0.9: 48.04623999999998 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - DELETE-0.99: 60.73882999999999 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - DELETE-1.0: 58.2283 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - QUERY operation count: 30
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - QUERY per second: 66.82642637665779
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - QUERY-0.0: 4.2242 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - QUERY-0.25: 6.1856 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - QUERY-0.5: 12.1863 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - QUERY-0.75: 21.86465 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - QUERY-0.9: 24.6423 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - QUERY-0.99: 35.878150000000005 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - QUERY-1.0: 34.2472 ms
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - JOIN operation count: 0
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - JOIN per second: NaN
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - Total operation count: 500
+[main] INFO cn.edu.thssdb.benchmark.executor.PerformanceTestExecutor - Avg latency of all operations:22401822 ns

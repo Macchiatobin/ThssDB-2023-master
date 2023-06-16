@@ -24,7 +24,7 @@ public class QueryResult {
   public boolean mWhetherRight;
   public String mErrorMessage;
 
-  public QueryResult(
+  public QueryResult( // join问题所在
       QueryTable queryTable, boolean isDistinct, String[] columns) { // originally QueryTable[]
     /* TODO */
     // v1 done
@@ -36,13 +36,13 @@ public class QueryResult {
     this.metaInfoInfos = new ArrayList<>();
     this.table = queryTable;
     this.isDistinct = isDistinct;
-    mWhetherRight = true;
-    mErrorMessage = "";
-    System.out.println("QueryResult QueryResult(): variable initializations done"); // debug
-    this.metaInfoInfos.addAll(queryTable.GenerateMetaInfo());
-    System.out.println("QueryResult QueryResult(): add metaInfoInfos done"); // debug
+    this.mWhetherRight = true;
+    this.mErrorMessage = "";
+    //    System.out.println("QueryResult QueryResult(): variable initializations done"); // debug
+    this.metaInfoInfos.addAll(this.table.GenerateMetaInfo());
+    //    System.out.println("QueryResult QueryResult(): add metaInfoInfos done"); // debug
     setColumns(columns); // select columns
-    System.out.println("QueryResult QueryResult(): set columns done"); // debug
+    //    System.out.println("QueryResult QueryResult(): set columns done"); // debug
   }
 
   public QueryResult(String errorMessage) {
@@ -61,7 +61,7 @@ public class QueryResult {
   private void setColumns(String[] columns) {
     // didn't select any columns -> return all columns
     if (columns == null) {
-      System.out.println("QueryResult setColumns(): columns is null"); // debug
+      //      System.out.println("QueryResult setColumns(): columns is null"); // debug
       int begin_index = 0;
       for (MetaInfo metaInfo : metaInfoInfos) {
         for (int i = 0; i < metaInfo.getColumnsNum(); i++) {
@@ -74,7 +74,7 @@ public class QueryResult {
     }
     // return selected columns
     else {
-      System.out.println("QueryResult setColumns(): columns is not null"); // debug
+      //      System.out.println("QueryResult setColumns(): columns is not null"); // debug
       for (String col_name : columns) { // 需考虑大小写转换
         System.out.println(col_name);
         System.out.println(getColIndex(col_name));
@@ -138,23 +138,23 @@ public class QueryResult {
   }
 
   // Execute query, add all results to results list and hashmap (if distinct)
-  public void obtainResults() {
+  public void obtainResults() { // join的问题所在
     while (table.hasNext()) {
-      System.out.println("QueryResult obtainResults(): entered method");
-      QueryRow cur_row = table.next();
-      System.out.println("QueryResult obtainResults(): obtained cur_row");
+      //      System.out.println("QueryResult obtainResults(): entered method"); // debug
+      QueryRow cur_row = table.next(); // 关键函数，obtain next row
+      //      System.out.println("QueryResult obtainResults(): obtained cur_row"); // debug
       if (cur_row == null) break;
-      System.out.println("QueryResult obtainResults(): cur_row not null");
+      //      System.out.println("QueryResult obtainResults(): cur_row not null");  // debug
       Entry[] full_entries = new Entry[col_indexes.size()];
       ArrayList<Entry> cur_entries = cur_row.getEntries();
-      System.out.println("QueryResult obtainResults(): entries initialized");
+      //      System.out.println("QueryResult obtainResults(): entries initialized");  // debug
       for (int i = 0; i < col_indexes.size(); i++) {
         int index = col_indexes.get(i);
         full_entries[i] = cur_entries.get(index);
       }
-      System.out.println("QueryResult obtainResults(): entries obtained");
+      //      System.out.println("QueryResult obtainResults(): entries obtained");  // debug
       Row row = new Row(full_entries);
-      System.out.println("QueryResult obtainResults(): answer row constructed");
+      //      System.out.println("QueryResult obtainResults(): answer row constructed");  // debug
       String row_str = row.toString();
       if (!hash_set.contains(row_str) || !isDistinct) {
         results.add(row);
@@ -162,8 +162,12 @@ public class QueryResult {
           hash_set.add(row_str);
         }
       }
-      System.out.println("QueryResult obtainResults(): 1 answer row added");
+      //      System.out.println("QueryResult obtainResults(): 1 answer row added");  // debug
     }
+  }
+
+  public QueryTable getTable() {
+    return this.table;
   }
 
   // TODO: 展示MetaInfo相关?

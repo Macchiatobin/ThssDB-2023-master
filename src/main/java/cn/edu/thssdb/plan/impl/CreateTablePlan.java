@@ -42,8 +42,12 @@ public class CreateTablePlan extends LogicalPlan {
     if (dbForTableCreate == null) {
       return new ExecuteStatementResp(StatusUtil.fail("Use database first."), false);
     }
-    List<Column> cList = columns;
-    dbForTableCreate.create(tableName, cList.toArray(new Column[cList.size()]));
+    try {
+      List<Column> cList = columns;
+      dbForTableCreate.create(tableName, cList.toArray(new Column[cList.size()]));
+    } catch (Exception e) {
+      return new ExecuteStatementResp(StatusUtil.fail(e.toString()), false);
+    }
     return new ExecuteStatementResp(StatusUtil.success(), false);
   }
 
