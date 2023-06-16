@@ -1,15 +1,11 @@
 package cn.edu.thssdb.parser;
 
 import cn.edu.thssdb.exception.IllegalSQLStatementException;
-import cn.edu.thssdb.plan.LogicalPlan;
-import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.sql.SQLLexer;
 import cn.edu.thssdb.sql.SQLParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-
-import java.util.ArrayList;
 
 /** 描述:处理sql的主类，需要传入manager */
 public class MySQLParser {

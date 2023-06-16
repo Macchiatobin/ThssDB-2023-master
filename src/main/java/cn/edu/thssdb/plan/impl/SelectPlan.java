@@ -43,7 +43,7 @@ public class SelectPlan extends LogicalPlan {
     // Single query table
     if (ctx.K_JOIN().size() == 0) {
       System.out.println(
-          "SelectPlan createQueryTable(): createSingleQueryTable " + ctx.tableName(0).getText());
+              "SelectPlan createQueryTable(): createSingleQueryTable " + ctx.tableName(0).getText());
       return cur_db.createSingleQueryTable(ctx.tableName(0).getText()); // original: toLowerCase()
     }
     // Joined query table
@@ -51,8 +51,8 @@ public class SelectPlan extends LogicalPlan {
       System.out.println("SelectPlan createQueryTable(): createJoinedQueryTable");
       MultipleCondition multiple_condition = obtainMultipleCondition(ctx.multipleCondition());
       System.out.println(
-          "SelectPlan createQueryTable(): ctx.multipleCondition().getText(): "
-              + ctx.multipleCondition().getText());
+              "SelectPlan createQueryTable(): ctx.multipleCondition().getText(): "
+                      + ctx.multipleCondition().getText());
       ArrayList<String> table_names = new ArrayList<>();
       for (SQLParser.TableNameContext subCtx : ctx.tableName()) {
         //        System.out.println("Added Table: " + subCtx.getText()); // debug
@@ -62,10 +62,10 @@ public class SelectPlan extends LogicalPlan {
     }
   }
 
-  //  @Override
-  //  public ExecuteStatementResp execute_plan(long the_session) {
-  //    return null;
-  //  }
+//  @Override
+//  public ExecuteStatementResp execute_plan(long the_session) {
+//    return null;
+//  }
 
   @Override
   public ExecuteStatementResp execute_plan() {
@@ -121,110 +121,111 @@ public class SelectPlan extends LogicalPlan {
     } else {
       multiple_condition = obtainMultipleCondition(mult_con_ctx); // obtain results recursively
       System.out.println(
-          "found WHERE statement, multiple_condition.getText(): "
-              + multiple_condition.getText()); // debug
+              "found WHERE statement, multiple_condition.getText(): "
+                      + multiple_condition.getText()); // debug
       // 目前toString只实现了singlecondition的版本
     }
 
     QueryResult query_res = null;
     // Transaction Lock
-    //    if (!manager.transaction_sessions.contains(the_session)) {
-    //      System.out.println("Auto Commit:" + the_session);
-    //      System.out.println(!manager.transaction_sessions.contains(the_session));
-    //      my_parser.evaluate("AUTO-BEGIN TRANSACTION", the_session);
-    //      the_result = my_parser.evaluate("SELECT", the_session);
-    //      result.addAll(the_result);
-    //      my_parser.evaluate("AUTO COMMIT", the_session);
-    //    } else {
-    //      System.out.println("Commit:" + the_session);
-    //      System.out.println(!manager.transaction_sessions.contains(the_session));
-    //      the_result = my_parser.evaluate("SELECT", the_session);
-    //      result.addAll(the_result);
-    //    }
-    //    long session = 0;
-    //    if (manager.transaction_sessions.contains(session)) {
-    //      // manager.session_queue.add(session);
-    //      while (true) {
-    //        if (!manager.lockTransactionList.contains(session)) // 新加入一个session
-    //        {
-    //          ArrayList<Integer> lock_result = new ArrayList<>();
-    //          for (String name : table_names) {
-    //            Table the_table = cur_db.getTable(name);
-    //            int get_lock = the_table.acquireReadLock(session);
-    //            lock_result.add(get_lock);
-    //          }
-    //          if (lock_result.contains(-1)) {
-    //            for (String table_name : table_names) {
-    //              Table the_table = cur_db.getTable(table_name);
-    //              the_table.releaseReadLock(session);
-    //            }
-    //            manager.lockTransactionList.add(session);
-    //
-    //          } else {
-    //            break;
-    //          }
-    //        } else // 之前等待的session
-    //        {
-    //          if (manager.lockTransactionList.get(0) == session) // 只查看阻塞队列开头session
-    //          {
-    //            ArrayList<Integer> lock_result = new ArrayList<>();
-    //            for (String name : table_names) {
-    //              Table the_table = cur_db.getTable(name);
-    //              int get_lock = the_table.acquireReadLock(session);
-    //              lock_result.add(get_lock);
-    //            }
-    //            if (!lock_result.contains(-1)) {
-    //              manager.lockTransactionList.remove(0);
-    //              break;
-    //            } else {
-    //              for (String table_name : table_names) {
-    //                Table the_table = cur_db.getTable(table_name);
-    //                the_table.releaseReadLock(session);
-    //              }
-    //            }
-    //          }
-    //        }
-    //        try {
-    //          // System.out.print("session: "+session+": ");
-    //          // System.out.println(manager.session_queue);
-    //          Thread.sleep(500); // 休眠3秒
-    //        } catch (Exception e) {
-    //          System.out.println("Got an exception!");
-    //        }
-    //      }
-    //    } else {
-    // execute select
-    try {
-      // debug: check null
-      if (query_table == null) System.out.println("query_table is null!"); // debug
-      if (col_names == null)
-        System.out.println("col_names is null!(Correct if \'select *\')"); // debug
-      if (multiple_condition == null)
-        System.out.println("multiple_condition is null!(Correct if no \'WHERE\' clause)"); // debug
+//    if (!manager.transaction_sessions.contains(the_session)) {
+//      System.out.println("Auto Commit:" + the_session);
+//      System.out.println(!manager.transaction_sessions.contains(the_session));
+//      my_parser.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+//      the_result = my_parser.evaluate("SELECT", the_session);
+//      result.addAll(the_result);
+//      my_parser.evaluate("AUTO COMMIT", the_session);
+//    } else {
+//      System.out.println("Commit:" + the_session);
+//      System.out.println(!manager.transaction_sessions.contains(the_session));
+//      the_result = my_parser.evaluate("SELECT", the_session);
+//      result.addAll(the_result);
+//    }
+//    long session = 0;
+//    if (manager.transaction_sessions.contains(session)) {
+//      // manager.session_queue.add(session);
+//      while (true) {
+//        if (!manager.lockTransactionList.contains(session)) // 新加入一个session
+//        {
+//          ArrayList<Integer> lock_result = new ArrayList<>();
+//          for (String name : table_names) {
+//            Table the_table = cur_db.getTable(name);
+//            int get_lock = the_table.acquireReadLock(session);
+//            lock_result.add(get_lock);
+//          }
+//          if (lock_result.contains(-1)) {
+//            for (String table_name : table_names) {
+//              Table the_table = cur_db.getTable(table_name);
+//              the_table.releaseReadLock(session);
+//            }
+//            manager.lockTransactionList.add(session);
+//
+//          } else {
+//            break;
+//          }
+//        } else // 之前等待的session
+//        {
+//          if (manager.lockTransactionList.get(0) == session) // 只查看阻塞队列开头session
+//          {
+//            ArrayList<Integer> lock_result = new ArrayList<>();
+//            for (String name : table_names) {
+//              Table the_table = cur_db.getTable(name);
+//              int get_lock = the_table.acquireReadLock(session);
+//              lock_result.add(get_lock);
+//            }
+//            if (!lock_result.contains(-1)) {
+//              manager.lockTransactionList.remove(0);
+//              break;
+//            } else {
+//              for (String table_name : table_names) {
+//                Table the_table = cur_db.getTable(table_name);
+//                the_table.releaseReadLock(session);
+//              }
+//            }
+//          }
+//        }
+//        try {
+//          // System.out.print("session: "+session+": ");
+//          // System.out.println(manager.session_queue);
+//          Thread.sleep(500); // 休眠3秒
+//        } catch (Exception e) {
+//          System.out.println("Got an exception!");
+//        }
+//      }
+//    } else {
+      // execute select
+      try {
+        // debug: check null
+        if (query_table == null) System.out.println("query_table is null!"); // debug
+        if (col_names == null)
+          System.out.println("col_names is null!(Correct if \'select *\')"); // debug
+        if (multiple_condition == null)
+          System.out.println(
+                  "multiple_condition is null!(Correct if no \'WHERE\' clause)"); // debug
 
-      if (is_distinct) System.out.println("isDistinct: true"); // debug
-      else System.out.println("isDistinct: false");
+        if (is_distinct) System.out.println("isDistinct: true"); // debug
+        else System.out.println("isDistinct: false");
 
-      //        System.out.println(
-      //            "SelectPlan right before calling Database.select(), multiple_condition: "
-      //                + multiple_condition.getText()); // debug
+        //        System.out.println(
+        //            "SelectPlan right before calling Database.select(), multiple_condition: "
+        //                + multiple_condition.getText()); // debug
 
-      query_res = cur_db.select(query_table, col_names, multiple_condition, is_distinct);
-      System.out.println("WHERE clause (Database.select()) execution done"); // debug
-    } catch (Exception e) {
-      throw new QueryResultException(); // 但是这样好像会把更细节的报错也都返回成QueryResultException
+        query_res = cur_db.select(query_table, col_names, multiple_condition, is_distinct);
+        System.out.println("WHERE clause (Database.select()) execution done"); // debug
+      } catch (Exception e) {
+        throw new QueryResultException(); // 但是这样好像会把更细节的报错也都返回成QueryResultException
+//      }
     }
-    //    }
 
     // build return result
     ExecuteStatementResp statement_res = new ExecuteStatementResp(StatusUtil.success(), true);
 
     if (query_res == null) // 按理来说不该是null
-    throw new QueryResultException();
+      throw new QueryResultException();
 
     ArrayList<Row> row_results = query_res.getRows(); // 要考虑没有row的情况，按理来说应该是返回一个长度为0的arraylist
     System.out.println(
-        "SelectPlan executePlan(): row_results.size(): " + row_results.size()); // debug
+            "SelectPlan executePlan(): row_results.size(): " + row_results.size()); // debug
     List<String> column_names = query_res.getColNames();
     for (String col_name : column_names) {
       statement_res.addToColumnsList(col_name);
@@ -248,7 +249,7 @@ public class SelectPlan extends LogicalPlan {
   }
 
   public MultipleCondition obtainMultipleCondition(
-      SQLParser.MultipleConditionContext mult_con_ctx) {
+          SQLParser.MultipleConditionContext mult_con_ctx) {
     //    SQLParser.ConditionContext con_ctx = mult_con_ctx.condition();
 
     // Single condition
@@ -266,14 +267,14 @@ public class SelectPlan extends LogicalPlan {
       //                  .tableName()
       //                  .getText());
       System.out.println(
-          "SelectPlan conditionColumnName: "
-              + mult_con_ctx
-                  .condition()
-                  .expression(0)
-                  .comparer()
-                  .columnFullName()
-                  .columnName()
-                  .getText());
+              "SelectPlan conditionColumnName: "
+                      + mult_con_ctx
+                      .condition()
+                      .expression(0)
+                      .comparer()
+                      .columnFullName()
+                      .columnName()
+                      .getText());
       return new MultipleCondition(obtainCondition(mult_con_ctx.condition()));
     }
     // Multiple conditions
@@ -288,9 +289,9 @@ public class SelectPlan extends LogicalPlan {
         throw new UnknownOperatorException();
       }
       return new MultipleCondition(
-          obtainMultipleCondition(mult_con_ctx.multipleCondition(0)),
-          obtainMultipleCondition(mult_con_ctx.multipleCondition(1)),
-          logical_op_type); // 做递归，可能有bug
+              obtainMultipleCondition(mult_con_ctx.multipleCondition(0)),
+              obtainMultipleCondition(mult_con_ctx.multipleCondition(1)),
+              logical_op_type); // 做递归，可能有bug
     }
   }
 

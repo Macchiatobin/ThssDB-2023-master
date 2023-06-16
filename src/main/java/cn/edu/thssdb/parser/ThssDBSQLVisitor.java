@@ -162,7 +162,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
       }
     }
 
-    return new InsertPlan(tableName, columnName, valueEntry, manager);
+    return new InsertPlan(tableName, columnName, valueEntry);
   }
 
   @Override
@@ -177,7 +177,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     }
     String comparator = condition.comparator().getText();
 
-    return new DeletePlan(tableName, attrname, attrvalue, comparator, manager);
+    return new DeletePlan(tableName, attrname, attrvalue, comparator);
   }
 
   @Override
@@ -197,8 +197,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
         set_attr_value,
         where_attr_name,
         where_attr_value,
-        comparator,
-        manager);
+        comparator);
   }
 
   @Override

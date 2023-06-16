@@ -3,7 +3,6 @@ package cn.edu.thssdb.schema;
 import cn.edu.thssdb.exception.AlreadyExistsException;
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.NotExistsException;
-import cn.edu.thssdb.transaction.MainTransaction;
 
 import java.io.*;
 import java.util.HashMap;
@@ -157,21 +156,21 @@ public class Manager implements Serializable {
   }
 
   // 恢复机制 Log
-    public void writeLog(String statement) {
-      Database current_base = getCurDB();
-      String database_name = current_base.getName();
-      String filename = DATA_DIR + database_name + ".log";
-      System.out.println("Log File: " + filename);
-      try {
-        FileWriter writer = new FileWriter(filename, true);
-        System.out.println("Log File Create Success: " + filename);
-        System.out.println(statement);
-        writer.write(statement + "\n");
-        writer.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
+//  public void writeLog(String statement) {
+//    Database current_base = getCurDB();
+//    String database_name = current_base.getName();
+//    String filename = DATA_DIR + database_name + ".log";
+//    System.out.println("Log File: " + filename);
+//    try {
+//      FileWriter writer = new FileWriter(filename, true);
+//      System.out.println("Log File Create Success: " + filename);
+//      System.out.println(statement);
+//      writer.write(statement + "\n");
+//      writer.close();
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
+//  }
   //
   //  public void readLog(String database_name) {
   //

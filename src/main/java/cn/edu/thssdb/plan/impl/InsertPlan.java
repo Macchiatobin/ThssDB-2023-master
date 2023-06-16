@@ -27,13 +27,13 @@ public class InsertPlan extends LogicalPlan {
   private List<String> entryValues;
 
   public InsertPlan(
-      String tableName, List<String> columnList, List<String> entryList, Manager manager) {
+      String tableName, List<String> columnList, List<String> entryList) {
     super(LogicalPlanType.INSERT);
     this.tableName = tableName;
     this.columnNames = columnList;
     this.entryValues = entryList;
-    this.manager = manager;
-    handler = new MySQLParser(manager);
+//    this.manager = manager;
+//    handler = new MySQLParser(manager);
   }
 
   public ArrayList<String> getTableName() {

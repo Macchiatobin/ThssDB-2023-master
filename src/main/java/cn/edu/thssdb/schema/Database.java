@@ -1,11 +1,8 @@
 package cn.edu.thssdb.schema;
 
 import cn.edu.thssdb.exception.AlreadyExistsException;
-import cn.edu.thssdb.exception.CustomIOException;
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.NotExistsException;
-import cn.edu.thssdb.parser.MySQLParser;
-import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.query.*;
 import cn.edu.thssdb.transaction.MainTransaction;
 
@@ -28,7 +25,7 @@ public class Database implements Serializable {
   transient ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
   private String path;
   private String metaPath;
-  private MainTransaction transactionManager;   // 事务管理
+  private MainTransaction transactionManager; // 事务管理
 
   public Database(String name) {
     this.name = name;

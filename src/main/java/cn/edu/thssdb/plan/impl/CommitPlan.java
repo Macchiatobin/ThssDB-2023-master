@@ -30,5 +30,4 @@ public class CommitPlan extends LogicalPlan {
   public ExecuteStatementResp execute_plan() {
     return new ExecuteStatementResp(StatusUtil.success(), false);
   }
-
 }

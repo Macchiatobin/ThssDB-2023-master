@@ -4,7 +4,6 @@ import cn.edu.thssdb.parser.MySQLParser;
 import cn.edu.thssdb.plan.LogicalGenerator;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
-import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.rpc.thrift.ConnectReq;
 import cn.edu.thssdb.rpc.thrift.ConnectResp;
 import cn.edu.thssdb.rpc.thrift.DisconnectReq;
@@ -20,11 +19,9 @@ import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
-import cn.edu.thssdb.transaction.MainTransaction;
 import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.StatusUtil;
 import org.apache.thrift.TException;
-import sun.applet.Main;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,9 +75,9 @@ public class IServiceHandler implements IService.Iface {
 
   @Override
   public ExecuteStatementResp executeStatement(ExecuteStatementReq req) throws TException {
-//    long the_session = req.getSessionId();
-//    ArrayList<QueryResult> the_result;
-//    ArrayList<QueryResult> result = new ArrayList<>();
+    //    long the_session = req.getSessionId();
+    //    ArrayList<QueryResult> the_result;
+    //    ArrayList<QueryResult> result = new ArrayList<>();
 
     if (req.getSessionId() < 0) {
       return new ExecuteStatementResp(
@@ -161,37 +158,38 @@ public class IServiceHandler implements IService.Iface {
       case BEGIN_TRANSACTION:
         System.out.println("BEGIN_TRANSACTION");
         System.out.println("[DEBUG] " + plan);
-//        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println(plan);
         System.out.println("Transaction!");
-        manager.getCurDB().getTransactionManager().exec(plan);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         System.out.println("Begin Exec");
-        return new ExecuteStatementResp(StatusUtil.success(), false);
-//        return plan.execute_plan();
+        break;        //        return plan.execute_plan();
 
         // TODO
 
       case COMMIT:
         System.out.println("COMMIT");
         System.out.println("[DEBUG] " + plan);
-//        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        manager.getCurDB().getTransactionManager().exec(plan);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         System.out.println("Commit Exec");
-        return new ExecuteStatementResp(StatusUtil.success(), false);
-//        return plan.execute_plan();
+        break;
+//        return new ExecuteStatementResp(StatusUtil.success(), false);
+//                return plan.execute_plan();
 
         // TODO
 
       case INSERT:
         System.out.println("INSERT");
         System.out.println("[DEBUG] " + plan);
-//        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        manager.getCurDB().getTransactionManager().exec(plan);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         System.out.println("Insert Exec");
-        return new ExecuteStatementResp(StatusUtil.success(), false);
-//        return plan.execute_plan();
+        break;
+//        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //        return plan.execute_plan();
         //        if (!manager.transaction_sessions.contains(the_session)) {
         //          System.out.println(the_session);
         //
@@ -208,12 +206,13 @@ public class IServiceHandler implements IService.Iface {
       case DELETE:
         System.out.println("DELETE");
         System.out.println("[DEBUG] " + plan);
-//        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        manager.getCurDB().getTransactionManager().exec(plan);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         System.out.println("Delete Exec");
-        return new ExecuteStatementResp(StatusUtil.success(), false);
-//        return plan.execute_plan();
+        break;
+//        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //        return plan.execute_plan();
 
         //      if (!manager.transaction_sessions.contains(the_session)) {
         //          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
@@ -229,12 +228,13 @@ public class IServiceHandler implements IService.Iface {
       case UPDATE:
         System.out.println("UPDATE");
         System.out.println("[DEBUG] " + plan);
-//        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        manager.getCurDB().getTransactionManager().exec(plan);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         System.out.println("Update Exec");
-        return new ExecuteStatementResp(StatusUtil.success(), false);
-//        return plan.execute_plan();
+        break;
+//        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //        return plan.execute_plan();
 
         //        if (!manager.transaction_sessions.contains(the_session)) {
         //          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
@@ -251,12 +251,13 @@ public class IServiceHandler implements IService.Iface {
         /* TODO */
         System.out.println("SELECT");
         System.out.println("[DEBUG] " + plan);
-//        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        manager.getCurDB().getTransactionManager().exec(plan);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         System.out.println("Select Exec");
-        return new ExecuteStatementResp(StatusUtil.success(), false);
-//        return plan.execute_plan();
+        break;
+//        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //        return plan.execute_plan();
 
         //        if (!manager.transaction_sessions.contains(the_session)) {
         //          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);

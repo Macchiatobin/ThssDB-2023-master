@@ -29,23 +29,24 @@ public class MainTransaction {
 
   public TransactionFlag exec(LogicalPlan plan) {
     System.out.println("Main Transaction Plan:" + plan);
-//    manager.writeLog(plan);
-    if (plan instanceof SelectPlan){
+    if (plan instanceof SelectPlan) {
       System.out.println("Trans Select");
-      return readTransaction(plan);}
-    else if (plan instanceof UpdatePlan || plan instanceof DeletePlan
-            || plan instanceof InsertPlan){
+      return readTransaction(plan);
+    } else if (plan instanceof UpdatePlan
+        || plan instanceof DeletePlan
+        || plan instanceof InsertPlan) {
       System.out.println("Trans I?U?D");
-      return writeTransaction(plan);}
-    else if (plan instanceof CommitPlan){
+      return writeTransaction(plan);
+    } else if (plan instanceof CommitPlan) {
       System.out.println("Trans Commit");
-      return commitTransaction();}
-    else if (plan instanceof BeginTransactionPlan){
+      return commitTransaction();
+    } else if (plan instanceof BeginTransactionPlan) {
       System.out.println("Trans Begin");
-      return beginTransaction();}
-    else{
+      return beginTransaction();
+    } else {
       System.out.println("Unknown");
-      return endTransaction(plan);}
+      return endTransaction(plan);
+    }
   }
 
   private TransactionFlag endTransaction(LogicalPlan plan) {
@@ -53,7 +54,7 @@ public class MainTransaction {
       commitTransaction();
     }
     try {
-      plan.execute_plan();
+//      plan.execute_plan();
       checkTransaction = false;
     } catch (Exception e) {
       return new TransactionFlag(false, e.getMessage());
@@ -62,7 +63,7 @@ public class MainTransaction {
   }
 
   private TransactionFlag beginTransaction() {
-    System.out.println("beginT check:"+ checkTransaction);
+    System.out.println("beginT check:" + checkTransaction);
     if (databaseName == null) {
       throw new NotExistsException(1, "");
     }
@@ -75,7 +76,7 @@ public class MainTransaction {
   }
 
   private TransactionFlag commitTransaction() {
-    System.out.println("commitT check:"+ checkTransaction);
+    System.out.println("commitT check:" + checkTransaction);
 
     if (databaseName == null) {
       throw new NotExistsException(1, "");
@@ -90,11 +91,11 @@ public class MainTransaction {
   }
 
   private TransactionFlag readTransaction(LogicalPlan plan) {
-    System.out.println("readT check:"+ checkTransaction);
+    System.out.println("readT check:" + checkTransaction);
 
     if (Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.READ_UNCOMMITTED) {
       try {
-        plan.execute_plan();
+//        plan.execute_plan();
         checkTransaction = true;
       } catch (Exception e) {
         return new TransactionFlag(false, e.getMessage());
@@ -111,7 +112,7 @@ public class MainTransaction {
       }
 
       try {
-        plan.execute_plan();
+//        plan.execute_plan();
         checkTransaction = true;
       } catch (Exception e) {
         return new TransactionFlag(false, e.getMessage());
@@ -134,7 +135,7 @@ public class MainTransaction {
       }
 
       try {
-        plan.execute_plan();
+//        plan.execute_plan();
         checkTransaction = true;
       } catch (Exception e) {
         return new TransactionFlag(false, e.getMessage());
@@ -145,7 +146,7 @@ public class MainTransaction {
   }
 
   private TransactionFlag writeTransaction(LogicalPlan plan) {
-    System.out.println("writeT check:"+ checkTransaction);
+    System.out.println("writeT check:" + checkTransaction);
 
     if ((Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.READ_COMMITTED)
         || (Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.READ_UNCOMMITTED)
@@ -157,17 +158,16 @@ public class MainTransaction {
         }
       }
 
-      if(!checkTransaction)
       try {
           System.out.println("Write Trans plan execute!");
-          plan.execute_plan();
+//          plan.execute_plan();
           planList.add(plan);
           checkTransaction = true;
         } catch (Exception e) {
           return new TransactionFlag(false, e.getMessage());
         }
-        return new TransactionFlag(true, "Success");
-      }
+      return new TransactionFlag(true, "Success");
+    }
 
     return new TransactionFlag(false, "Failure cause ISOLATION_LEVEL error");
   }
