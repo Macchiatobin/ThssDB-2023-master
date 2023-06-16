@@ -14,10 +14,10 @@ public class QuitPlan extends LogicalPlan {
     return "QuitPlan";
   }
 
-  @Override
-  public ExecuteStatementResp execute_plan(long the_session) {
-    return null;
-  }
+  //  @Override
+  //  public ExecuteStatementResp execute_plan(long the_session) {
+  //    return null;
+  //  }
 
   @Override
   public ExecuteStatementResp execute_plan() {

@@ -2,6 +2,7 @@ package cn.edu.thssdb.transaction;
 
 import cn.edu.thssdb.exception.NotExistsException;
 import cn.edu.thssdb.plan.LogicalPlan;
+import cn.edu.thssdb.plan.impl.*;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
 import cn.edu.thssdb.utils.Global;
@@ -27,23 +28,41 @@ public class MainTransaction {
   }
 
   public TransactionFlag exec(LogicalPlan plan) {
-    switch (plan.getType()) {
-      case BEGIN_TRANSACTION:
-        return beginTransaction();
-      case COMMIT:
-        return commitTransaction();
-      case SELECT:
-        return readTransaction(plan);
-      case INSERT:
-      case UPDATE:
-      case DELETE:
-        return writeTransaction(plan);
-      default:
-        return null;
+    System.out.println("Main Transaction Plan:" + plan);
+//    manager.writeLog(plan);
+    if (plan instanceof SelectPlan){
+      System.out.println("Trans Select");
+      return readTransaction(plan);}
+    else if (plan instanceof UpdatePlan || plan instanceof DeletePlan
+            || plan instanceof InsertPlan){
+      System.out.println("Trans I?U?D");
+      return writeTransaction(plan);}
+    else if (plan instanceof CommitPlan){
+      System.out.println("Trans Commit");
+      return commitTransaction();}
+    else if (plan instanceof BeginTransactionPlan){
+      System.out.println("Trans Begin");
+      return beginTransaction();}
+    else{
+      System.out.println("Unknown");
+      return endTransaction(plan);}
+  }
+
+  private TransactionFlag endTransaction(LogicalPlan plan) {
+    if (checkTransaction) {
+      commitTransaction();
     }
+    try {
+      plan.execute_plan();
+      checkTransaction = false;
+    } catch (Exception e) {
+      return new TransactionFlag(false, e.getMessage());
+    }
+    return new TransactionFlag(true, "Success");
   }
 
   private TransactionFlag beginTransaction() {
+    System.out.println("beginT check:"+ checkTransaction);
     if (databaseName == null) {
       throw new NotExistsException(1, "");
     }
@@ -56,6 +75,8 @@ public class MainTransaction {
   }
 
   private TransactionFlag commitTransaction() {
+    System.out.println("commitT check:"+ checkTransaction);
+
     if (databaseName == null) {
       throw new NotExistsException(1, "");
     }
@@ -69,6 +90,8 @@ public class MainTransaction {
   }
 
   private TransactionFlag readTransaction(LogicalPlan plan) {
+    System.out.println("readT check:"+ checkTransaction);
+
     if (Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.READ_UNCOMMITTED) {
       try {
         plan.execute_plan();
@@ -122,6 +145,8 @@ public class MainTransaction {
   }
 
   private TransactionFlag writeTransaction(LogicalPlan plan) {
+    System.out.println("writeT check:"+ checkTransaction);
+
     if ((Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.READ_COMMITTED)
         || (Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.READ_UNCOMMITTED)
         || (Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.SERIALIZABLE)) {
@@ -131,15 +156,19 @@ public class MainTransaction {
           this.getTransactionWriteLock(tmp_tableName);
         }
       }
+
+      if(!checkTransaction)
       try {
-        plan.execute_plan();
-        planList.add(plan);
-        checkTransaction = true;
-      } catch (Exception e) {
-        return new TransactionFlag(false, e.getMessage());
+          System.out.println("Write Trans plan execute!");
+          plan.execute_plan();
+          planList.add(plan);
+          checkTransaction = true;
+        } catch (Exception e) {
+          return new TransactionFlag(false, e.getMessage());
+        }
+        return new TransactionFlag(true, "Success");
       }
-      return new TransactionFlag(true, "Success");
-    }
+
     return new TransactionFlag(false, "Failure cause ISOLATION_LEVEL error");
   }
 

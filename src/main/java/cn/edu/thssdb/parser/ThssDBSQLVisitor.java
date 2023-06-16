@@ -38,9 +38,8 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
   private Manager manager;
   private long session; // TODO: transaction交互
 
-  public ThssDBSQLVisitor(Manager manager) {
+  public ThssDBSQLVisitor() {
     super();
-    this.manager = manager;
   }
 
   @Override
@@ -117,16 +116,16 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
   }
 
   public LogicalPlan visitBeginTransactionStmt(SQLParser.BeginTransactionStmtContext ctx) {
-    return new BeginTransactionPlan(manager);
+    return new BeginTransactionPlan();
   }
 
   @Override
   public LogicalPlan visitCommitStmt(SQLParser.CommitStmtContext ctx) {
-    return new CommitPlan(manager, getCurDB());
+    return new CommitPlan();
   }
 
   public LogicalPlan visitAutoCommitStmt(SQLParser.AutoCommitStmtContext ctx) {
-    return new AutoCommitPlan(manager, getCurDB());
+    return new AutoCommitPlan();
   }
 
   @Override

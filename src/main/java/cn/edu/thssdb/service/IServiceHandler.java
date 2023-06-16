@@ -20,9 +20,11 @@ import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
+import cn.edu.thssdb.transaction.MainTransaction;
 import cn.edu.thssdb.utils.Global;
 import cn.edu.thssdb.utils.StatusUtil;
 import org.apache.thrift.TException;
+import sun.applet.Main;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,16 +78,19 @@ public class IServiceHandler implements IService.Iface {
 
   @Override
   public ExecuteStatementResp executeStatement(ExecuteStatementReq req) throws TException {
-    long the_session = req.getSessionId();
-    ArrayList<QueryResult> the_result;
-    ArrayList<QueryResult> result = new ArrayList<>();
+//    long the_session = req.getSessionId();
+//    ArrayList<QueryResult> the_result;
+//    ArrayList<QueryResult> result = new ArrayList<>();
 
     if (req.getSessionId() < 0) {
       return new ExecuteStatementResp(
           StatusUtil.fail("You are not connected. Please connect first."), false);
     }
     // TODO: implement execution logic，需要实现日志记录等
+    // 事务管理
     LogicalPlan plan = LogicalGenerator.generate(manager, req.statement);
+    System.out.println("Logical Plan!");
+
     switch (plan.getType()) {
       case CREATE_DB:
         System.out.println("CREATE_DB");
@@ -149,7 +154,6 @@ public class IServiceHandler implements IService.Iface {
       case AUTO_COMMIT:
         System.out.println("AUTO_COMMIT");
         System.out.println("[DEBUG] " + plan);
-
         // TODO
 
         break;
@@ -157,25 +161,37 @@ public class IServiceHandler implements IService.Iface {
       case BEGIN_TRANSACTION:
         System.out.println("BEGIN_TRANSACTION");
         System.out.println("[DEBUG] " + plan);
-        return plan.execute_plan(the_session);
+//        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        System.out.println(plan);
+        System.out.println("Transaction!");
+        manager.getCurDB().getTransactionManager().exec(plan);
+        System.out.println("Begin Exec");
+        return new ExecuteStatementResp(StatusUtil.success(), false);
+//        return plan.execute_plan();
 
         // TODO
-
-        //        break;
 
       case COMMIT:
         System.out.println("COMMIT");
         System.out.println("[DEBUG] " + plan);
-        return plan.execute_plan(the_session);
+//        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        System.out.println("Transaction!");
+        manager.getCurDB().getTransactionManager().exec(plan);
+        System.out.println("Commit Exec");
+        return new ExecuteStatementResp(StatusUtil.success(), false);
+//        return plan.execute_plan();
 
         // TODO
-
-        //        break;
 
       case INSERT:
         System.out.println("INSERT");
         System.out.println("[DEBUG] " + plan);
-        return plan.execute_plan(the_session);
+//        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        System.out.println("Transaction!");
+        manager.getCurDB().getTransactionManager().exec(plan);
+        System.out.println("Insert Exec");
+        return new ExecuteStatementResp(StatusUtil.success(), false);
+//        return plan.execute_plan();
         //        if (!manager.transaction_sessions.contains(the_session)) {
         //          System.out.println(the_session);
         //
@@ -192,7 +208,12 @@ public class IServiceHandler implements IService.Iface {
       case DELETE:
         System.out.println("DELETE");
         System.out.println("[DEBUG] " + plan);
-        return plan.execute_plan(the_session);
+//        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        System.out.println("Transaction!");
+        manager.getCurDB().getTransactionManager().exec(plan);
+        System.out.println("Delete Exec");
+        return new ExecuteStatementResp(StatusUtil.success(), false);
+//        return plan.execute_plan();
 
         //      if (!manager.transaction_sessions.contains(the_session)) {
         //          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
@@ -204,12 +225,16 @@ public class IServiceHandler implements IService.Iface {
         //          the_result = handler.evaluate("DELETE", the_session);
         //          result.addAll(the_result);
         //        }
-        //        break;
 
       case UPDATE:
         System.out.println("UPDATE");
         System.out.println("[DEBUG] " + plan);
-        return plan.execute_plan(the_session);
+//        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        System.out.println("Transaction!");
+        manager.getCurDB().getTransactionManager().exec(plan);
+        System.out.println("Update Exec");
+        return new ExecuteStatementResp(StatusUtil.success(), false);
+//        return plan.execute_plan();
 
         //        if (!manager.transaction_sessions.contains(the_session)) {
         //          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
@@ -221,13 +246,17 @@ public class IServiceHandler implements IService.Iface {
         //          the_result = handler.evaluate("UPDATE", the_session);
         //          result.addAll(the_result);
         //        }
-        //        break;
 
       case SELECT:
         /* TODO */
         System.out.println("SELECT");
         System.out.println("[DEBUG] " + plan);
-        return plan.execute_plan(the_session);
+//        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        System.out.println("Transaction!");
+        manager.getCurDB().getTransactionManager().exec(plan);
+        System.out.println("Select Exec");
+        return new ExecuteStatementResp(StatusUtil.success(), false);
+//        return plan.execute_plan();
 
         //        if (!manager.transaction_sessions.contains(the_session)) {
         //          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
@@ -240,7 +269,6 @@ public class IServiceHandler implements IService.Iface {
         //          result.addAll(the_result);
         //        }
         //        return ((SelectPlan)plan).execute_plan(req); // 加了个req参数，用于和transaction交互
-        //        break;
 
       default:
         break;

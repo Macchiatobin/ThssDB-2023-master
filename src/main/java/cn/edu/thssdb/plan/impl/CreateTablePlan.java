@@ -30,10 +30,10 @@ public class CreateTablePlan extends LogicalPlan {
     return columns;
   }
 
-  @Override
-  public ExecuteStatementResp execute_plan(long the_session) {
-    return null;
-  }
+  //  @Override
+  //  public ExecuteStatementResp execute_plan(long the_session) {
+  //    return null;
+  //  }
 
   @Override
   public ExecuteStatementResp execute_plan() {

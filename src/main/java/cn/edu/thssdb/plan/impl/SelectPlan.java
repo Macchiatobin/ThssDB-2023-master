@@ -62,13 +62,13 @@ public class SelectPlan extends LogicalPlan {
     }
   }
 
-  @Override
-  public ExecuteStatementResp execute_plan() {
-    return null;
-  }
+  //  @Override
+  //  public ExecuteStatementResp execute_plan(long the_session) {
+  //    return null;
+  //  }
 
   @Override
-  public ExecuteStatementResp execute_plan(long the_session) {
+  public ExecuteStatementResp execute_plan() {
     /* TODO */
     // v1 done
 
@@ -128,94 +128,93 @@ public class SelectPlan extends LogicalPlan {
 
     QueryResult query_res = null;
     // Transaction Lock
-    if (!manager.transaction_sessions.contains(the_session)) {
-      System.out.println("Auto Commit:" + the_session);
-      System.out.println(!manager.transaction_sessions.contains(the_session));
-      my_parser.evaluate("AUTO-BEGIN TRANSACTION", the_session);
-      the_result = my_parser.evaluate("SELECT", the_session);
-      result.addAll(the_result);
-      my_parser.evaluate("AUTO COMMIT", the_session);
-    } else {
-      System.out.println("Commit:" + the_session);
-      System.out.println(!manager.transaction_sessions.contains(the_session));
-      the_result = my_parser.evaluate("SELECT", the_session);
-      result.addAll(the_result);
+    //    if (!manager.transaction_sessions.contains(the_session)) {
+    //      System.out.println("Auto Commit:" + the_session);
+    //      System.out.println(!manager.transaction_sessions.contains(the_session));
+    //      my_parser.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+    //      the_result = my_parser.evaluate("SELECT", the_session);
+    //      result.addAll(the_result);
+    //      my_parser.evaluate("AUTO COMMIT", the_session);
+    //    } else {
+    //      System.out.println("Commit:" + the_session);
+    //      System.out.println(!manager.transaction_sessions.contains(the_session));
+    //      the_result = my_parser.evaluate("SELECT", the_session);
+    //      result.addAll(the_result);
+    //    }
+    //    long session = 0;
+    //    if (manager.transaction_sessions.contains(session)) {
+    //      // manager.session_queue.add(session);
+    //      while (true) {
+    //        if (!manager.lockTransactionList.contains(session)) // 新加入一个session
+    //        {
+    //          ArrayList<Integer> lock_result = new ArrayList<>();
+    //          for (String name : table_names) {
+    //            Table the_table = cur_db.getTable(name);
+    //            int get_lock = the_table.acquireReadLock(session);
+    //            lock_result.add(get_lock);
+    //          }
+    //          if (lock_result.contains(-1)) {
+    //            for (String table_name : table_names) {
+    //              Table the_table = cur_db.getTable(table_name);
+    //              the_table.releaseReadLock(session);
+    //            }
+    //            manager.lockTransactionList.add(session);
+    //
+    //          } else {
+    //            break;
+    //          }
+    //        } else // 之前等待的session
+    //        {
+    //          if (manager.lockTransactionList.get(0) == session) // 只查看阻塞队列开头session
+    //          {
+    //            ArrayList<Integer> lock_result = new ArrayList<>();
+    //            for (String name : table_names) {
+    //              Table the_table = cur_db.getTable(name);
+    //              int get_lock = the_table.acquireReadLock(session);
+    //              lock_result.add(get_lock);
+    //            }
+    //            if (!lock_result.contains(-1)) {
+    //              manager.lockTransactionList.remove(0);
+    //              break;
+    //            } else {
+    //              for (String table_name : table_names) {
+    //                Table the_table = cur_db.getTable(table_name);
+    //                the_table.releaseReadLock(session);
+    //              }
+    //            }
+    //          }
+    //        }
+    //        try {
+    //          // System.out.print("session: "+session+": ");
+    //          // System.out.println(manager.session_queue);
+    //          Thread.sleep(500); // 休眠3秒
+    //        } catch (Exception e) {
+    //          System.out.println("Got an exception!");
+    //        }
+    //      }
+    //    } else {
+    // execute select
+    try {
+      // debug: check null
+      if (query_table == null) System.out.println("query_table is null!"); // debug
+      if (col_names == null)
+        System.out.println("col_names is null!(Correct if \'select *\')"); // debug
+      if (multiple_condition == null)
+        System.out.println("multiple_condition is null!(Correct if no \'WHERE\' clause)"); // debug
+
+      if (is_distinct) System.out.println("isDistinct: true"); // debug
+      else System.out.println("isDistinct: false");
+
+      //        System.out.println(
+      //            "SelectPlan right before calling Database.select(), multiple_condition: "
+      //                + multiple_condition.getText()); // debug
+
+      query_res = cur_db.select(query_table, col_names, multiple_condition, is_distinct);
+      System.out.println("WHERE clause (Database.select()) execution done"); // debug
+    } catch (Exception e) {
+      throw new QueryResultException(); // 但是这样好像会把更细节的报错也都返回成QueryResultException
     }
-    long session = 0;
-    if (manager.transaction_sessions.contains(session)) {
-      // manager.session_queue.add(session);
-      while (true) {
-        if (!manager.lockTransactionList.contains(session)) // 新加入一个session
-        {
-          ArrayList<Integer> lock_result = new ArrayList<>();
-          for (String name : table_names) {
-            Table the_table = cur_db.getTable(name);
-            int get_lock = the_table.acquireReadLock(session);
-            lock_result.add(get_lock);
-          }
-          if (lock_result.contains(-1)) {
-            for (String table_name : table_names) {
-              Table the_table = cur_db.getTable(table_name);
-              the_table.releaseReadLock(session);
-            }
-            manager.lockTransactionList.add(session);
-
-          } else {
-            break;
-          }
-        } else // 之前等待的session
-        {
-          if (manager.lockTransactionList.get(0) == session) // 只查看阻塞队列开头session
-          {
-            ArrayList<Integer> lock_result = new ArrayList<>();
-            for (String name : table_names) {
-              Table the_table = cur_db.getTable(name);
-              int get_lock = the_table.acquireReadLock(session);
-              lock_result.add(get_lock);
-            }
-            if (!lock_result.contains(-1)) {
-              manager.lockTransactionList.remove(0);
-              break;
-            } else {
-              for (String table_name : table_names) {
-                Table the_table = cur_db.getTable(table_name);
-                the_table.releaseReadLock(session);
-              }
-            }
-          }
-        }
-        try {
-          // System.out.print("session: "+session+": ");
-          // System.out.println(manager.session_queue);
-          Thread.sleep(500); // 休眠3秒
-        } catch (Exception e) {
-          System.out.println("Got an exception!");
-        }
-      }
-    } else {
-      // execute select
-      try {
-        // debug: check null
-        if (query_table == null) System.out.println("query_table is null!"); // debug
-        if (col_names == null)
-          System.out.println("col_names is null!(Correct if \'select *\')"); // debug
-        if (multiple_condition == null)
-          System.out.println(
-              "multiple_condition is null!(Correct if no \'WHERE\' clause)"); // debug
-
-        if (is_distinct) System.out.println("isDistinct: true"); // debug
-        else System.out.println("isDistinct: false");
-
-        //        System.out.println(
-        //            "SelectPlan right before calling Database.select(), multiple_condition: "
-        //                + multiple_condition.getText()); // debug
-
-        query_res = cur_db.select(query_table, col_names, multiple_condition, is_distinct);
-        System.out.println("WHERE clause (Database.select()) execution done"); // debug
-      } catch (Exception e) {
-        throw new QueryResultException(); // 但是这样好像会把更细节的报错也都返回成QueryResultException
-      }
-    }
+    //    }
 
     // build return result
     ExecuteStatementResp statement_res = new ExecuteStatementResp(StatusUtil.success(), true);

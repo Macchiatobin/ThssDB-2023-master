@@ -28,10 +28,10 @@ public class ShowTablePlan extends LogicalPlan {
     return "ShowTablePlan{" + "tableName='" + tableName + '\'' + '}';
   }
 
-  @Override
-  public ExecuteStatementResp execute_plan(long the_session) {
-    return null;
-  }
+  //  @Override
+  //  public ExecuteStatementResp execute_plan(long the_session) {
+  //    return null;
+  //  }
 
   @Override
   public ExecuteStatementResp execute_plan() {

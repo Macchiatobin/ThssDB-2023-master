@@ -1,11 +1,16 @@
 package cn.edu.thssdb.schema;
 
 import cn.edu.thssdb.exception.AlreadyExistsException;
+import cn.edu.thssdb.exception.CustomIOException;
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.NotExistsException;
+import cn.edu.thssdb.parser.MySQLParser;
+import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.query.*;
+import cn.edu.thssdb.transaction.MainTransaction;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,9 +26,9 @@ public class Database implements Serializable {
   private transient HashMap<String, Table> tables;
   public HashMap<String, MetaInfo> metaInfos;
   transient ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
   private String path;
   private String metaPath;
+  private MainTransaction transactionManager;   // 事务管理
 
   public Database(String name) {
     this.name = name;
@@ -31,7 +36,13 @@ public class Database implements Serializable {
     this.metaInfos = new HashMap<>();
     this.path = DATA_DIR + name + "/";
     this.metaPath = this.path + "meta";
+    String folder = Paths.get("data", name).toString();
+    String logger_name = name + ".log";
     recover();
+  }
+
+  public MainTransaction getTransactionManager() {
+    return transactionManager;
   }
 
   public Table getTable(String tableName) {
@@ -133,6 +144,7 @@ public class Database implements Serializable {
   }
 
   private void recover() { // read from file, when create
+    transactionManager = new MainTransaction(name);
     File dbFolder = new File(this.path);
     if (!dbFolder.exists()) // Create Folder, if first create
     {
