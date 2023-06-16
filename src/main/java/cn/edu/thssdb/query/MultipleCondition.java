@@ -31,13 +31,18 @@ public class MultipleCondition {
     this.op_type = type;
   }
 
+  public String getText() {
+    if (!has_mult_conditions) return condition.getText();
+    else return "复合条件getText()暂未实现";
+  }
+
   // Obtain query result recursively
   public boolean executeQuery(QueryRow row) {
 
-    System.out.println("MultipleCondition executeQuery(): entered method"); // debug
+    //    System.out.println("MultipleCondition executeQuery(): entered method"); // debug
 
     // Case of a Single Condition
-    if (has_mult_conditions == false) {
+    if (!has_mult_conditions) {
       System.out.println("MultipleCondition executeQuery(): case1 single condition"); // debug
       if (condition == null) {
         System.out.println("MultipleCondition executeQuery(): condition is null"); // debug
@@ -54,12 +59,14 @@ public class MultipleCondition {
       if (right_condition != null) right_res = right_condition.executeQuery(row);
 
       // Calculate final result
-      System.out.println("MultipleCondition executeQuery(): calculate final result"); // debug
-      System.out.println("MultipleCondition executeQuery(): op_type \'" + op_type + "\'"); // debug
-      System.out.println(
-          "MultipleCondition executeQuery(): left_res \'" + left_res + "\'"); // debug
-      System.out.println(
-          "MultipleCondition executeQuery(): op_type \'" + right_res + "\'"); // debug
+      //      System.out.println("MultipleCondition executeQuery(): calculate final result"); //
+      // debug
+      //      System.out.println("MultipleCondition executeQuery(): op_type \'" + op_type + "\'");
+      // // debug
+      //      System.out.println(
+      //          "MultipleCondition executeQuery(): left_res \'" + left_res + "\'"); // debug
+      //      System.out.println(
+      //          "MultipleCondition executeQuery(): op_type \'" + right_res + "\'"); // debug
       if (op_type == LogicalOperatorType.AND) return left_res && right_res;
       else if (op_type == LogicalOperatorType.OR) return left_res || right_res;
 

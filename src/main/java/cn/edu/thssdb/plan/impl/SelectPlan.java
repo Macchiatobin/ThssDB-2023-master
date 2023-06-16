@@ -11,6 +11,7 @@ import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.sql.SQLParser;
 import cn.edu.thssdb.type.*;
 import cn.edu.thssdb.utils.StatusUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,13 +42,20 @@ public class SelectPlan extends LogicalPlan {
 
     // Single query table
     if (ctx.K_JOIN().size() == 0) {
+      System.out.println(
+          "SelectPlan createQueryTable(): createSingleQueryTable " + ctx.tableName(0).getText());
       return cur_db.createSingleQueryTable(ctx.tableName(0).getText()); // original: toLowerCase()
     }
     // Joined query table
     else {
+      System.out.println("SelectPlan createQueryTable(): createJoinedQueryTable");
       MultipleCondition multiple_condition = obtainMultipleCondition(ctx.multipleCondition());
+      System.out.println(
+          "SelectPlan createQueryTable(): ctx.multipleCondition().getText(): "
+              + ctx.multipleCondition().getText());
       ArrayList<String> table_names = new ArrayList<>();
       for (SQLParser.TableNameContext subCtx : ctx.tableName()) {
+        //        System.out.println("Added Table: " + subCtx.getText()); // debug
         table_names.add(subCtx.getText());
       }
       return cur_db.createJoinedQueryTable(table_names, multiple_condition);
@@ -112,7 +120,10 @@ public class SelectPlan extends LogicalPlan {
       System.out.println("no WHERE statement: mult_con_ctx is null"); // debug
     } else {
       multiple_condition = obtainMultipleCondition(mult_con_ctx); // obtain results recursively
-      System.out.println("WHERE recursive part done"); // debug
+      System.out.println(
+          "found WHERE statement, multiple_condition.getText(): "
+              + multiple_condition.getText()); // debug
+      // 目前toString只实现了singlecondition的版本
     }
 
     QueryResult query_res = null;
@@ -124,7 +135,6 @@ public class SelectPlan extends LogicalPlan {
       the_result = my_parser.evaluate("SELECT", the_session);
       result.addAll(the_result);
       my_parser.evaluate("AUTO COMMIT", the_session);
-
     } else {
       System.out.println("Commit:" + the_session);
       System.out.println(!manager.transaction_sessions.contains(the_session));
@@ -186,17 +196,22 @@ public class SelectPlan extends LogicalPlan {
       // execute select
       try {
         // debug: check null
-        if (query_table == null) System.out.println("query_table is null!");
-        if (col_names == null) System.out.println("col_names is null!(Correct if \'select *\')");
+        if (query_table == null) System.out.println("query_table is null!"); // debug
+        if (col_names == null)
+          System.out.println("col_names is null!(Correct if \'select *\')"); // debug
         if (multiple_condition == null)
-          System.out.println("multiple_condition is null!(Correct if no \'WHERE\' clause)");
+          System.out.println(
+              "multiple_condition is null!(Correct if no \'WHERE\' clause)"); // debug
 
-        // debug: check isDistinct
-        if (is_distinct) System.out.println("isDistinct: true");
+        if (is_distinct) System.out.println("isDistinct: true"); // debug
         else System.out.println("isDistinct: false");
 
+        //        System.out.println(
+        //            "SelectPlan right before calling Database.select(), multiple_condition: "
+        //                + multiple_condition.getText()); // debug
+
         query_res = cur_db.select(query_table, col_names, multiple_condition, is_distinct);
-        System.out.println("WHERE select execution done"); // debug
+        System.out.println("WHERE clause (Database.select()) execution done"); // debug
       } catch (Exception e) {
         throw new QueryResultException(); // 但是这样好像会把更细节的报错也都返回成QueryResultException
       }
@@ -228,7 +243,7 @@ public class SelectPlan extends LogicalPlan {
       statement_res.addToRowList(null_row);
     }
 
-    System.out.println("SelectPlan executePlan(): done, ready to return");
+    //    System.out.println("SelectPlan executePlan(): done, ready to return");
     System.out.println("--------------------------------------------------------");
     return statement_res;
   }
@@ -238,9 +253,28 @@ public class SelectPlan extends LogicalPlan {
     //    SQLParser.ConditionContext con_ctx = mult_con_ctx.condition();
 
     // Single condition
-    if (mult_con_ctx.AND() == null
-        && mult_con_ctx.OR() == null) { // original: if (mult_con_ctx.condition() != null)
+    // if (mult_con_ctx.AND() == null && mult_con_ctx.OR() == null) { // original: if
+    // (mult_con_ctx.condition() != null)
+    if (mult_con_ctx.condition() != null) {
       System.out.println("SelectPlan obtainMultipleCondition(): single condition");
+      //      System.out.println( // debug（在没有on时会报错）
+      //          "SelectPlan conditionTableName: "
+      //              + mult_con_ctx
+      //                  .condition()
+      //                  .expression(0)
+      //                  .comparer()
+      //                  .columnFullName()
+      //                  .tableName()
+      //                  .getText());
+      System.out.println(
+          "SelectPlan conditionColumnName: "
+              + mult_con_ctx
+                  .condition()
+                  .expression(0)
+                  .comparer()
+                  .columnFullName()
+                  .columnName()
+                  .getText());
       return new MultipleCondition(obtainCondition(mult_con_ctx.condition()));
     }
     // Multiple conditions

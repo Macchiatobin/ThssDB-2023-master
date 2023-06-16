@@ -6,6 +6,7 @@ import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
 import cn.edu.thssdb.utils.StatusUtil;
+
 import java.util.ArrayList;
 
 public class AutoCommitPlan extends LogicalPlan {

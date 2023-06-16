@@ -2,6 +2,7 @@ package cn.edu.thssdb.plan.impl;
 
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
