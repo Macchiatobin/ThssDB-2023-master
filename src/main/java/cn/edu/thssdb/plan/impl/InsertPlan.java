@@ -12,6 +12,7 @@ import cn.edu.thssdb.utils.StatusUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import static cn.edu.thssdb.type.ColumnType.STRING;
@@ -21,19 +22,22 @@ public class InsertPlan extends LogicalPlan {
   public static MySQLParser handler;
   ArrayList<QueryResult> the_result;
   ArrayList<QueryResult> result = new ArrayList<>();
+  private ArrayList<Row> rowsHasInsert;
+
 
   private String tableName;
   private List<String> columnNames;
   private List<String> entryValues;
 
-  public InsertPlan(
-      String tableName, List<String> columnList, List<String> entryList) {
+  public InsertPlan(String tableName, List<String> columnList, List<String> entryList) {
     super(LogicalPlanType.INSERT);
     this.tableName = tableName;
     this.columnNames = columnList;
     this.entryValues = entryList;
-//    this.manager = manager;
-//    handler = new MySQLParser(manager);
+    this.rowsHasInsert = new ArrayList<>();
+
+    //    this.manager = manager;
+    //    handler = new MySQLParser(manager);
   }
 
   public ArrayList<String> getTableName() {
@@ -64,6 +68,14 @@ public class InsertPlan extends LogicalPlan {
         + "; entryValues="
         + entryValues
         + '}';
+  }
+
+  public LinkedList<String> getLog() {
+    LinkedList<String> log = new LinkedList<>();
+    for (Row row : rowsHasInsert) {
+      log.add("INSERT INTO " + tableName + " VALUES " + "(" + row.toString() + ")");
+    }
+    return log;
   }
 
   @Override
@@ -123,6 +135,7 @@ public class InsertPlan extends LogicalPlan {
       }
     }
     Row rowToInsert = new Row(entries);
+
 
     // Transaction Lock
     //    if (!manager.transaction_sessions.contains(the_session)) {
@@ -184,6 +197,8 @@ public class InsertPlan extends LogicalPlan {
     //    } else {
     try {
       dbForInsert.getTable(tableName).insert(rowToInsert);
+      this.rowsHasInsert.add(rowToInsert);
+
     } catch (DuplicateKeyException e) {
       return new ExecuteStatementResp(StatusUtil.fail(e.getMessage()), false);
     }
