@@ -79,12 +79,12 @@ public class DeletePlan extends LogicalPlan {
   //    return null;
   //  }
 
-    @Override
-    public ArrayList<String> getTableName() {
-        return new ArrayList<>(Collections.singletonList(this.tableName));
-    }
+  @Override
+  public ArrayList<String> getTableName() {
+    return new ArrayList<>(Collections.singletonList(this.tableName));
+  }
 
-    public LinkedList<String> getLog() {
+  public LinkedList<String> getLog() {
     LinkedList<String> log = new LinkedList<>();
     Database cur_db = Manager.getInstance().getCurDB();
     Table cur_tb = cur_db.getTable(tableName);

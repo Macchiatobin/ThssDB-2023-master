@@ -211,18 +211,19 @@ public class Database implements Serializable {
     try {
       ArrayList<String> logs = this.logger.readLog();
       for (String log : logs) {
-        String[] info = log.split(" ");
-        String type = info[0];
+//        String[] info = log.split(" ");
+//        String type = info[0];
 //        if (type.equals("DELETE")) {
 //          tables.get(info[1]).delete(info[2]);
 //        } else if (type.equals("INSERT")) {
 //          tables.get(info[1]).insert(info[2]);
 //        } else if (!type.equals("COMMIT")) {
-          ArrayList<LogicalPlan> operations = MySQLParser.getOperations(log);
-          for (LogicalPlan op : operations) {
+          ArrayList<LogicalPlan> plans = MySQLParser.getOperations(log);
+          for (LogicalPlan plan : plans) {
             try {
-              op.execute_plan();
+              plan.execute_plan();
             } catch (Exception e) {
+
             }
           }
         }
