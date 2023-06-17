@@ -24,7 +24,7 @@ public class BPlusTreeTest {
     values = new ArrayList<>();
     map = new HashMap<>();
     HashSet<Integer> set = new HashSet<>();
-    int size = 10000;
+    int size = 50000;
     for (int i = 0; i < size; i++) {
       double random = Math.random();
       set.add((int) (random * size));

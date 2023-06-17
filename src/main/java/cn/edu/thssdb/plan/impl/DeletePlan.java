@@ -21,6 +21,10 @@ public class DeletePlan extends LogicalPlan {
   ArrayList<QueryResult> the_result;
   ArrayList<QueryResult> result = new ArrayList<>();
 
+  // added for Ray start
+  ArrayList<Row> deleted_rows;
+  // added for Ray end
+
   private String attrName;
   private String attrValue;
   private String tableName;
@@ -34,6 +38,11 @@ public class DeletePlan extends LogicalPlan {
     this.attrName = attrname; // condition attribute name
     this.attrValue = attrvalue; // condition attribute value
     this.manager = manager;
+
+    // added for Ray start
+    this.deleted_rows = new ArrayList<>();
+    // added for Ray end
+
     handler = new MySQLParser(manager);
 
     if (comp == "=") this.comparator = COMP_EQ;
@@ -142,7 +151,20 @@ public class DeletePlan extends LogicalPlan {
         ColumnType cur_column_type = cur_column.getType(); // where column type
         Entry entry_to_delete = new Entry(Table.getColumnTypeValue(cur_column_type, attrValue));
 
-        if (cur_column_index == cur_tb.getPrimaryIndex()) { // delete on primary key
+        if (cur_column_index == cur_tb.getPrimaryIndex()) { // delete on primary key\
+
+          // added for Ray start
+          Row temp_row = cur_tb.get(entry_to_delete);
+          ArrayList<Entry> entries = new ArrayList<>();
+          int it = 0;
+          for (Entry e : temp_row.getEntries()) {
+            entries.add(
+                    new Entry(Table.getColumnTypeValue(cur_columns.get(it).getType(), e.toString())));
+            ++it;
+          }
+          this.deleted_rows.add(new Row(entries));
+          // added for Ray end
+
           cur_tb.delete(entry_to_delete); // throw IllegalArgumentException, if key doesn't exist
         }
 
@@ -158,6 +180,18 @@ public class DeletePlan extends LogicalPlan {
           }
 
           for (Entry cur_entry : entries_to_delete) {
+            // added for Ray start
+            Row temp_row = cur_tb.get(cur_entry);
+            ArrayList<Entry> entries = new ArrayList<>();
+            int it = 0;
+            for (Entry e : temp_row.getEntries()) {
+              entries.add(
+                      new Entry(Table.getColumnTypeValue(cur_columns.get(it).getType(), e.toString())));
+              ++it;
+            }
+            this.deleted_rows.add(new Row(entries));
+            // added for Ray end
+
             cur_tb.delete(cur_entry); // maybe throw some error
           }
 
