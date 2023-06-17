@@ -37,11 +37,13 @@ public abstract class LogicalPlan {
     DELETE,
     UPDATE,
     SELECT,
+    ROLLBACK,
   }
 
-  public LinkedList<String> getLog(){
+  public LinkedList<String> getLog() {
     return null;
   }
+
   public abstract ExecuteStatementResp
       execute_plan(); // Plan execution abstract method, returns response
 

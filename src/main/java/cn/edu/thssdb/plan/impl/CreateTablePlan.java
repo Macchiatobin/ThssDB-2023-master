@@ -15,15 +15,14 @@ public class CreateTablePlan extends LogicalPlan {
   private List<Column> columns;
   private String stmt;
 
-
-  public CreateTablePlan(String tableName, List<Column> columnList,String stmt) {
+  public CreateTablePlan(String tableName, List<Column> columnList, String stmt) {
     super(LogicalPlanType.CREATE_TABLE);
     this.tableName = tableName;
     this.columns = columnList;
     this.stmt = stmt;
   }
 
-
+  @Override
   public ArrayList<String> getTableName() {
     return new ArrayList<>(Collections.singletonList(this.tableName));
   }
@@ -32,6 +31,7 @@ public class CreateTablePlan extends LogicalPlan {
   public LinkedList<String> getLog() {
     return new LinkedList<>(Arrays.asList(stmt));
   }
+
   public List<Column> getColumns() {
     return columns;
   }
