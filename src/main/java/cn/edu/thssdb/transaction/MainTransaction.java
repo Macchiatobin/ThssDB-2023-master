@@ -3,6 +3,7 @@ package cn.edu.thssdb.transaction;
 import cn.edu.thssdb.exception.NotExistsException;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
+import cn.edu.thssdb.schema.Logger;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
 import cn.edu.thssdb.utils.Global;
@@ -14,14 +15,17 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class MainTransaction {
   private Manager manager;
   private String databaseName;
+  private Logger logger; // 日志对象
+
   private LinkedList<LogicalPlan> planList;
   private LinkedList<ReentrantReadWriteLock.ReadLock> readLockLinkedList;
   private LinkedList<ReentrantReadWriteLock.WriteLock> writeLockLinkedList;
   private boolean checkTransaction = false;
 
-  public MainTransaction(String databaseName) {
+  public MainTransaction(String databaseName,Logger logger) {
     this.manager = Manager.getInstance();
     this.databaseName = databaseName;
+    this.logger = logger;
     this.planList = new LinkedList<>();
     this.readLockLinkedList = new LinkedList<>();
     this.writeLockLinkedList = new LinkedList<>();
@@ -54,7 +58,7 @@ public class MainTransaction {
       commitTransaction();
     }
     try {
-//      plan.execute_plan();
+      //      plan.execute_plan();
       checkTransaction = false;
     } catch (Exception e) {
       return new TransactionFlag(false, e.getMessage());
@@ -82,10 +86,14 @@ public class MainTransaction {
       throw new NotExistsException(1, "");
     }
     this.releaseTransactionReadWriteLock();
+    LinkedList<String> log = new LinkedList<>();
     while (!planList.isEmpty()) {
       LogicalPlan lp = planList.getFirst();
+      log.addAll(lp.getLog());
       planList.removeFirst();
     }
+    log.add("COMMIT");
+    logger.writeLines(log);
     checkTransaction = false;
     return new TransactionFlag(true, "Success");
   }
@@ -95,7 +103,7 @@ public class MainTransaction {
 
     if (Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.READ_UNCOMMITTED) {
       try {
-//        plan.execute_plan();
+        //        plan.execute_plan();
         checkTransaction = true;
       } catch (Exception e) {
         return new TransactionFlag(false, e.getMessage());
@@ -112,7 +120,7 @@ public class MainTransaction {
       }
 
       try {
-//        plan.execute_plan();
+        //        plan.execute_plan();
         checkTransaction = true;
       } catch (Exception e) {
         return new TransactionFlag(false, e.getMessage());
@@ -135,7 +143,7 @@ public class MainTransaction {
       }
 
       try {
-//        plan.execute_plan();
+        //        plan.execute_plan();
         checkTransaction = true;
       } catch (Exception e) {
         return new TransactionFlag(false, e.getMessage());
@@ -159,13 +167,13 @@ public class MainTransaction {
       }
 
       try {
-          System.out.println("Write Trans plan execute!");
-//          plan.execute_plan();
-          planList.add(plan);
-          checkTransaction = true;
-        } catch (Exception e) {
-          return new TransactionFlag(false, e.getMessage());
-        }
+        System.out.println("Write Trans plan execute!");
+        //          plan.execute_plan();
+        planList.add(plan);
+        checkTransaction = true;
+      } catch (Exception e) {
+        return new TransactionFlag(false, e.getMessage());
+      }
       return new TransactionFlag(true, "Success");
     }
 

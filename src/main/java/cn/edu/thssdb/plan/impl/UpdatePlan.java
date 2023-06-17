@@ -7,11 +7,13 @@ import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.type.ColumnType;
+import cn.edu.thssdb.utils.Pair;
 import cn.edu.thssdb.utils.StatusUtil;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static cn.edu.thssdb.utils.Global.*;
@@ -30,21 +32,16 @@ public class UpdatePlan extends LogicalPlan {
   private String tableName;
   int where_comparator;
 
-  public UpdatePlan(
-      String tableName,
-      String san,
-      String sav,
-      String wan,
-      String wav,
-      String comp) {
+  public UpdatePlan(String tableName, String san, String sav, String wan, String wav, String comp) {
     super(LogicalPlanType.UPDATE);
     this.tableName = tableName;
     this.set_attrName = san;
     this.set_attrValue = sav;
     this.where_attrName = wan;
     this.where_attrValue = wav;
-//    this.manager = manager;
-//    handler = new MySQLParser(manager);
+
+    //    this.manager = manager;
+    //    handler = new MySQLParser(manager);
 
     if (comp == "=") this.where_comparator = COMP_EQ;
     else if (comp == ">=") this.where_comparator = COMP_GE;

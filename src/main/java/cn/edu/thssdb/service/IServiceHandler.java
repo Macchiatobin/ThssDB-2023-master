@@ -163,7 +163,7 @@ public class IServiceHandler implements IService.Iface {
         System.out.println("Transaction!");
         Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         System.out.println("Begin Exec");
-        break;        //        return plan.execute_plan();
+        break; //        return plan.execute_plan();
 
         // TODO
 
@@ -175,8 +175,8 @@ public class IServiceHandler implements IService.Iface {
         Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         System.out.println("Commit Exec");
         break;
-//        return new ExecuteStatementResp(StatusUtil.success(), false);
-//                return plan.execute_plan();
+        //        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //                return plan.execute_plan();
 
         // TODO
 
@@ -188,7 +188,7 @@ public class IServiceHandler implements IService.Iface {
         Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         System.out.println("Insert Exec");
         break;
-//        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //        return new ExecuteStatementResp(StatusUtil.success(), false);
         //        return plan.execute_plan();
         //        if (!manager.transaction_sessions.contains(the_session)) {
         //          System.out.println(the_session);
@@ -211,7 +211,7 @@ public class IServiceHandler implements IService.Iface {
         Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         System.out.println("Delete Exec");
         break;
-//        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //        return new ExecuteStatementResp(StatusUtil.success(), false);
         //        return plan.execute_plan();
 
         //      if (!manager.transaction_sessions.contains(the_session)) {
@@ -233,7 +233,7 @@ public class IServiceHandler implements IService.Iface {
         Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         System.out.println("Update Exec");
         break;
-//        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //        return new ExecuteStatementResp(StatusUtil.success(), false);
         //        return plan.execute_plan();
 
         //        if (!manager.transaction_sessions.contains(the_session)) {
@@ -256,7 +256,7 @@ public class IServiceHandler implements IService.Iface {
         Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         System.out.println("Select Exec");
         break;
-//        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //        return new ExecuteStatementResp(StatusUtil.success(), false);
         //        return plan.execute_plan();
 
         //        if (!manager.transaction_sessions.contains(the_session)) {

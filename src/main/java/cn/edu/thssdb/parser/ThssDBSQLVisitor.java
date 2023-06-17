@@ -27,6 +27,10 @@ import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.sql.SQLBaseVisitor;
 import cn.edu.thssdb.sql.SQLParser;
 import cn.edu.thssdb.type.ColumnType;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +44,18 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
   public ThssDBSQLVisitor() {
     super();
+  }
+
+  public String getFullText(ParseTree tree) {
+    ParserRuleContext context = (ParserRuleContext) tree;
+    if (context.children == null) {
+      return "";
+    }
+    Token startToken = context.start;
+    Token stopToken = context.stop;
+    Interval interval = new Interval(startToken.getStartIndex(), stopToken.getStopIndex());
+    String result = context.start.getInputStream().getText(interval);
+    return result;
   }
 
   @Override
@@ -102,7 +118,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
         }
       }
     }
-    return new CreateTablePlan(tableName, columns);
+    return new CreateTablePlan(tableName, columns,getFullText(ctx));
   }
 
   @Override
@@ -192,12 +208,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     String comparator = condition.comparator().getText();
 
     return new UpdatePlan(
-        tableName,
-        set_column_name,
-        set_attr_value,
-        where_attr_name,
-        where_attr_value,
-        comparator);
+        tableName, set_column_name, set_attr_value, where_attr_name, where_attr_value, comparator);
   }
 
   @Override

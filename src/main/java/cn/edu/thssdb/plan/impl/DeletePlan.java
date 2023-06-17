@@ -11,6 +11,7 @@ import cn.edu.thssdb.utils.StatusUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import static cn.edu.thssdb.utils.Global.*;
@@ -20,21 +21,20 @@ public class DeletePlan extends LogicalPlan {
   public static MySQLParser handler;
   ArrayList<QueryResult> the_result;
   ArrayList<QueryResult> result = new ArrayList<>();
-
+  private int primaryIndex;
   private String attrName;
   private String attrValue;
   private String tableName;
 
   private int comparator; // from GLOBAL.COMP_...
 
-  public DeletePlan(
-      String tableName, String attrname, String attrvalue, String comp) {
+  public DeletePlan(String tableName, String attrname, String attrvalue, String comp) {
     super(LogicalPlanType.DELETE);
     this.tableName = tableName;
     this.attrName = attrname; // condition attribute name
     this.attrValue = attrvalue; // condition attribute value
-//    this.manager = manager;
-//    handler = new MySQLParser(manager);
+    //    this.manager = manager;
+    //    handler = new MySQLParser(manager);
 
     if (comp == "=") this.comparator = COMP_EQ;
     else if (comp == ">=") this.comparator = COMP_GE;
@@ -45,6 +45,17 @@ public class DeletePlan extends LogicalPlan {
     else this.comparator = 6; // unknown
 
     // it seems always do: delete where some_name = some_value;
+  }
+
+  public LinkedList<String> getLog(){
+    LinkedList<String> log = new LinkedList<>();
+    Database cur_db = manager.getCurDB();
+    Table cur_tb = cur_db.getTable(tableName);
+    primaryIndex = cur_tb.getPrimaryIndex();
+    for(Row row: rowsHasDelete){
+      log.add("DELETE " + tableName + " " + row.getEntries().get(primaryIndex).toString());
+    }
+    return log;
   }
 
   @Override
@@ -144,6 +155,7 @@ public class DeletePlan extends LogicalPlan {
 
       if (cur_column_index == cur_tb.getPrimaryIndex()) { // delete on primary key
         cur_tb.delete(entry_to_delete); // throw IllegalArgumentException, if key doesn't exist
+
       } else { // delete on non-primary key
         Iterator<Row> iterator = cur_tb.iterator();
         ArrayList<Entry> entries_to_delete = new ArrayList<>(); // key entries to delete
