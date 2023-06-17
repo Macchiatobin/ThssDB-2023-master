@@ -29,8 +29,7 @@ public class Database implements Serializable {
   private String path;
   private String metaPath;
   private MainTransaction transactionManager; // 事务管理
-  private Logger logger;                      // 日志管理
-
+  private Logger logger; // 日志管理
 
   public Database(String name) {
     this.name = name;
@@ -186,7 +185,6 @@ public class Database implements Serializable {
             tables.put(
                 info.getTableName(), new Table(this.name, info.getTableName(), array, false));
           }
-          logRecover();
         }
       } catch (EOFException e) { // when some database got no table in it, no error!
         System.out.println("Empty database:" + this.name + ", this is no error!");
@@ -206,28 +204,29 @@ public class Database implements Serializable {
         throw new FileException(FileException.Create, metaFile.getName());
       }
     }
+    logRecover();
   }
 
   public void logRecover() {
     try {
       ArrayList<String> logs = this.logger.readLog();
-      for (String log: logs) {
-        String [] info = log.split(" ");
+      for (String log : logs) {
+        String[] info = log.split(" ");
         String type = info[0];
-        if (type.equals("DELETE")) {
-          tables.get(info[1]).delete(info[2]);
-        } else if (type.equals("INSERT")) {
-          tables.get(info[1]).insert(info[2]);
-        } else if (!type.equals("COMMIT")) {
+//        if (type.equals("DELETE")) {
+//          tables.get(info[1]).delete(info[2]);
+//        } else if (type.equals("INSERT")) {
+//          tables.get(info[1]).insert(info[2]);
+//        } else if (!type.equals("COMMIT")) {
           ArrayList<LogicalPlan> operations = MySQLParser.getOperations(log);
-          for (LogicalPlan op: operations) {
+          for (LogicalPlan op : operations) {
             try {
               op.execute_plan();
             } catch (Exception e) {
             }
           }
         }
-      }
+//      }
     } catch (Exception e) {
       throw new CustomIOException();
     }

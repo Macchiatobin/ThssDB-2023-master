@@ -9,6 +9,7 @@ import cn.edu.thssdb.schema.Table;
 import cn.edu.thssdb.utils.Global;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -16,19 +17,21 @@ public class MainTransaction {
   private Manager manager;
   private String databaseName;
   private Logger logger; // 日志对象
+  private ReentrantReadWriteLock transactionLock;
 
+  private HashMap<String, ReentrantReadWriteLock.ReadLock> readLocks;
+  private HashMap<String, ReentrantReadWriteLock.WriteLock> writeLocks;
   private LinkedList<LogicalPlan> planList;
-  private LinkedList<ReentrantReadWriteLock.ReadLock> readLockLinkedList;
-  private LinkedList<ReentrantReadWriteLock.WriteLock> writeLockLinkedList;
   private boolean checkTransaction = false;
 
-  public MainTransaction(String databaseName,Logger logger) {
+  public MainTransaction(String databaseName, Logger logger) {
     this.manager = Manager.getInstance();
     this.databaseName = databaseName;
     this.logger = logger;
+    this.transactionLock = new ReentrantReadWriteLock();
+    this.readLocks = new HashMap<>();
+    this.writeLocks = new HashMap<>();
     this.planList = new LinkedList<>();
-    this.readLockLinkedList = new LinkedList<>();
-    this.writeLockLinkedList = new LinkedList<>();
   }
 
   public TransactionFlag exec(LogicalPlan plan) {
@@ -37,8 +40,8 @@ public class MainTransaction {
       System.out.println("Trans Select");
       return readTransaction(plan);
     } else if (plan instanceof UpdatePlan
-        || plan instanceof DeletePlan
-        || plan instanceof InsertPlan) {
+            || plan instanceof DeletePlan
+            || plan instanceof InsertPlan) {
       System.out.println("Trans I?U?D");
       return writeTransaction(plan);
     } else if (plan instanceof CommitPlan) {
@@ -49,21 +52,31 @@ public class MainTransaction {
       return beginTransaction();
     } else {
       System.out.println("Unknown");
-      return endTransaction(plan);
+      return null;
     }
   }
 
-  private TransactionFlag endTransaction(LogicalPlan plan) {
-    if (checkTransaction) {
-      commitTransaction();
+  public TransactionFlag exec(LogicalPlan plan, LinkedList<String> log) {
+    System.out.println("Main Transaction Plan:" + plan);
+    logger.writeLines(log);
+    if (plan instanceof SelectPlan) {
+      System.out.println("Trans Select");
+      return readTransaction(plan);
+    } else if (plan instanceof UpdatePlan
+            || plan instanceof DeletePlan
+            || plan instanceof InsertPlan) {
+      System.out.println("Trans I?U?D");
+      return writeTransaction(plan);
+    } else if (plan instanceof CommitPlan) {
+      System.out.println("Trans Commit");
+      return commitTransaction();
+    } else if (plan instanceof BeginTransactionPlan) {
+      System.out.println("Trans Begin");
+      return beginTransaction();
+    } else {
+      System.out.println("Unknown");
+      return null;
     }
-    try {
-      //      plan.execute_plan();
-      checkTransaction = false;
-    } catch (Exception e) {
-      return new TransactionFlag(false, e.getMessage());
-    }
-    return new TransactionFlag(true, "Success");
   }
 
   private TransactionFlag beginTransaction() {
@@ -76,7 +89,7 @@ public class MainTransaction {
     } else {
       checkTransaction = true;
       LinkedList<String> log = new LinkedList<>();
-      log.add("Begin Transaction");
+      log.add("BEGIN TRANSACTION");
       logger.writeLines(log);
       return new TransactionFlag(true, "Success");
     }
@@ -88,160 +101,117 @@ public class MainTransaction {
     if (databaseName == null) {
       throw new NotExistsException(1, "");
     }
-    this.releaseTransactionReadWriteLock();
-    LinkedList<String> log = new LinkedList<>();
-    while (!planList.isEmpty()) {
-      LogicalPlan lp = planList.getFirst();
-      log.addAll(lp.getLog());
-      planList.removeFirst();
+
+    try {
+      transactionLock.writeLock().lock();
+      LinkedList<String> log = new LinkedList<>();
+      while (!planList.isEmpty()) {
+        LogicalPlan lp = planList.getFirst();
+        // log.addAll(lp.getLog());
+        planList.removeFirst();
+      }
+      log.add("COMMIT");
+      logger.writeLines(log);
+      checkTransaction = false;
+      return new TransactionFlag(true, "Success");
+    } catch (NullPointerException e) {
+      return new TransactionFlag(false, "No pending operations to commit");
+    } finally {
+      transactionLock.writeLock().unlock();
+      releaseAllLocks();
     }
-    log.add("Commit");
-    logger.writeLines(log);
-    checkTransaction = false;
-    return new TransactionFlag(true, "Success");
   }
 
   private TransactionFlag readTransaction(LogicalPlan plan) {
     System.out.println("readT check:" + checkTransaction);
 
-    if (Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.READ_UNCOMMITTED) {
-      try {
-        //        plan.execute_plan();
-        checkTransaction = true;
-      } catch (Exception e) {
-        return new TransactionFlag(false, e.getMessage());
+    try {
+      transactionLock.readLock().lock();
+
+      if (checkTransaction) {
+        return new TransactionFlag(false, "Other transaction is in progress");
       }
+
+      // Check if there are any pending write operations in the planList
+      if (!planList.isEmpty()) {
+        return new TransactionFlag(false, "Pending write operations, cannot read");
+      }
+
+      String tableName = String.valueOf(plan.getTableName()); // 获取表名
+      System.out.println("read tableName e:" + tableName);
+      ReentrantReadWriteLock.ReadLock readLock = getReadLock(tableName);
+      System.out.println("read readLock e:" + readLock);
+
+
+      readLock.lock(); // 加读锁
       return new TransactionFlag(true, "Success");
+    } catch (Exception e) {
+      System.out.println("readT e:" + e);
+      return new TransactionFlag(false, e.getMessage());
+    } finally {
+      transactionLock.readLock().unlock();
     }
-
-    if (Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.READ_COMMITTED) {
-      ArrayList<String> tableName = plan.getTableName();
-      if (tableName != null) {
-        for (String tmp_tableName : tableName) {
-          this.getTransactionReadLock(tmp_tableName);
-        }
-      }
-
-      try {
-        //        plan.execute_plan();
-        checkTransaction = true;
-      } catch (Exception e) {
-        return new TransactionFlag(false, e.getMessage());
-      }
-
-      if (tableName != null) {
-        for (String tmp_tableName : tableName) {
-          this.releaseTransactionReadLock(tmp_tableName);
-        }
-      }
-      return new TransactionFlag(true, "Success");
-    }
-
-    if (Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.SERIALIZABLE) {
-      ArrayList<String> tableName = plan.getTableName();
-      if (tableName != null) {
-        for (String tmp_tableName : tableName) {
-          this.getTransactionReadLock(tmp_tableName);
-        }
-      }
-
-      try {
-        //        plan.execute_plan();
-        checkTransaction = true;
-      } catch (Exception e) {
-        return new TransactionFlag(false, e.getMessage());
-      }
-      return new TransactionFlag(true, "Success");
-    }
-    return new TransactionFlag(false, "Failure cause ISOLATION_LEVEL error");
   }
 
   private TransactionFlag writeTransaction(LogicalPlan plan) {
     System.out.println("writeT check:" + checkTransaction);
 
-    if ((Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.READ_COMMITTED)
-        || (Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.READ_UNCOMMITTED)
-        || (Global.DATABASE_ISOLATION_LEVEL == Global.ISOLATION_LEVEL.SERIALIZABLE)) {
-      ArrayList<String> tableName = plan.getTableName();
-      if (tableName != null) {
-        for (String tmp_tableName : tableName) {
-          this.getTransactionWriteLock(tmp_tableName);
-        }
-      }
+    try {
+      transactionLock.writeLock().lock();
+      String tableName = String.valueOf(plan.getTableName()); // 获取表名
+      System.out.println("write tableName e:" + tableName);
 
-      try {
-        System.out.println("Write Trans plan execute!");
-        //          plan.execute_plan();
-        System.out.println("Plan: " + plan);
-        planList.add(plan);
-        checkTransaction = true;
-      } catch (Exception e) {
-        return new TransactionFlag(false, e.getMessage());
-      }
+      ReentrantReadWriteLock.WriteLock writeLock = getWriteLock(tableName);
+      System.out.println("write writeLock e:" + writeLock);
+
+
+      writeLock.lock(); // 加写锁
+      planList.add(plan);
+      checkTransaction = true;
       return new TransactionFlag(true, "Success");
+    } catch (Exception e) {
+      System.out.println("writeT e:" + e);
+      return new TransactionFlag(false, e.getMessage());
+    } finally {
+      transactionLock.writeLock().unlock();
     }
-
-    return new TransactionFlag(false, "Failure cause ISOLATION_LEVEL error");
   }
 
-  private void getTransactionReadLock(String tableName) {
-    if (!Global.ISOLATION_STATUS) {
-      return;
+  private ReentrantReadWriteLock.ReadLock getReadLock(String tableName) {
+    if (!readLocks.containsKey(tableName)) {
+      Table table = manager.getCurDB().getTable(tableName);
+      System.out.println("1---WriteLock:" + tableName);
+
+      ReentrantReadWriteLock lock = table.getLock();
+      System.out.println("2---WriteLock:" + tableName);
+
+      readLocks.put(tableName, lock.readLock());
     }
-    Table table = manager.getCurDB().getTable(tableName);
-    if (table == null) {
-      return;
-    }
-    ReentrantReadWriteLock.ReadLock readLock = table.lock.readLock();
-    readLock.lock();
-    readLockLinkedList.add(readLock);
+    return readLocks.get(tableName);
   }
 
-  private void getTransactionWriteLock(String tableName) {
-    if (!Global.ISOLATION_STATUS) {
-      return;
+  private ReentrantReadWriteLock.WriteLock getWriteLock(String tableName) {
+    if (!writeLocks.containsKey(tableName)) {
+      Table table = manager.getCurDB().getTable(tableName);
+      System.out.println("1---WriteLock:" + tableName);
+
+      ReentrantReadWriteLock lock = table.getLock();
+      System.out.println("2---WriteLock:" + tableName);
+
+      writeLocks.put(tableName, lock.writeLock());
     }
-    Table table = manager.getCurDB().getTable(tableName);
-    if (table == null) {
-      return;
-    }
-    ReentrantReadWriteLock.WriteLock writeLock = table.lock.writeLock();
-    if (!writeLock.tryLock()) {
-      while (true) {
-        if (!this.releaseTransactionReadLock(tableName)) {
-          break;
-        }
-      }
-      writeLock.lock();
-    }
-    writeLockLinkedList.add(writeLock);
+    return writeLocks.get(tableName);
   }
 
-  private boolean releaseTransactionReadLock(String tableName) {
-    if (!Global.ISOLATION_STATUS) {
-      return true;
-    }
-    Table table = manager.getCurDB().getTable(tableName);
-    if (table == null) {
-      return false;
-    }
-    ReentrantReadWriteLock.ReadLock readLock = table.lock.readLock();
-    if (readLockLinkedList.remove(readLock)) {
+
+  private void releaseAllLocks() {
+    for (ReentrantReadWriteLock.ReadLock readLock : readLocks.values()) {
       readLock.unlock();
-      return true;
     }
-    return false;
-  }
-
-  private void releaseTransactionReadWriteLock() {
-    if (!Global.ISOLATION_STATUS) {
-      return;
+    for (ReentrantReadWriteLock.WriteLock writeLock : writeLocks.values()) {
+      writeLock.unlock();
     }
-    while (!writeLockLinkedList.isEmpty()) {
-      writeLockLinkedList.remove().unlock();
-    }
-    while (!readLockLinkedList.isEmpty()) {
-      readLockLinkedList.remove().unlock();
-    }
+    readLocks.clear();
+    writeLocks.clear();
   }
 }

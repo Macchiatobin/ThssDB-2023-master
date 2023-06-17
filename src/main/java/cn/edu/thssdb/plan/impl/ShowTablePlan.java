@@ -15,6 +15,7 @@ public class ShowTablePlan extends LogicalPlan {
     this.tableName = tableName;
   }
 
+  @Override
   public ArrayList<String> getTableName() {
     return new ArrayList<>(Collections.singletonList(this.tableName));
   }

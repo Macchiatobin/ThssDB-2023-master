@@ -31,7 +31,8 @@ public class MySQLParser {
     ArrayList res;
     try {
       ThssDBSQLVisitor visitor = new ThssDBSQLVisitor();
-      LogicalPlan logicalPlan = (LogicalPlan) visitor.visit(parser.parse()); // Retrieve the LogicalPlan object
+      LogicalPlan logicalPlan =
+          (LogicalPlan) visitor.visit(parser.parse()); // Retrieve the LogicalPlan object
       res = new ArrayList<>(); // Create a new ArrayList
       res.add(logicalPlan); // Add the LogicalPlan object to the ArrayList
     } catch (Exception e) {

@@ -17,7 +17,7 @@ import static cn.edu.thssdb.type.ColumnType.*;
 import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Table implements Iterable<Row>, Serializable {
-  public transient ReentrantReadWriteLock lock;
+  public ReentrantReadWriteLock lock;
   private String databaseName;
   public String tableName;
   public ArrayList<Column> columns;
@@ -61,6 +61,11 @@ public class Table implements Iterable<Row>, Serializable {
     }
   }
 
+  public ReentrantReadWriteLock getLock() {
+    System.out.println("TABLE LOCK:" + lock);
+    return lock;
+  }
+
   public int getPrimaryIndex() {
     return primaryIndex;
   }
@@ -68,8 +73,8 @@ public class Table implements Iterable<Row>, Serializable {
   // GET Row (Used when update)
   public Row get(Entry entry) {
     Row result = null;
-    lock.readLock().lock();
     try {
+      lock.readLock().lock();
       result = index.get(entry);
     } catch (Exception e) { // key not exists
       return null;
@@ -81,8 +86,8 @@ public class Table implements Iterable<Row>, Serializable {
 
   // INSERT Row
   public void insert(Row row) {
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       Entry key = row.getEntries().get(primaryIndex);
       index.put(key, row);
       serialize();
@@ -107,8 +112,8 @@ public class Table implements Iterable<Row>, Serializable {
   // INSERT String
   public void insert(String val) {
     // TODO
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       String[] tmp = val.split(",");
       ArrayList<Entry> entries = new ArrayList<>();
       int i = 0;
@@ -128,8 +133,8 @@ public class Table implements Iterable<Row>, Serializable {
   // DELETE Row
   public void delete(Row row) {
     // TODO
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       Entry key = row.getEntries().get(primaryIndex);
       index.remove(key);
       serialize();
@@ -143,8 +148,8 @@ public class Table implements Iterable<Row>, Serializable {
   // DELETE Entry
   public void delete(Entry entry) {
     // TODO
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       index.remove(entry);
       serialize();
     } catch (Exception e) {
@@ -156,8 +161,8 @@ public class Table implements Iterable<Row>, Serializable {
 
   // DELETE String
   public void delete(String val) {
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       ColumnType columnType = columns.get(primaryIndex).getType();
       Entry primaryEntry = new Entry(getColumnTypeValue(columnType, val));
       index.remove(primaryEntry);
@@ -171,8 +176,8 @@ public class Table implements Iterable<Row>, Serializable {
 
   // DELETE All Row
   public void delete() {
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       index.clear();
       index = new BPlusTree<>();
       serialize();
@@ -184,8 +189,8 @@ public class Table implements Iterable<Row>, Serializable {
   }
 
   public void update(Row oldRow, Row newRow) { // simple implementation
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       delete(oldRow);
       insert(newRow);
       serialize();
@@ -208,9 +213,9 @@ public class Table implements Iterable<Row>, Serializable {
       }
     }
 
-    lock.writeLock().lock();
     try (ObjectOutputStream objectOutputStream =
         new ObjectOutputStream(new FileOutputStream(meta_file)); ) {
+      lock.writeLock().lock();
       objectOutputStream.writeObject(this);
     } catch (Exception e) {
       System.out.println(e);
@@ -223,9 +228,9 @@ public class Table implements Iterable<Row>, Serializable {
     File meta_file = new File(this.metaPath);
     if (!meta_file.exists()) return; // no file, nothing to recover
 
-    lock.writeLock().lock();
     try (ObjectInputStream objectInputStream =
         new ObjectInputStream(new FileInputStream(meta_file)); ) {
+      lock.writeLock().lock();
       Table restored = (Table) objectInputStream.readObject();
 
       if (restored != null) {
