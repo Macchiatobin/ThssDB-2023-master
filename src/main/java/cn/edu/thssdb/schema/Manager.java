@@ -62,8 +62,8 @@ public class Manager implements Serializable {
 
   public void deleteDatabase(String databaseName) {
     // v1 done
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       if (databases.get(databaseName) == null)
         throw new NotExistsException(NotExistsException.Database, databaseName);
       databases.remove(databaseName);
@@ -78,8 +78,8 @@ public class Manager implements Serializable {
   public void switchDatabase(String databaseName) {
     /* TODO */
     // v1 done
-    lock.readLock().lock();
     try {
+      lock.readLock().lock();
       if (!databases.containsKey(databaseName))
         throw new NotExistsException(NotExistsException.Database, databaseName);
       curDB = getDB(databaseName);
@@ -156,21 +156,21 @@ public class Manager implements Serializable {
   }
 
   // 恢复机制 Log
-//    public void writeLog(String statement) {
-//      Database current_base = getCurDB();
-//      String database_name = current_base.getName();
-//      String filename = DATA_DIR + database_name + ".log";
-//      System.out.println("Log File: " + filename);
-//      try {
-//        FileWriter writer = new FileWriter(filename, true);
-//        System.out.println("Log File Create Success: " + filename);
-//        System.out.println(statement);
-//        writer.write(statement + "\n");
-//        writer.close();
-//      } catch (IOException e) {
-//        e.printStackTrace();
-//      }
-//    }
+  //    public void writeLog(String statement) {
+  //      Database current_base = getCurDB();
+  //      String database_name = current_base.getName();
+  //      String filename = DATA_DIR + database_name + ".log";
+  //      System.out.println("Log File: " + filename);
+  //      try {
+  //        FileWriter writer = new FileWriter(filename, true);
+  //        System.out.println("Log File Create Success: " + filename);
+  //        System.out.println(statement);
+  //        writer.write(statement + "\n");
+  //        writer.close();
+  //      } catch (IOException e) {
+  //        e.printStackTrace();
+  //      }
+  //    }
   //
   //  public void readLog(String database_name) {
   //

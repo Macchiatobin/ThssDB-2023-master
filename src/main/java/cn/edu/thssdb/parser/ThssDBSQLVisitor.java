@@ -118,7 +118,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
         }
       }
     }
-    return new CreateTablePlan(tableName, columns,getFullText(ctx));
+    return new CreateTablePlan(tableName, columns, getFullText(ctx));
   }
 
   @Override

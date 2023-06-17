@@ -24,7 +24,6 @@ public class InsertPlan extends LogicalPlan {
   ArrayList<QueryResult> result = new ArrayList<>();
   private ArrayList<Row> rowsHasInsert;
 
-
   private String tableName;
   private List<String> columnNames;
   private List<String> entryValues;
@@ -40,6 +39,7 @@ public class InsertPlan extends LogicalPlan {
     //    handler = new MySQLParser(manager);
   }
 
+  @Override
   public ArrayList<String> getTableName() {
     return new ArrayList<>(Collections.singletonList(this.tableName));
   }
@@ -135,7 +135,6 @@ public class InsertPlan extends LogicalPlan {
       }
     }
     Row rowToInsert = new Row(entries);
-
 
     // Transaction Lock
     //    if (!manager.transaction_sessions.contains(the_session)) {

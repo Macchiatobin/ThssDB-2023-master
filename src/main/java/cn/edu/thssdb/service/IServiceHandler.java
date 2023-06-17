@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static cn.edu.thssdb.utils.Global.DATA_DIR;
@@ -181,11 +182,21 @@ public class IServiceHandler implements IService.Iface {
         // TODO
 
       case INSERT:
+        LinkedList<String> log_insert = new LinkedList<>();
+        String command_full_insert = req.statement;
+        String[] commands_insert = command_full_insert.split(";");
+        for (String command : commands_insert) {
+          command = command.trim();
+          System.out.println("Command: " + command);
+          log_insert.add(command);
+        }
+
+
         System.out.println("INSERT");
         System.out.println("[DEBUG] " + plan);
         //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan,log_insert);
         System.out.println("Insert Exec");
         break;
         //        return new ExecuteStatementResp(StatusUtil.success(), false);
@@ -204,11 +215,19 @@ public class IServiceHandler implements IService.Iface {
         //        }
 
       case DELETE:
+        LinkedList<String> log_delete = new LinkedList<>();
+        String command_full_delete = req.statement;
+        String[] commands_delete = command_full_delete.split(";");
+        for (String command : commands_delete) {
+          command = command.trim();
+          System.out.println("Command: " + command);
+          log_delete.add(command);
+        }
         System.out.println("DELETE");
         System.out.println("[DEBUG] " + plan);
         //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan,log_delete);
         System.out.println("Delete Exec");
         break;
         //        return new ExecuteStatementResp(StatusUtil.success(), false);
@@ -226,11 +245,19 @@ public class IServiceHandler implements IService.Iface {
         //        }
 
       case UPDATE:
+        LinkedList<String> log_update = new LinkedList<>();
+        String command_full_update = req.statement;
+        String[] commands_update = command_full_update.split(";");
+        for (String command : commands_update) {
+          command = command.trim();
+          System.out.println("Command: " + command);
+          log_update.add(command);
+        }
         System.out.println("UPDATE");
         System.out.println("[DEBUG] " + plan);
         //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan,log_update);
         System.out.println("Update Exec");
         break;
         //        return new ExecuteStatementResp(StatusUtil.success(), false);
