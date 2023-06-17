@@ -28,6 +28,11 @@ public class UpdatePlan extends LogicalPlan {
   private String where_attrName;
   private String where_attrValue;
   private String tableName;
+
+  // added for Ray start
+  private Row original_row;
+  private Row updated_row;
+  // added for Ray end
   int where_comparator;
 
   public UpdatePlan(
@@ -161,10 +166,22 @@ public class UpdatePlan extends LogicalPlan {
         Entry entry_to_delete =
             new Entry(Table.getColumnTypeValue(where_column_type, where_attrValue));
         Row old_row = cur_tb.get(entry_to_delete); // get old row
+
+        // added for Ray start
+        ArrayList<Entry> old_entries = new ArrayList<>();
+        int it = 0;
+        for (Entry e : old_row.getEntries()) {
+          old_entries.add(
+                  new Entry(Table.getColumnTypeValue(cur_columns.get(it).getType(), e.toString())));
+          ++it;
+        }
+        this.original_row = new Row(old_entries);
+        // added for Ray end
+
         ArrayList<Entry> entries = old_row.getEntries();
 
         ArrayList<Entry> new_entries = new ArrayList<>();
-        int it = 0;
+        it = 0;
         for (Entry e : entries) { // copy into new entry
           new_entries.add(
               new Entry(Table.getColumnTypeValue(cur_columns.get(it).getType(), e.toString())));
@@ -176,6 +193,10 @@ public class UpdatePlan extends LogicalPlan {
 
         // create new row with modified entries
         Row new_row = new Row(new_entries);
+
+        // added for Ray start
+        this.updated_row = new_row;
+        // added for Ray end
 
         cur_tb.update(old_row, new_row);
 
