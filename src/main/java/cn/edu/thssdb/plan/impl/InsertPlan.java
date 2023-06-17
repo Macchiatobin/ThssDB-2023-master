@@ -34,7 +34,7 @@ public class InsertPlan extends LogicalPlan {
     this.tableName = tableName;
     this.columnNames = columnList;
     this.entryValues = entryList;
-    rowsHasInsert = new ArrayList<>();
+    this.rowsHasInsert = new ArrayList<>();
 
     //    this.manager = manager;
     //    handler = new MySQLParser(manager);
@@ -73,7 +73,7 @@ public class InsertPlan extends LogicalPlan {
   public LinkedList<String> getLog() {
     LinkedList<String> log = new LinkedList<>();
     for (Row row : rowsHasInsert) {
-      log.add("INSERT " + tableName + " " + row.toString());
+      log.add("INSERT INTO " + tableName + " VALUES " + "(" + row.toString() + ")");
     }
     return log;
   }
@@ -197,7 +197,7 @@ public class InsertPlan extends LogicalPlan {
     //    } else {
     try {
       dbForInsert.getTable(tableName).insert(rowToInsert);
-      rowsHasInsert.add(rowToInsert);
+      this.rowsHasInsert.add(rowToInsert);
 
     } catch (DuplicateKeyException e) {
       return new ExecuteStatementResp(StatusUtil.fail(e.getMessage()), false);

@@ -151,7 +151,7 @@ public class Database implements Serializable {
   }
 
   private void recover() { // read from file, when create
-    transactionManager = new MainTransaction(name,null);
+    transactionManager = new MainTransaction(name, getLogger());
     File dbFolder = new File(this.path);
     if (!dbFolder.exists()) // Create Folder, if first create
     {

@@ -12,6 +12,7 @@ import cn.edu.thssdb.utils.StatusUtil;
 import javax.management.openmbean.KeyAlreadyExistsException;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static cn.edu.thssdb.utils.Global.*;
@@ -19,9 +20,9 @@ import static cn.edu.thssdb.utils.Global.COMP_NE;
 
 public class UpdatePlan extends LogicalPlan {
   private Manager manager;
-  public static MySQLParser handler;
-  ArrayList<QueryResult> the_result;
-  ArrayList<QueryResult> result = new ArrayList<>();
+//  public static MySQLParser handler;
+//  ArrayList<QueryResult> the_result;
+//  ArrayList<QueryResult> result = new ArrayList<>();
 
   private String set_attrName;
   private String set_attrValue;
@@ -32,6 +33,7 @@ public class UpdatePlan extends LogicalPlan {
   // added for Ray start
   private Row original_row;
   private Row updated_row;
+
   // added for Ray end
   int where_comparator;
 
@@ -41,16 +43,15 @@ public class UpdatePlan extends LogicalPlan {
       String sav,
       String wan,
       String wav,
-      String comp,
-      Manager manager) {
+      String comp) {
     super(LogicalPlanType.UPDATE);
     this.tableName = tableName;
     this.set_attrName = san;
     this.set_attrValue = sav;
     this.where_attrName = wan;
     this.where_attrValue = wav;
-    this.manager = manager;
-    handler = new MySQLParser(manager);
+    this.manager = Manager.getInstance();
+//    handler = new MySQLParser(manager);
 
     if (comp == "=") this.where_comparator = COMP_EQ;
     else if (comp == ">=") this.where_comparator = COMP_GE;
@@ -68,73 +69,85 @@ public class UpdatePlan extends LogicalPlan {
     return "UpdatePlan";
   } // TODO
 
-  @Override
-  public ExecuteStatementResp execute_plan() {
-    return null;
+//  @Override
+//  public ExecuteStatementResp execute_plan(long the_session) {
+//    return null;
+//  }
+
+  public LinkedList<String> getLog() {
+    LinkedList<String> deleteLog = new LinkedList<>();
+    Database cur_db = Manager.getInstance().getCurDB();
+    Table cur_tb = cur_db.getTable(tableName);
+    int primaryIndex = cur_tb.getPrimaryIndex();
+    System.out.println("Original Row: " + original_row + " Updated Row:" + updated_row);
+    deleteLog.add("DELETE FROM " + tableName + " " + original_row.getEntries().get(primaryIndex).toString());
+    deleteLog.add("INSERT INTO " + tableName + " VALUES " + "(" + updated_row.toString() + ")");
+    System.out.println("Delete Log: " + deleteLog);
+    return deleteLog;
   }
 
   @Override
-  public ExecuteStatementResp execute_plan(long the_session) {
+  public ExecuteStatementResp execute_plan() {
     Manager manager = Manager.getInstance();
     Database cur_db = manager.getCurDB();
     // Transaction Lock
-    if (!manager.transaction_sessions.contains(the_session)) {
-      System.out.println("Auto Commit:" + the_session);
-      System.out.println(!manager.transaction_sessions.contains(the_session));
-      handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
-      the_result = handler.evaluate("UPDATE", the_session);
-      result.addAll(the_result);
-      handler.evaluate("AUTO COMMIT", the_session);
-
-    } else {
-      System.out.println("Commit:" + the_session);
-      System.out.println(!manager.transaction_sessions.contains(the_session));
-      the_result = handler.evaluate("UPDATE", the_session);
-      result.addAll(the_result);
-    }
-    long session = 0;
-
-    if (manager.transaction_sessions.contains(session)) {
-      Table the_table = cur_db.getTable(tableName);
-      while (true) {
-        if (!manager.lockTransactionList.contains(session)) // 新加入一个session
-        {
-          int get_lock = the_table.acquireWriteLock(session);
-          if (get_lock != -1) {
-            if (get_lock == 1) {
-              ArrayList<String> tmp = manager.writeLockMap.get(session);
-              tmp.add(tableName);
-              manager.writeLockMap.put(session, tmp);
-            }
-            break;
-          } else {
-            manager.lockTransactionList.add(session);
-          }
-        } else // 之前等待的session
-        {
-          if (manager.lockTransactionList.get(0) == session) // 只查看阻塞队列开头session
-          {
-            int get_lock = the_table.acquireWriteLock(session);
-            if (get_lock != -1) {
-              if (get_lock == 1) {
-                ArrayList<String> tmp = manager.writeLockMap.get(session);
-                tmp.add(tableName);
-                manager.writeLockMap.put(session, tmp);
-              }
-              manager.lockTransactionList.remove(0);
-              break;
-            }
-          }
-        }
-        try {
-          // System.out.print("session: "+session+": ");
-          // System.out.println(manager.session_queue);
-          Thread.sleep(500); // 休眠3秒
-        } catch (Exception e) {
-          System.out.println("Got an exception!");
-        }
-      }
-    } else {
+//    if (!manager.transaction_sessions.contains(the_session)) {
+//      System.out.println("Auto Commit:" + the_session);
+//      System.out.println(!manager.transaction_sessions.contains(the_session));
+//      handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+//      the_result = handler.evaluate("UPDATE", the_session);
+//      result.addAll(the_result);
+//      handler.evaluate("AUTO COMMIT", the_session);
+//
+//    } else {
+//      System.out.println("Commit:" + the_session);
+//      System.out.println(!manager.transaction_sessions.contains(the_session));
+//      the_result = handler.evaluate("UPDATE", the_session);
+//      result.addAll(the_result);
+//    }
+//    long session = 0;
+//
+//    if (manager.transaction_sessions.contains(session)) {
+//      Table the_table = cur_db.getTable(tableName);
+//      while (true) {
+//        if (!manager.lockTransactionList.contains(session)) // 新加入一个session
+//        {
+//          int get_lock = the_table.acquireWriteLock(session);
+//          if (get_lock != -1) {
+//            if (get_lock == 1) {
+//              ArrayList<String> tmp = manager.writeLockMap.get(session);
+//              tmp.add(tableName);
+//              manager.writeLockMap.put(session, tmp);
+//            }
+//            break;
+//          } else {
+//            manager.lockTransactionList.add(session);
+//          }
+//        } else // 之前等待的session
+//        {
+//          if (manager.lockTransactionList.get(0) == session) // 只查看阻塞队列开头session
+//          {
+//            int get_lock = the_table.acquireWriteLock(session);
+//            if (get_lock != -1) {
+//              if (get_lock == 1) {
+//                ArrayList<String> tmp = manager.writeLockMap.get(session);
+//                tmp.add(tableName);
+//                manager.writeLockMap.put(session, tmp);
+//              }
+//              manager.lockTransactionList.remove(0);
+//              break;
+//            }
+//          }
+//        }
+//        try {
+//          // System.out.print("session: "+session+": ");
+//          // System.out.println(manager.session_queue);
+//          Thread.sleep(500); // 休眠3秒
+//        } catch (Exception e) {
+//          System.out.println("Got an exception!");
+//        }
+//      }
+//    } else {
       try { // currently update only WHERE is primary key
         if (cur_db == null) {
           return new ExecuteStatementResp(StatusUtil.fail("Use database first."), false);
@@ -176,6 +189,7 @@ public class UpdatePlan extends LogicalPlan {
           ++it;
         }
         this.original_row = new Row(old_entries);
+        System.out.println("Original Row: " + original_row);
         // added for Ray end
 
         ArrayList<Entry> entries = old_row.getEntries();
@@ -196,13 +210,15 @@ public class UpdatePlan extends LogicalPlan {
 
         // added for Ray start
         this.updated_row = new_row;
+        System.out.println("Updated Row: " + updated_row);
+
         // added for Ray end
 
         cur_tb.update(old_row, new_row);
 
       } catch (Exception e) {
         return new ExecuteStatementResp(StatusUtil.fail(e.toString()), false);
-      }
+//      }
     }
 
     return new ExecuteStatementResp(StatusUtil.success(), false);

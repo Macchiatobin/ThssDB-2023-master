@@ -18,6 +18,7 @@ public class Logger {private String folder_name;
 
         File d = new File(this.folder_name);
         if (!d.isDirectory()) {
+            System.out.println("Make Logfile");
             d.mkdirs();
         }
         File f = new File(this.full_path);
@@ -31,6 +32,8 @@ public class Logger {private String folder_name;
     }
 
     public ArrayList<String> readLog() {
+        System.out.println("readLog");
+
         ArrayList<String> lines = new ArrayList<>();
         String str;
         try {
@@ -55,6 +58,7 @@ public class Logger {private String folder_name;
     }
 
     public void writeLines(List<String> lines) {
+        System.out.println("writeLog");
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(full_path, true));
             for (String line : lines) {

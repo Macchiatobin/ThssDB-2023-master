@@ -75,6 +75,9 @@ public class MainTransaction {
       return new TransactionFlag(false, "Other plan is working");
     } else {
       checkTransaction = true;
+      LinkedList<String> log = new LinkedList<>();
+      log.add("Begin Transaction");
+      logger.writeLines(log);
       return new TransactionFlag(true, "Success");
     }
   }
@@ -92,7 +95,7 @@ public class MainTransaction {
       log.addAll(lp.getLog());
       planList.removeFirst();
     }
-    log.add("COMMIT");
+    log.add("Commit");
     logger.writeLines(log);
     checkTransaction = false;
     return new TransactionFlag(true, "Success");
@@ -169,6 +172,7 @@ public class MainTransaction {
       try {
         System.out.println("Write Trans plan execute!");
         //          plan.execute_plan();
+        System.out.println("Plan: " + plan);
         planList.add(plan);
         checkTransaction = true;
       } catch (Exception e) {

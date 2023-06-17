@@ -11,6 +11,7 @@ import cn.edu.thssdb.utils.StatusUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import static cn.edu.thssdb.utils.Global.*;
@@ -32,7 +33,7 @@ public class DeletePlan extends LogicalPlan {
   private int comparator; // from GLOBAL.COMP_...
 
   public DeletePlan(
-      String tableName, String attrname, String attrvalue, String comp, Manager manager) {
+      String tableName, String attrname, String attrvalue, String comp) {
     super(LogicalPlanType.DELETE);
     this.tableName = tableName;
     this.attrName = attrname; // condition attribute name
@@ -69,73 +70,84 @@ public class DeletePlan extends LogicalPlan {
         + "'}";
   }
 
-  @Override
-  public ExecuteStatementResp execute_plan() {
-    return null;
+//  @Override
+//  public ExecuteStatementResp execute_plan(long the_session) {
+//    return null;
+//  }
+
+  public LinkedList<String> getLog(){
+    LinkedList<String> log = new LinkedList<>();
+    Database cur_db = Manager.getInstance().getCurDB();
+    Table cur_tb = cur_db.getTable(tableName);
+    int primaryIndex = cur_tb.getPrimaryIndex();
+    for(Row row: deleted_rows){
+      log.add("DELETE FROM " + tableName + " " + row.getEntries().get(primaryIndex).toString());
+    }
+    return log;
   }
 
   @Override
-  public ExecuteStatementResp execute_plan(long the_session) {
+  public ExecuteStatementResp execute_plan() {
     Manager manager = Manager.getInstance();
     Database cur_db = manager.getCurDB();
 
     // Transaction Lock
-    if (!manager.transaction_sessions.contains(the_session)) {
-      System.out.println("Auto Commit:" + the_session);
-      System.out.println(!manager.transaction_sessions.contains(the_session));
-      handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
-      the_result = handler.evaluate("DELETE", the_session);
-      result.addAll(the_result);
-      handler.evaluate("AUTO COMMIT", the_session);
-
-    } else {
-      System.out.println("Commit:" + the_session);
-      System.out.println(!manager.transaction_sessions.contains(the_session));
-      the_result = handler.evaluate("DELETE", the_session);
-      result.addAll(the_result);
-    }
-    long session = 0;
-    if (manager.transaction_sessions.contains(session)) {
-      Table the_table = cur_db.getTable(tableName);
-      while (true) {
-        if (!manager.lockTransactionList.contains(session)) // 新加入一个session
-        {
-          int get_lock = the_table.acquireWriteLock(session);
-          if (get_lock != -1) {
-            if (get_lock == 1) {
-              ArrayList<String> tmp = manager.writeLockMap.get(session);
-              tmp.add(tableName);
-              manager.writeLockMap.put(session, tmp);
-            }
-            break;
-          } else {
-            manager.lockTransactionList.add(session);
-          }
-        } else // 之前等待的session
-        {
-          if (manager.lockTransactionList.get(0) == session) // 只查看阻塞队列开头session
-          {
-            int get_lock = the_table.acquireWriteLock(session);
-            if (get_lock != -1) {
-              if (get_lock == 1) {
-                ArrayList<String> tmp = manager.writeLockMap.get(session);
-                tmp.add(tableName);
-                manager.writeLockMap.put(session, tmp);
-              }
-              manager.lockTransactionList.remove(0);
-              break;
-            }
-          }
-        }
-        try {
-          // System.out.print("session: "+session+": ");
-          // System.out.println(manager.session_queue);
-          Thread.sleep(500); // 休眠3秒
-        } catch (Exception e) {
-          System.out.println("Got an exception!");
-        }
-      }
-    } else {
+//    if (!manager.transaction_sessions.contains(the_session)) {
+//      System.out.println("Auto Commit:" + the_session);
+//      System.out.println(!manager.transaction_sessions.contains(the_session));
+//      handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
+//      the_result = handler.evaluate("DELETE", the_session);
+//      result.addAll(the_result);
+//      handler.evaluate("AUTO COMMIT", the_session);
+//
+//    } else {
+//      System.out.println("Commit:" + the_session);
+//      System.out.println(!manager.transaction_sessions.contains(the_session));
+//      the_result = handler.evaluate("DELETE", the_session);
+//      result.addAll(the_result);
+//    }
+//    long session = 0;
+//    if (manager.transaction_sessions.contains(session)) {
+//      Table the_table = cur_db.getTable(tableName);
+//      while (true) {
+//        if (!manager.lockTransactionList.contains(session)) // 新加入一个session
+//        {
+//          int get_lock = the_table.acquireWriteLock(session);
+//          if (get_lock != -1) {
+//            if (get_lock == 1) {
+//              ArrayList<String> tmp = manager.writeLockMap.get(session);
+//              tmp.add(tableName);
+//              manager.writeLockMap.put(session, tmp);
+//            }
+//            break;
+//          } else {
+//            manager.lockTransactionList.add(session);
+//          }
+//        } else // 之前等待的session
+//        {
+//          if (manager.lockTransactionList.get(0) == session) // 只查看阻塞队列开头session
+//          {
+//            int get_lock = the_table.acquireWriteLock(session);
+//            if (get_lock != -1) {
+//              if (get_lock == 1) {
+//                ArrayList<String> tmp = manager.writeLockMap.get(session);
+//                tmp.add(tableName);
+//                manager.writeLockMap.put(session, tmp);
+//              }
+//              manager.lockTransactionList.remove(0);
+//              break;
+//            }
+//          }
+//        }
+//        try {
+//          // System.out.print("session: "+session+": ");
+//          // System.out.println(manager.session_queue);
+//          Thread.sleep(500); // 休眠3秒
+//        } catch (Exception e) {
+//          System.out.println("Got an exception!");
+//        }
+//      }
+//    } else {
       try {
         if (cur_db == null) {
           return new ExecuteStatementResp(StatusUtil.fail("Use database first."), false);
@@ -200,7 +212,7 @@ public class DeletePlan extends LogicalPlan {
       } catch (Exception e) {
         return new ExecuteStatementResp(StatusUtil.fail(e.toString()), false);
       }
-    }
+//    }
     return new ExecuteStatementResp(StatusUtil.success(), false);
   }
 }
