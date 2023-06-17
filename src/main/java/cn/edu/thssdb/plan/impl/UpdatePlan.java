@@ -67,19 +67,23 @@ public class UpdatePlan extends LogicalPlan {
   //    return null;
   //  }
 
-    @Override
-    public ArrayList<String> getTableName() {
-        return new ArrayList<>(Collections.singletonList(this.tableName));
-    }
+  @Override
+  public ArrayList<String> getTableName() {
+    return new ArrayList<>(Collections.singletonList(this.tableName));
+  }
 
-    public LinkedList<String> getLog() {
+  public LinkedList<String> getLog() {
     LinkedList<String> updateLog = new LinkedList<>();
     Database cur_db = Manager.getInstance().getCurDB();
     Table cur_tb = cur_db.getTable(tableName);
     int primaryIndex = cur_tb.getPrimaryIndex();
-    if(original_row!=null&&updated_row!=null) {
+    if (original_row != null && updated_row != null) {
       System.out.println("Original Row: " + original_row + " Updated Row:" + updated_row);
-      updateLog.add("DELETE FROM " + tableName + " " + original_row.getEntries().get(primaryIndex).toString());
+      updateLog.add(
+          "DELETE FROM "
+              + tableName
+              + " "
+              + original_row.getEntries().get(primaryIndex).toString());
       updateLog.add("INSERT INTO " + tableName + " VALUES " + "(" + updated_row.toString() + ")");
       System.out.println("Update Log: " + updateLog);
     }

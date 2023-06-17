@@ -191,12 +191,11 @@ public class IServiceHandler implements IService.Iface {
           log_insert.add(command);
         }
 
-
         System.out.println("INSERT");
         System.out.println("[DEBUG] " + plan);
         //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        Manager.getInstance().getCurDB().getTransactionManager().exec(plan,log_insert);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan, log_insert);
         System.out.println("Insert Exec");
         break;
         //        return new ExecuteStatementResp(StatusUtil.success(), false);
@@ -227,7 +226,7 @@ public class IServiceHandler implements IService.Iface {
         System.out.println("[DEBUG] " + plan);
         //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        Manager.getInstance().getCurDB().getTransactionManager().exec(plan,log_delete);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan, log_delete);
         System.out.println("Delete Exec");
         break;
         //        return new ExecuteStatementResp(StatusUtil.success(), false);
@@ -257,7 +256,7 @@ public class IServiceHandler implements IService.Iface {
         System.out.println("[DEBUG] " + plan);
         //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        Manager.getInstance().getCurDB().getTransactionManager().exec(plan,log_update);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan, log_update);
         System.out.println("Update Exec");
         break;
         //        return new ExecuteStatementResp(StatusUtil.success(), false);

@@ -6,9 +6,7 @@ import cn.edu.thssdb.plan.impl.*;
 import cn.edu.thssdb.schema.Logger;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
-import cn.edu.thssdb.utils.Global;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -40,8 +38,8 @@ public class MainTransaction {
       System.out.println("Trans Select");
       return readTransaction(plan);
     } else if (plan instanceof UpdatePlan
-            || plan instanceof DeletePlan
-            || plan instanceof InsertPlan) {
+        || plan instanceof DeletePlan
+        || plan instanceof InsertPlan) {
       System.out.println("Trans I?U?D");
       return writeTransaction(plan);
     } else if (plan instanceof CommitPlan) {
@@ -63,8 +61,8 @@ public class MainTransaction {
       System.out.println("Trans Select");
       return readTransaction(plan);
     } else if (plan instanceof UpdatePlan
-            || plan instanceof DeletePlan
-            || plan instanceof InsertPlan) {
+        || plan instanceof DeletePlan
+        || plan instanceof InsertPlan) {
       System.out.println("Trans I?U?D");
       return writeTransaction(plan);
     } else if (plan instanceof CommitPlan) {
@@ -142,7 +140,6 @@ public class MainTransaction {
       ReentrantReadWriteLock.ReadLock readLock = getReadLock(tableName);
       System.out.println("read readLock e:" + readLock);
 
-
       readLock.lock(); // 加读锁
       return new TransactionFlag(true, "Success");
     } catch (Exception e) {
@@ -163,7 +160,6 @@ public class MainTransaction {
 
       ReentrantReadWriteLock.WriteLock writeLock = getWriteLock(tableName);
       System.out.println("write writeLock e:" + writeLock);
-
 
       writeLock.lock(); // 加写锁
       planList.add(plan);
@@ -202,7 +198,6 @@ public class MainTransaction {
     }
     return writeLocks.get(tableName);
   }
-
 
   private void releaseAllLocks() {
     for (ReentrantReadWriteLock.ReadLock readLock : readLocks.values()) {

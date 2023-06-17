@@ -69,12 +69,12 @@ public class SelectPlan extends LogicalPlan {
 
   @Override
   public ArrayList<String> getTableName() {
-      ArrayList<String> table_names = new ArrayList<>();
-      for (SQLParser.TableNameContext cur_ctx : ctx.tableQuery(0).tableName()) {
-        System.out.println("Table name: " + cur_ctx.getText()); // for debugging
-        table_names.add(cur_ctx.getText()); // original: toLowerCase()
-      }
-      return table_names;
+    ArrayList<String> table_names = new ArrayList<>();
+    for (SQLParser.TableNameContext cur_ctx : ctx.tableQuery(0).tableName()) {
+      System.out.println("Table name: " + cur_ctx.getText()); // for debugging
+      table_names.add(cur_ctx.getText()); // original: toLowerCase()
+    }
+    return table_names;
   }
 
   @Override
