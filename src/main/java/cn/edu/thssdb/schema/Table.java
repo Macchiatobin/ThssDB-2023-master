@@ -17,7 +17,7 @@ import static cn.edu.thssdb.type.ColumnType.*;
 import static cn.edu.thssdb.utils.Global.DATA_DIR;
 
 public class Table implements Iterable<Row>, Serializable {
-  public ReentrantReadWriteLock lock;
+  public transient ReentrantReadWriteLock lock;
   private String databaseName;
   public String tableName;
   public ArrayList<Column> columns;
@@ -33,6 +33,7 @@ public class Table implements Iterable<Row>, Serializable {
 
   public Table(String databaseName, String tableName, Column[] columns, boolean isFirst) {
     this.lock = new ReentrantReadWriteLock();
+    System.out.println("HI LOCK: " + this.lock);
     this.databaseName = databaseName;
     this.tableName = tableName;
     this.columns = new ArrayList<>(Arrays.asList(columns));
@@ -61,9 +62,16 @@ public class Table implements Iterable<Row>, Serializable {
     }
   }
 
-  public ReentrantReadWriteLock getLock() {
-    System.out.println("TABLE LOCK:" + lock);
-    return lock;
+  public ReentrantReadWriteLock.ReadLock getReadLock() {
+    this.lock = new ReentrantReadWriteLock();
+    System.out.println("HALOO");
+    return lock.readLock();
+  }
+
+  public ReentrantReadWriteLock.WriteLock getWriteLock() {
+    this.lock = new ReentrantReadWriteLock();
+    System.out.println("HALOO");
+    return lock.writeLock();
   }
 
   public int getPrimaryIndex() {

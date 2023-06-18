@@ -87,6 +87,8 @@ public class InsertPlan extends LogicalPlan {
       return new ExecuteStatementResp(StatusUtil.fail("Use database first."), false);
     }
     Table tableToInsert = dbForInsert.getTable(tableName);
+    System.out.println("666---Database getTable:" + tableToInsert);
+
     if (tableToInsert == null) {
       return new ExecuteStatementResp(StatusUtil.fail("Table doesn't exist!"), false);
     }
