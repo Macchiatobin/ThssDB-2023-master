@@ -34,7 +34,7 @@ public class LogicalGenerator {
 
   public static LogicalPlan generate(Manager manager, String sql)
       throws ParseCancellationException { // manager added
-    ThssDBSQLVisitor dbsqlVisitor = new ThssDBSQLVisitor(manager); // manager added
+    ThssDBSQLVisitor dbsqlVisitor = new ThssDBSQLVisitor(); // manager added
 
     CharStream charStream1 = CharStreams.fromString(sql);
 

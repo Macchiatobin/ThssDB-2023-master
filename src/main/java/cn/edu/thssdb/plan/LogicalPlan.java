@@ -3,6 +3,7 @@ package cn.edu.thssdb.plan;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public abstract class LogicalPlan {
 
@@ -36,10 +37,15 @@ public abstract class LogicalPlan {
     DELETE,
     UPDATE,
     SELECT,
+    ROLLBACK,
+  }
+
+  public LinkedList<String> getLog() {
+    return null;
   }
 
   public abstract ExecuteStatementResp
       execute_plan(); // Plan execution abstract method, returns response
 
-  public abstract ExecuteStatementResp execute_plan(long the_session);
+  //  public abstract ExecuteStatementResp execute_plan(long the_session);
 }

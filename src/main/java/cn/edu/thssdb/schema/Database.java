@@ -1,11 +1,16 @@
 package cn.edu.thssdb.schema;
 
 import cn.edu.thssdb.exception.AlreadyExistsException;
+import cn.edu.thssdb.exception.CustomIOException;
 import cn.edu.thssdb.exception.FileException;
 import cn.edu.thssdb.exception.NotExistsException;
+import cn.edu.thssdb.parser.MySQLParser;
+import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.query.*;
+import cn.edu.thssdb.transaction.MainTransaction;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,9 +26,11 @@ public class Database implements Serializable {
   private transient HashMap<String, Table> tables;
   public HashMap<String, MetaInfo> metaInfos;
   transient ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
   private String path;
   private String metaPath;
+  private MainTransaction transactionManager; // 事务管理
+  private Logger logger; // 日志管理
+  private List<Column> columns;
 
   public Database(String name) {
     this.name = name;
@@ -31,10 +38,38 @@ public class Database implements Serializable {
     this.metaInfos = new HashMap<>();
     this.path = DATA_DIR + name + "/";
     this.metaPath = this.path + "meta";
+    String folder = Paths.get("data", name).toString();
+    String logger_name = name + ".log";
+    this.logger = new Logger(folder, logger_name);
     recover();
   }
 
+  public Logger getLogger() {
+    return logger;
+  }
+
+  public MainTransaction getTransactionManager() {
+    return transactionManager;
+  }
+
   public Table getTable(String tableName) {
+    System.out.println("Database getTable:" + tables.get(tableName));
+    //    List<Column> cList = columns;
+    //    Column column0 = new Column("column0", ColumnType.INT, 1, false, 0);
+    //    Column column1 = new Column("column1", ColumnType.LONG, 0, false, 0);
+    //    Column column2 = new Column("column2", ColumnType.FLOAT, 0, false, 0);
+    //    Column column3 = new Column("column3", ColumnType.DOUBLE, 0, false, 0);
+    //    Column column4 = new Column("column4", ColumnType.STRING, 0, false, 5);
+    //    columns.add(column0);
+    //    columns.add(column1);
+    //    columns.add(column2);
+    //    columns.add(column3);
+    //    columns.add(column4);
+    //    if(tables.get(tableName)==null)
+    //    {
+    //      Manager.getInstance().getCurDB().create(tableName,cList.toArray(new
+    // Column[cList.size()]));
+    //    }
     return tables.get(tableName);
   }
 
@@ -133,6 +168,7 @@ public class Database implements Serializable {
   }
 
   private void recover() { // read from file, when create
+    transactionManager = new MainTransaction(name, getLogger());
     File dbFolder = new File(this.path);
     if (!dbFolder.exists()) // Create Folder, if first create
     {
@@ -185,6 +221,33 @@ public class Database implements Serializable {
       } catch (Exception e) {
         throw new FileException(FileException.Create, metaFile.getName());
       }
+    }
+    logRecover();
+  }
+
+  public void logRecover() {
+    try {
+      ArrayList<String> logs = this.logger.readLog();
+      for (String log : logs) {
+        //        String[] info = log.split(" ");
+        //        String type = info[0];
+        //        if (type.equals("DELETE")) {
+        //          tables.get(info[1]).delete(info[2]);
+        //        } else if (type.equals("INSERT")) {
+        //          tables.get(info[1]).insert(info[2]);
+        //        } else if (!type.equals("COMMIT")) {
+        ArrayList<LogicalPlan> plans = MySQLParser.getOperations(log);
+        for (LogicalPlan plan : plans) {
+          try {
+            plan.execute_plan();
+          } catch (Exception e) {
+
+          }
+        }
+      }
+      //      }
+    } catch (Exception e) {
+      throw new CustomIOException();
     }
   }
 

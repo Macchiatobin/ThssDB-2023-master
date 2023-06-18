@@ -4,7 +4,6 @@ import cn.edu.thssdb.parser.MySQLParser;
 import cn.edu.thssdb.plan.LogicalGenerator;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
-import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.rpc.thrift.ConnectReq;
 import cn.edu.thssdb.rpc.thrift.ConnectResp;
 import cn.edu.thssdb.rpc.thrift.DisconnectReq;
@@ -28,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static cn.edu.thssdb.utils.Global.DATA_DIR;
@@ -76,16 +76,19 @@ public class IServiceHandler implements IService.Iface {
 
   @Override
   public ExecuteStatementResp executeStatement(ExecuteStatementReq req) throws TException {
-    long the_session = req.getSessionId();
-    ArrayList<QueryResult> the_result;
-    ArrayList<QueryResult> result = new ArrayList<>();
+    //    long the_session = req.getSessionId();
+    //    ArrayList<QueryResult> the_result;
+    //    ArrayList<QueryResult> result = new ArrayList<>();
 
     if (req.getSessionId() < 0) {
       return new ExecuteStatementResp(
           StatusUtil.fail("You are not connected. Please connect first."), false);
     }
     // TODO: implement execution logic，需要实现日志记录等
+    // 事务管理
     LogicalPlan plan = LogicalGenerator.generate(manager, req.statement);
+    System.out.println("Logical Plan!");
+
     switch (plan.getType()) {
       case CREATE_DB:
         System.out.println("CREATE_DB");
@@ -103,21 +106,37 @@ public class IServiceHandler implements IService.Iface {
         break;
 
       case CREATE_TABLE:
+        LinkedList<String> log_create = new LinkedList<>();
+        String command_full_create = req.statement;
+        String[] commands_create = command_full_create.split(";");
+        for (String command : commands_create) {
+          command = command.trim();
+          System.out.println("Command: " + command);
+          log_create.add(command);
+        }
         System.out.println("CREATE_TABLE");
         System.out.println("[DEBUG] " + plan);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan, log_create);
         break;
 
       case DROP_TABLE:
+        LinkedList<String> log_drop = new LinkedList<>();
+        String command_full_drop = req.statement;
+        String[] commands_drop = command_full_drop.split(";");
+        for (String command : commands_drop) {
+          command = command.trim();
+          System.out.println("Command: " + command);
+          log_drop.add(command);
+        }
         System.out.println("DROP_TABLE");
         System.out.println("[DEBUG] " + plan);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan, log_drop);
         break;
 
       case QUIT:
         System.out.println("QUIT");
         System.out.println("[DEBUG] " + plan);
-
-        // TODO: wtf does this quit mean
-
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         break;
 
       case SHOW_TABLE:
@@ -149,7 +168,6 @@ public class IServiceHandler implements IService.Iface {
       case AUTO_COMMIT:
         System.out.println("AUTO_COMMIT");
         System.out.println("[DEBUG] " + plan);
-
         // TODO
 
         break;
@@ -157,25 +175,47 @@ public class IServiceHandler implements IService.Iface {
       case BEGIN_TRANSACTION:
         System.out.println("BEGIN_TRANSACTION");
         System.out.println("[DEBUG] " + plan);
-        return plan.execute_plan(the_session);
+        //        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        System.out.println(plan);
+        System.out.println("Transaction!");
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
+        System.out.println("Begin Exec");
+        break; //        return plan.execute_plan();
 
         // TODO
-
-        //        break;
 
       case COMMIT:
         System.out.println("COMMIT");
         System.out.println("[DEBUG] " + plan);
-        return plan.execute_plan(the_session);
+        //        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        System.out.println("Transaction!");
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
+        System.out.println("Commit Exec");
+        break;
+        //        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //                return plan.execute_plan();
 
         // TODO
 
-        //        break;
-
       case INSERT:
+        LinkedList<String> log_insert = new LinkedList<>();
+        String command_full_insert = req.statement;
+        String[] commands_insert = command_full_insert.split(";");
+        for (String command : commands_insert) {
+          command = command.trim();
+          System.out.println("Command: " + command);
+          log_insert.add(command);
+        }
+
         System.out.println("INSERT");
         System.out.println("[DEBUG] " + plan);
-        return plan.execute_plan(the_session);
+        //        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        System.out.println("Transaction!");
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan, log_insert);
+        System.out.println("Insert Exec");
+        break;
+        //        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //        return plan.execute_plan();
         //        if (!manager.transaction_sessions.contains(the_session)) {
         //          System.out.println(the_session);
         //
@@ -190,9 +230,23 @@ public class IServiceHandler implements IService.Iface {
         //        }
 
       case DELETE:
+        LinkedList<String> log_delete = new LinkedList<>();
+        String command_full_delete = req.statement;
+        String[] commands_delete = command_full_delete.split(";");
+        for (String command : commands_delete) {
+          command = command.trim();
+          System.out.println("Command: " + command);
+          log_delete.add(command);
+        }
         System.out.println("DELETE");
         System.out.println("[DEBUG] " + plan);
-        return plan.execute_plan(the_session);
+        //        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        System.out.println("Transaction!");
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan, log_delete);
+        System.out.println("Delete Exec");
+        break;
+        //        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //        return plan.execute_plan();
 
         //      if (!manager.transaction_sessions.contains(the_session)) {
         //          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
@@ -204,12 +258,25 @@ public class IServiceHandler implements IService.Iface {
         //          the_result = handler.evaluate("DELETE", the_session);
         //          result.addAll(the_result);
         //        }
-        //        break;
 
       case UPDATE:
+        LinkedList<String> log_update = new LinkedList<>();
+        String command_full_update = req.statement;
+        String[] commands_update = command_full_update.split(";");
+        for (String command : commands_update) {
+          command = command.trim();
+          System.out.println("Command: " + command);
+          log_update.add(command);
+        }
         System.out.println("UPDATE");
         System.out.println("[DEBUG] " + plan);
-        return plan.execute_plan(the_session);
+        //        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        System.out.println("Transaction!");
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan, log_update);
+        System.out.println("Update Exec");
+        break;
+        //        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //        return plan.execute_plan();
 
         //        if (!manager.transaction_sessions.contains(the_session)) {
         //          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
@@ -221,13 +288,18 @@ public class IServiceHandler implements IService.Iface {
         //          the_result = handler.evaluate("UPDATE", the_session);
         //          result.addAll(the_result);
         //        }
-        //        break;
 
       case SELECT:
         /* TODO */
         System.out.println("SELECT");
         System.out.println("[DEBUG] " + plan);
-        return plan.execute_plan(the_session);
+        //        transactionManager = new MainTransaction(manager.getCurDB().getName());
+        System.out.println("Transaction!");
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
+        System.out.println("Select Exec");
+        break;
+        //        return new ExecuteStatementResp(StatusUtil.success(), false);
+        //        return plan.execute_plan();
 
         //        if (!manager.transaction_sessions.contains(the_session)) {
         //          handler.evaluate("AUTO-BEGIN TRANSACTION", the_session);
@@ -240,7 +312,6 @@ public class IServiceHandler implements IService.Iface {
         //          result.addAll(the_result);
         //        }
         //        return ((SelectPlan)plan).execute_plan(req); // 加了个req参数，用于和transaction交互
-        //        break;
 
       default:
         break;

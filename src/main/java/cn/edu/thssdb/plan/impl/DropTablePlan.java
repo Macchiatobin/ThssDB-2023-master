@@ -8,6 +8,7 @@ import cn.edu.thssdb.utils.StatusUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 
 public class DropTablePlan extends LogicalPlan {
 
@@ -18,14 +19,20 @@ public class DropTablePlan extends LogicalPlan {
     this.tableName = tableName;
   }
 
+  @Override
   public ArrayList<String> getTableName() {
     return new ArrayList<>(Collections.singletonList(this.tableName));
   }
 
   @Override
-  public ExecuteStatementResp execute_plan(long the_session) {
-    return null;
+  public LinkedList<String> getLog() {
+    return super.getLog();
   }
+
+  //  @Override
+  //  public ExecuteStatementResp execute_plan(long the_session) {
+  //    return null;
+  //  }
 
   @Override
   public ExecuteStatementResp execute_plan() {
