@@ -9,11 +9,11 @@ import java.util.LinkedList;
 
 public abstract class QueryTable implements Iterator<Row> {
 
-  MultipleCondition multiple_condition;  // WHERE给出的查询条件
+  MultipleCondition multiple_condition; // WHERE给出的查询条件
 
-  public ArrayList<Column> columns;  // 查询表的列
-  LinkedList<QueryRow> row_queue;  // 查询表的行
-  boolean first_flag = true;  // 查询表的列
+  public ArrayList<Column> columns; // 查询表的列
+  LinkedList<QueryRow> row_queue; // 查询表的行
+  boolean first_flag = true; // 查询表的列
 
   QueryTable() {
     this.row_queue = new LinkedList<>();
