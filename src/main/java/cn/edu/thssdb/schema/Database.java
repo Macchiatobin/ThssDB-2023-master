@@ -30,6 +30,7 @@ public class Database implements Serializable {
   private String metaPath;
   private MainTransaction transactionManager; // 事务管理
   private Logger logger; // 日志管理
+  private List<Column> columns;
 
   public Database(String name) {
     this.name = name;
@@ -52,6 +53,23 @@ public class Database implements Serializable {
   }
 
   public Table getTable(String tableName) {
+    System.out.println("Database getTable:" + tables.get(tableName));
+    //    List<Column> cList = columns;
+    //    Column column0 = new Column("column0", ColumnType.INT, 1, false, 0);
+    //    Column column1 = new Column("column1", ColumnType.LONG, 0, false, 0);
+    //    Column column2 = new Column("column2", ColumnType.FLOAT, 0, false, 0);
+    //    Column column3 = new Column("column3", ColumnType.DOUBLE, 0, false, 0);
+    //    Column column4 = new Column("column4", ColumnType.STRING, 0, false, 5);
+    //    columns.add(column0);
+    //    columns.add(column1);
+    //    columns.add(column2);
+    //    columns.add(column3);
+    //    columns.add(column4);
+    //    if(tables.get(tableName)==null)
+    //    {
+    //      Manager.getInstance().getCurDB().create(tableName,cList.toArray(new
+    // Column[cList.size()]));
+    //    }
     return tables.get(tableName);
   }
 
@@ -211,22 +229,23 @@ public class Database implements Serializable {
     try {
       ArrayList<String> logs = this.logger.readLog();
       for (String log : logs) {
-        String[] info = log.split(" ");
-        String type = info[0];
-//        if (type.equals("DELETE")) {
-//          tables.get(info[1]).delete(info[2]);
-//        } else if (type.equals("INSERT")) {
-//          tables.get(info[1]).insert(info[2]);
-//        } else if (!type.equals("COMMIT")) {
-          ArrayList<LogicalPlan> operations = MySQLParser.getOperations(log);
-          for (LogicalPlan op : operations) {
-            try {
-              op.execute_plan();
-            } catch (Exception e) {
-            }
+        //        String[] info = log.split(" ");
+        //        String type = info[0];
+        //        if (type.equals("DELETE")) {
+        //          tables.get(info[1]).delete(info[2]);
+        //        } else if (type.equals("INSERT")) {
+        //          tables.get(info[1]).insert(info[2]);
+        //        } else if (!type.equals("COMMIT")) {
+        ArrayList<LogicalPlan> plans = MySQLParser.getOperations(log);
+        for (LogicalPlan plan : plans) {
+          try {
+            plan.execute_plan();
+          } catch (Exception e) {
+
           }
         }
-//      }
+      }
+      //      }
     } catch (Exception e) {
       throw new CustomIOException();
     }

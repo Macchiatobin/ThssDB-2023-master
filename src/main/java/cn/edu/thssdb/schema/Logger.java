@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Logger {
+public class Logger implements Serializable {
   private String folder_name;
   private String file_name;
   private String full_path;

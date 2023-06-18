@@ -106,21 +106,37 @@ public class IServiceHandler implements IService.Iface {
         break;
 
       case CREATE_TABLE:
+        LinkedList<String> log_create = new LinkedList<>();
+        String command_full_create = req.statement;
+        String[] commands_create = command_full_create.split(";");
+        for (String command : commands_create) {
+          command = command.trim();
+          System.out.println("Command: " + command);
+          log_create.add(command);
+        }
         System.out.println("CREATE_TABLE");
         System.out.println("[DEBUG] " + plan);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan, log_create);
         break;
 
       case DROP_TABLE:
+        LinkedList<String> log_drop = new LinkedList<>();
+        String command_full_drop = req.statement;
+        String[] commands_drop = command_full_drop.split(";");
+        for (String command : commands_drop) {
+          command = command.trim();
+          System.out.println("Command: " + command);
+          log_drop.add(command);
+        }
         System.out.println("DROP_TABLE");
         System.out.println("[DEBUG] " + plan);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan, log_drop);
         break;
 
       case QUIT:
         System.out.println("QUIT");
         System.out.println("[DEBUG] " + plan);
-
-        // TODO: wtf does this quit mean
-
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan);
         break;
 
       case SHOW_TABLE:
@@ -191,12 +207,11 @@ public class IServiceHandler implements IService.Iface {
           log_insert.add(command);
         }
 
-
         System.out.println("INSERT");
         System.out.println("[DEBUG] " + plan);
         //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        Manager.getInstance().getCurDB().getTransactionManager().exec(plan,log_insert);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan, log_insert);
         System.out.println("Insert Exec");
         break;
         //        return new ExecuteStatementResp(StatusUtil.success(), false);
@@ -227,7 +242,7 @@ public class IServiceHandler implements IService.Iface {
         System.out.println("[DEBUG] " + plan);
         //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        Manager.getInstance().getCurDB().getTransactionManager().exec(plan,log_delete);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan, log_delete);
         System.out.println("Delete Exec");
         break;
         //        return new ExecuteStatementResp(StatusUtil.success(), false);
@@ -257,7 +272,7 @@ public class IServiceHandler implements IService.Iface {
         System.out.println("[DEBUG] " + plan);
         //        transactionManager = new MainTransaction(manager.getCurDB().getName());
         System.out.println("Transaction!");
-        Manager.getInstance().getCurDB().getTransactionManager().exec(plan,log_update);
+        Manager.getInstance().getCurDB().getTransactionManager().exec(plan, log_update);
         System.out.println("Update Exec");
         break;
         //        return new ExecuteStatementResp(StatusUtil.success(), false);

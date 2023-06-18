@@ -3,17 +3,18 @@ package cn.edu.thssdb.transaction;
 import cn.edu.thssdb.exception.NotExistsException;
 import cn.edu.thssdb.plan.LogicalPlan;
 import cn.edu.thssdb.plan.impl.*;
+import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Logger;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
-import cn.edu.thssdb.utils.Global;
 
-import java.util.ArrayList;
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class MainTransaction {
+public class MainTransaction implements Serializable {
   private Manager manager;
   private String databaseName;
   private Logger logger; // 日志对象
@@ -23,6 +24,7 @@ public class MainTransaction {
   private HashMap<String, ReentrantReadWriteLock.WriteLock> writeLocks;
   private LinkedList<LogicalPlan> planList;
   private boolean checkTransaction = false;
+  private List<Column> columns;
 
   public MainTransaction(String databaseName, Logger logger) {
     this.manager = Manager.getInstance();
@@ -40,8 +42,8 @@ public class MainTransaction {
       System.out.println("Trans Select");
       return readTransaction(plan);
     } else if (plan instanceof UpdatePlan
-            || plan instanceof DeletePlan
-            || plan instanceof InsertPlan) {
+        || plan instanceof DeletePlan
+        || plan instanceof InsertPlan) {
       System.out.println("Trans I?U?D");
       return writeTransaction(plan);
     } else if (plan instanceof CommitPlan) {
@@ -52,7 +54,7 @@ public class MainTransaction {
       return beginTransaction();
     } else {
       System.out.println("Unknown");
-      return null;
+      return endTransaction(plan);
     }
   }
 
@@ -63,8 +65,8 @@ public class MainTransaction {
       System.out.println("Trans Select");
       return readTransaction(plan);
     } else if (plan instanceof UpdatePlan
-            || plan instanceof DeletePlan
-            || plan instanceof InsertPlan) {
+        || plan instanceof DeletePlan
+        || plan instanceof InsertPlan) {
       System.out.println("Trans I?U?D");
       return writeTransaction(plan);
     } else if (plan instanceof CommitPlan) {
@@ -75,8 +77,35 @@ public class MainTransaction {
       return beginTransaction();
     } else {
       System.out.println("Unknown");
-      return null;
+      return endTransaction(plan);
     }
+  }
+
+  private TransactionFlag endTransaction(LogicalPlan plan) {
+    System.out.println("endT check:" + checkTransaction);
+    if (checkTransaction) {
+      commitTransaction();
+    }
+    try {
+      // 检查删除的数据库此时是否被占用
+      //      if (operation instanceof DropDatabasePlan) {
+      //        for (Table table : Manager.getInstance().getCurDB(((DropDatabasePlan) operation).)
+      //                .getTables()) {
+      //          if (table.lock.isWriteLocked())
+      //            throw new DatabaseOccupiedException();
+      //        }
+      //      }
+      //      plan.execute_plan();
+      //      if (plan instanceof CreateTablePlan || plan instanceof DropTablePlan) {
+      //        logger.writeLines(plan.getLog());
+      //      }
+      checkTransaction = false;
+    } catch (Exception e) {
+      System.out.println("endT:" + e);
+      return new TransactionFlag(false, e.getMessage());
+    }
+    System.out.println("endT: Success");
+    return new TransactionFlag(true, "Success");
   }
 
   private TransactionFlag beginTransaction() {
@@ -142,7 +171,6 @@ public class MainTransaction {
       ReentrantReadWriteLock.ReadLock readLock = getReadLock(tableName);
       System.out.println("read readLock e:" + readLock);
 
-
       readLock.lock(); // 加读锁
       return new TransactionFlag(true, "Success");
     } catch (Exception e) {
@@ -164,7 +192,6 @@ public class MainTransaction {
       ReentrantReadWriteLock.WriteLock writeLock = getWriteLock(tableName);
       System.out.println("write writeLock e:" + writeLock);
 
-
       writeLock.lock(); // 加写锁
       planList.add(plan);
       checkTransaction = true;
@@ -179,30 +206,67 @@ public class MainTransaction {
 
   private ReentrantReadWriteLock.ReadLock getReadLock(String tableName) {
     if (!readLocks.containsKey(tableName)) {
-      Table table = manager.getCurDB().getTable(tableName);
-      System.out.println("1---WriteLock:" + tableName);
+      System.out.println("555---WriteLock:" + Manager.getInstance().getCurDB().getTable(tableName));
 
-      ReentrantReadWriteLock lock = table.getLock();
+      //      List<Column> cList = columns;
+      //      Column column0 = new Column("column0", ColumnType.INT, 1, false, 0);
+      //      Column column1 = new Column("column1", ColumnType.LONG, 0, false, 0);
+      //      Column column2 = new Column("column2", ColumnType.FLOAT, 0, false, 0);
+      //      Column column3 = new Column("column3", ColumnType.DOUBLE, 0, false, 0);
+      //      Column column4 = new Column("column4", ColumnType.STRING, 0, false, 5);
+      //      columns.add(column0);
+      //      columns.add(column1);
+      //      columns.add(column2);
+      //      columns.add(column3);
+      //      columns.add(column4);
+      //      if(Manager.getInstance().getCurDB().getTable(tableName)==null)
+      //      {
+      //        System.out.println("TABLE NULL");
+      //        Manager.getInstance().getCurDB().create(tableName,cList.toArray(new
+      // Column[cList.size()]));
+      //      }
+
+      Table table = manager.getCurDB().getTable(tableName);
+      System.out.println("1---WriteLock:" + table);
+      System.out.println("1---WriteLock:" + table.getWriteLock());
+
+      ReentrantReadWriteLock.ReadLock lock = table.getReadLock();
       System.out.println("2---WriteLock:" + tableName);
 
-      readLocks.put(tableName, lock.readLock());
+      readLocks.put(tableName, lock);
     }
     return readLocks.get(tableName);
   }
 
   private ReentrantReadWriteLock.WriteLock getWriteLock(String tableName) {
     if (!writeLocks.containsKey(tableName)) {
+      //      List<Column> cList = columns;
+      //      Column column0 = new Column("column0", ColumnType.INT, 1, false, 0);
+      //      Column column1 = new Column("column1", ColumnType.LONG, 0, false, 0);
+      //      Column column2 = new Column("column2", ColumnType.FLOAT, 0, false, 0);
+      //      Column column3 = new Column("column3", ColumnType.DOUBLE, 0, false, 0);
+      //      Column column4 = new Column("column4", ColumnType.STRING, 0, false, 5);
+      //      columns.add(column0);
+      //      columns.add(column1);
+      //      columns.add(column2);
+      //      columns.add(column3);
+      //      columns.add(column4);
+      //      if(Manager.getInstance().getCurDB().getTable(tableName)==null)
+      //      {
+      //        Manager.getInstance().getCurDB().create(tableName,cList.toArray(new
+      // Column[cList.size()]));
+      //      }
+
       Table table = manager.getCurDB().getTable(tableName);
       System.out.println("1---WriteLock:" + tableName);
 
-      ReentrantReadWriteLock lock = table.getLock();
+      ReentrantReadWriteLock.WriteLock lock = table.getWriteLock();
       System.out.println("2---WriteLock:" + tableName);
 
-      writeLocks.put(tableName, lock.writeLock());
+      writeLocks.put(tableName, lock);
     }
     return writeLocks.get(tableName);
   }
-
 
   private void releaseAllLocks() {
     for (ReentrantReadWriteLock.ReadLock readLock : readLocks.values()) {
