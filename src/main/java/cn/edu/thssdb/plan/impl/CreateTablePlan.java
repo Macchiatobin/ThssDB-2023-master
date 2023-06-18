@@ -51,6 +51,7 @@ public class CreateTablePlan extends LogicalPlan {
     try {
       List<Column> cList = columns;
       dbForTableCreate.create(tableName, cList.toArray(new Column[cList.size()]));
+      System.out.println("555---:" + Arrays.toString(cList.toArray(new Column[0])));
     } catch (Exception e) {
       return new ExecuteStatementResp(StatusUtil.fail(e.toString()), false);
     }
