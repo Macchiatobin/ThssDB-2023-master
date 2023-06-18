@@ -27,21 +27,22 @@ public class Table implements Iterable<Row>, Serializable {
   private String metaPath;
 
   // Transaction Lock
-  int lockPriority = 0;
-  public ArrayList<Long> readLockList;
-  public ArrayList<Long> writeLockList;
+  //  int lockPriority = 0;
+  //  public ArrayList<Long> readLockList;
+  //  public ArrayList<Long> writeLockList;
 
   public Table(String databaseName, String tableName, Column[] columns, boolean isFirst) {
     this.lock = new ReentrantReadWriteLock();
+    System.out.println("HI LOCK: " + this.lock);
     this.databaseName = databaseName;
     this.tableName = tableName;
     this.columns = new ArrayList<>(Arrays.asList(columns));
     this.primaryIndex = -1;
     this.path = DATA_DIR + databaseName + "/" + tableName;
     this.metaPath = this.path + "/meta";
-    this.lockPriority = 0;
-    this.readLockList = new ArrayList<>();
-    this.writeLockList = new ArrayList<>();
+    //    this.lockPriority = 0;
+    //    this.readLockList = new ArrayList<>();
+    //    this.writeLockList = new ArrayList<>();
 
     for (int i = 0; i < this.columns.size(); i++) {
       if (this.columns.get(i).getPrimary() == 1) {
@@ -61,6 +62,18 @@ public class Table implements Iterable<Row>, Serializable {
     }
   }
 
+  public ReentrantReadWriteLock.ReadLock getReadLock() {
+    this.lock = new ReentrantReadWriteLock();
+    System.out.println("HALOO");
+    return lock.readLock();
+  }
+
+  public ReentrantReadWriteLock.WriteLock getWriteLock() {
+    this.lock = new ReentrantReadWriteLock();
+    System.out.println("HALOO");
+    return lock.writeLock();
+  }
+
   public int getPrimaryIndex() {
     return primaryIndex;
   }
@@ -68,8 +81,8 @@ public class Table implements Iterable<Row>, Serializable {
   // GET Row (Used when update)
   public Row get(Entry entry) {
     Row result = null;
-    lock.readLock().lock();
     try {
+      lock.readLock().lock();
       result = index.get(entry);
     } catch (Exception e) { // key not exists
       return null;
@@ -81,8 +94,8 @@ public class Table implements Iterable<Row>, Serializable {
 
   // INSERT Row
   public void insert(Row row) {
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       Entry key = row.getEntries().get(primaryIndex);
       index.put(key, row);
       serialize();
@@ -107,8 +120,8 @@ public class Table implements Iterable<Row>, Serializable {
   // INSERT String
   public void insert(String val) {
     // TODO
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       String[] tmp = val.split(",");
       ArrayList<Entry> entries = new ArrayList<>();
       int i = 0;
@@ -128,8 +141,8 @@ public class Table implements Iterable<Row>, Serializable {
   // DELETE Row
   public void delete(Row row) {
     // TODO
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       Entry key = row.getEntries().get(primaryIndex);
       index.remove(key);
       serialize();
@@ -143,8 +156,8 @@ public class Table implements Iterable<Row>, Serializable {
   // DELETE Entry
   public void delete(Entry entry) {
     // TODO
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       index.remove(entry);
       serialize();
     } catch (Exception e) {
@@ -156,8 +169,8 @@ public class Table implements Iterable<Row>, Serializable {
 
   // DELETE String
   public void delete(String val) {
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       ColumnType columnType = columns.get(primaryIndex).getType();
       Entry primaryEntry = new Entry(getColumnTypeValue(columnType, val));
       index.remove(primaryEntry);
@@ -171,8 +184,8 @@ public class Table implements Iterable<Row>, Serializable {
 
   // DELETE All Row
   public void delete() {
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       index.clear();
       index = new BPlusTree<>();
       serialize();
@@ -184,8 +197,8 @@ public class Table implements Iterable<Row>, Serializable {
   }
 
   public void update(Row oldRow, Row newRow) { // simple implementation
-    lock.writeLock().lock();
     try {
+      lock.writeLock().lock();
       delete(oldRow);
       insert(newRow);
       serialize();
@@ -208,9 +221,9 @@ public class Table implements Iterable<Row>, Serializable {
       }
     }
 
-    lock.writeLock().lock();
     try (ObjectOutputStream objectOutputStream =
         new ObjectOutputStream(new FileOutputStream(meta_file)); ) {
+      lock.writeLock().lock();
       objectOutputStream.writeObject(this);
     } catch (Exception e) {
       System.out.println(e);
@@ -223,9 +236,9 @@ public class Table implements Iterable<Row>, Serializable {
     File meta_file = new File(this.metaPath);
     if (!meta_file.exists()) return; // no file, nothing to recover
 
-    lock.writeLock().lock();
     try (ObjectInputStream objectInputStream =
         new ObjectInputStream(new FileInputStream(meta_file)); ) {
+      lock.writeLock().lock();
       Table restored = (Table) objectInputStream.readObject();
 
       if (restored != null) {
@@ -240,70 +253,70 @@ public class Table implements Iterable<Row>, Serializable {
   }
 
   // Transaction Lock
-  public int acquireReadLock(long session) {
-    int checkFlag = 0; // 返回-1代表加锁失败 返回0代表成功但未加锁 返回1代表成功加锁
-
-    if (lockPriority == 2) {
-      if (writeLockList.contains(session)) { // 自身已经有更高级的锁了 用x锁去读，未加锁
-        checkFlag = 0;
-      } else {
-        checkFlag = -1; // 别的session占用x锁，未加锁
-      }
-    } else if (lockPriority == 1) {
-      if (readLockList.contains(session)) { // 自身已经有s锁了 用s锁去读，未加锁
-        checkFlag = 0;
-      } else {
-        readLockList.add(session); // 其他session加了s锁 把自己加上
-        lockPriority = 1;
-        checkFlag = 1;
-      }
-    } else if (lockPriority == 0) {
-      readLockList.add(session); // 未加锁 把自己加上
-      lockPriority = 1;
-      checkFlag = 1;
-    }
-
-    return checkFlag;
-  }
-
-  public void releaseReadLock(long session) {
-    if (readLockList.contains(session)) {
-      readLockList.remove(session);
-
-      if (readLockList.isEmpty()) {
-        lockPriority = 0;
-      } else {
-        lockPriority = 1;
-      }
-    }
-  }
-
-  public int acquireWriteLock(long session) {
-    int checkFlag = 0; // 返回-1代表加锁失败 返回0代表成功但未加锁 返回1代表成功加锁
-
-    if (lockPriority == 2) {
-      if (writeLockList.contains(session)) { // 自身已经取得x锁
-        checkFlag = 0;
-      } else {
-        checkFlag = -1; // 获取x锁失败
-      }
-    } else if (lockPriority == 1) {
-      checkFlag = -1; // 正在被其他s锁占用
-    } else if (lockPriority == 0) {
-      writeLockList.add(session);
-      lockPriority = 2;
-      checkFlag = 1;
-    }
-
-    return checkFlag;
-  }
-
-  public void releaseWriteLock(long session) {
-    if (writeLockList.contains(session)) {
-      lockPriority = 0;
-      writeLockList.remove(session);
-    }
-  }
+  //  public int acquireReadLock(long session) {
+  //    int checkFlag = 0; // 返回-1代表加锁失败 返回0代表成功但未加锁 返回1代表成功加锁
+  //
+  //    if (lockPriority == 2) {
+  //      if (writeLockList.contains(session)) { // 自身已经有更高级的锁了 用x锁去读，未加锁
+  //        checkFlag = 0;
+  //      } else {
+  //        checkFlag = -1; // 别的session占用x锁，未加锁
+  //      }
+  //    } else if (lockPriority == 1) {
+  //      if (readLockList.contains(session)) { // 自身已经有s锁了 用s锁去读，未加锁
+  //        checkFlag = 0;
+  //      } else {
+  //        readLockList.add(session); // 其他session加了s锁 把自己加上
+  //        lockPriority = 1;
+  //        checkFlag = 1;
+  //      }
+  //    } else if (lockPriority == 0) {
+  //      readLockList.add(session); // 未加锁 把自己加上
+  //      lockPriority = 1;
+  //      checkFlag = 1;
+  //    }
+  //
+  //    return checkFlag;
+  //  }
+  //
+  //  public void releaseReadLock(long session) {
+  //    if (readLockList.contains(session)) {
+  //      readLockList.remove(session);
+  //
+  //      if (readLockList.isEmpty()) {
+  //        lockPriority = 0;
+  //      } else {
+  //        lockPriority = 1;
+  //      }
+  //    }
+  //  }
+  //
+  //  public int acquireWriteLock(long session) {
+  //    int checkFlag = 0; // 返回-1代表加锁失败 返回0代表成功但未加锁 返回1代表成功加锁
+  //
+  //    if (lockPriority == 2) {
+  //      if (writeLockList.contains(session)) { // 自身已经取得x锁
+  //        checkFlag = 0;
+  //      } else {
+  //        checkFlag = -1; // 获取x锁失败
+  //      }
+  //    } else if (lockPriority == 1) {
+  //      checkFlag = -1; // 正在被其他s锁占用
+  //    } else if (lockPriority == 0) {
+  //      writeLockList.add(session);
+  //      lockPriority = 2;
+  //      checkFlag = 1;
+  //    }
+  //
+  //    return checkFlag;
+  //  }
+  //
+  //  public void releaseWriteLock(long session) {
+  //    if (writeLockList.contains(session)) {
+  //      lockPriority = 0;
+  //      writeLockList.remove(session);
+  //    }
+  //  }
 
   // TODO: use?
   private class TableIterator implements Iterator<Row> {

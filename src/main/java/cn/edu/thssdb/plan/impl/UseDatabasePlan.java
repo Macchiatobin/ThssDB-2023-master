@@ -41,10 +41,10 @@ public class UseDatabasePlan extends LogicalPlan {
     return "UseDatabasePlan{" + "databaseName='" + databaseName + '\'' + '}';
   }
 
-  @Override
-  public ExecuteStatementResp execute_plan(long the_session) {
-    return null;
-  }
+  //  @Override
+  //  public ExecuteStatementResp execute_plan(long the_session) {
+  //    return null;
+  //  }
 
   @Override
   public ExecuteStatementResp execute_plan() {

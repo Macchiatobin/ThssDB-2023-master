@@ -19,7 +19,7 @@ public class MultipleQueryTable extends QueryTable implements Iterator<Row> {
   public MultipleQueryTable(ArrayList<Table> tables, MultipleCondition mult_con) {
     super();
     this.tables = tables;
-    this.mult_con_for_join = mult_con;  // 注意这里是给join表依赖的条件赋值，如果不小心写成了给整个where查询条件赋值貌似会join成笛卡尔积
+    this.mult_con_for_join = mult_con; // 注意这里是给join表依赖的条件赋值，如果不小心写成了给整个where查询条件赋值貌似会join成笛卡尔积
     this.row_iterators = new ArrayList<>();
     this.columns = new ArrayList<>();
     this.rows_to_join = new LinkedList<>();

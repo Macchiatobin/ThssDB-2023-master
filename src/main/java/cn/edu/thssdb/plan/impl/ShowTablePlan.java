@@ -15,6 +15,7 @@ public class ShowTablePlan extends LogicalPlan {
     this.tableName = tableName;
   }
 
+  @Override
   public ArrayList<String> getTableName() {
     return new ArrayList<>(Collections.singletonList(this.tableName));
   }
@@ -28,10 +29,10 @@ public class ShowTablePlan extends LogicalPlan {
     return "ShowTablePlan{" + "tableName='" + tableName + '\'' + '}';
   }
 
-  @Override
-  public ExecuteStatementResp execute_plan(long the_session) {
-    return null;
-  }
+  //  @Override
+  //  public ExecuteStatementResp execute_plan(long the_session) {
+  //    return null;
+  //  }
 
   @Override
   public ExecuteStatementResp execute_plan() {

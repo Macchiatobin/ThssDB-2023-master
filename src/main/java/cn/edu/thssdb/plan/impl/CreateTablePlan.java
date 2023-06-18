@@ -7,33 +7,39 @@ import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.utils.StatusUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class CreateTablePlan extends LogicalPlan {
 
   private String tableName;
   private List<Column> columns;
+  private String stmt;
 
-  public CreateTablePlan(String tableName, List<Column> columnList) {
+  public CreateTablePlan(String tableName, List<Column> columnList, String stmt) {
     super(LogicalPlanType.CREATE_TABLE);
     this.tableName = tableName;
     this.columns = columnList;
+    this.stmt = stmt;
   }
 
+  @Override
   public ArrayList<String> getTableName() {
     return new ArrayList<>(Collections.singletonList(this.tableName));
+  }
+
+  @Override
+  public LinkedList<String> getLog() {
+    return new LinkedList<>(Arrays.asList(stmt));
   }
 
   public List<Column> getColumns() {
     return columns;
   }
 
-  @Override
-  public ExecuteStatementResp execute_plan(long the_session) {
-    return null;
-  }
+  //  @Override
+  //  public ExecuteStatementResp execute_plan(long the_session) {
+  //    return null;
+  //  }
 
   @Override
   public ExecuteStatementResp execute_plan() {
@@ -45,6 +51,7 @@ public class CreateTablePlan extends LogicalPlan {
     try {
       List<Column> cList = columns;
       dbForTableCreate.create(tableName, cList.toArray(new Column[cList.size()]));
+      System.out.println("555---:" + Arrays.toString(cList.toArray(new Column[0])));
     } catch (Exception e) {
       return new ExecuteStatementResp(StatusUtil.fail(e.toString()), false);
     }

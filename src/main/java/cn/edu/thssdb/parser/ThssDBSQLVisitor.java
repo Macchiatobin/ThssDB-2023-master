@@ -27,6 +27,10 @@ import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.sql.SQLBaseVisitor;
 import cn.edu.thssdb.sql.SQLParser;
 import cn.edu.thssdb.type.ColumnType;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +42,20 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
   private Manager manager;
   private long session; // TODO: transaction交互
 
-  public ThssDBSQLVisitor(Manager manager) {
+  public ThssDBSQLVisitor() {
     super();
-    this.manager = manager;
+  }
+
+  public String getFullText(ParseTree tree) {
+    ParserRuleContext context = (ParserRuleContext) tree;
+    if (context.children == null) {
+      return "";
+    }
+    Token startToken = context.start;
+    Token stopToken = context.stop;
+    Interval interval = new Interval(startToken.getStartIndex(), stopToken.getStopIndex());
+    String result = context.start.getInputStream().getText(interval);
+    return result;
   }
 
   @Override
@@ -103,7 +118,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
         }
       }
     }
-    return new CreateTablePlan(tableName, columns);
+    return new CreateTablePlan(tableName, columns, getFullText(ctx));
   }
 
   @Override
@@ -117,16 +132,16 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
   }
 
   public LogicalPlan visitBeginTransactionStmt(SQLParser.BeginTransactionStmtContext ctx) {
-    return new BeginTransactionPlan(manager);
+    return new BeginTransactionPlan();
   }
 
   @Override
   public LogicalPlan visitCommitStmt(SQLParser.CommitStmtContext ctx) {
-    return new CommitPlan(manager, getCurDB());
+    return new CommitPlan();
   }
 
   public LogicalPlan visitAutoCommitStmt(SQLParser.AutoCommitStmtContext ctx) {
-    return new AutoCommitPlan(manager, getCurDB());
+    return new AutoCommitPlan();
   }
 
   @Override
@@ -163,7 +178,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
       }
     }
 
-    return new InsertPlan(tableName, columnName, valueEntry, manager);
+    return new InsertPlan(tableName, columnName, valueEntry);
   }
 
   @Override
@@ -178,7 +193,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     }
     String comparator = condition.comparator().getText();
 
-    return new DeletePlan(tableName, attrname, attrvalue, comparator, manager);
+    return new DeletePlan(tableName, attrname, attrvalue, comparator);
   }
 
   @Override
@@ -193,13 +208,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
     String comparator = condition.comparator().getText();
 
     return new UpdatePlan(
-        tableName,
-        set_column_name,
-        set_attr_value,
-        where_attr_name,
-        where_attr_value,
-        comparator,
-        manager);
+        tableName, set_column_name, set_attr_value, where_attr_name, where_attr_value, comparator);
   }
 
   @Override
@@ -209,7 +218,7 @@ public class ThssDBSQLVisitor extends SQLBaseVisitor<LogicalPlan> {
 
   /** 自定义方法 */
   private Database getCurDB() {
-    Database curDB = manager.getCurDB();
+    Database curDB = Manager.getInstance().getCurDB();
     if (curDB == null) {
       throw new NotExistsException(NotExistsException.Database, "obtained from getCurDB()");
     }
