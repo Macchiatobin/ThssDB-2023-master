@@ -9,15 +9,13 @@ import java.util.LinkedList;
 
 public abstract class QueryTable implements Iterator<Row> {
 
-  MultipleCondition multiple_condition;
+  MultipleCondition multiple_condition;  // WHERE给出的查询条件
 
-  public ArrayList<Column> columns;
-  LinkedList<QueryRow> row_queue;
-  boolean first_flag = true;
+  public ArrayList<Column> columns;  // 查询表的列
+  LinkedList<QueryRow> row_queue;  // 查询表的行
+  boolean first_flag = true;  // 查询表的列
 
   QueryTable() {
-    /* TODO */
-    // v1 done
     this.row_queue = new LinkedList<>();
   }
 
@@ -27,8 +25,6 @@ public abstract class QueryTable implements Iterator<Row> {
 
   @Override
   public boolean hasNext() {
-    /* TODO */
-    // v1 done
     if (!row_queue.isEmpty() || first_flag) return true;
     return false;
   }
@@ -36,8 +32,6 @@ public abstract class QueryTable implements Iterator<Row> {
   // return next row
   @Override
   public QueryRow next() {
-    /* TODO */
-    // v1 done
     if (row_queue.isEmpty()) {
       findAndAddNext();
       System.out.println("QueryTable next(): row_queue.isEmpty() -> findAndAddNext done"); // debug
